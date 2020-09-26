@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.public_box_bg{
+			border-color: #3ae2c1;
+			padding: 0;
+		}
+		select{
+			background-color: rgba(0,0,0,0);
+			margin: 0;
+		}
+		select option{
+			background-color: rgba(0,0,0,0);
+			color: #333;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="javascript:;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('转账')}</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box">
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between">
+					<select id="coin_type">
+					  <option value="USDT">USDT</option>
+					  <option value="TTP">TTP</option>
+					</select>
+					<div class="mui-icon mui-icon-arrowdown"></div>
+				</div>
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between">
+					<select id="to_user_id">
+						{volist name="accounts" id="vo"}
+						{if condition="$vo.id != $user_id"}
+						<option value="{$vo.id}">{$vo.nickname}</option>
+						{/if}
+						{/volist}
+					</select>
+					<div class="mui-icon mui-icon-arrowdown"></div>
+				</div>
+				<div class="public_box_bg">
+					<input type="number" id="number" placeholder="{:lang('请输入转账数量')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="level_password" placeholder="{:lang('请输入二级密码')}">
+				</div>
+				<a href="javascript:;" class="a_big_btn a_btn">{:lang('确认转账')}</a>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		// 点击按钮获取选中的值
+		$('.a_btn').click(()=>{
+			var coin_type = $("#coin_type").val();
+			var to_user_id = $("#to_user_id").val();
+			var number = $("#number").val();
+			var level_password = $("#level_password").val();
+			$("#level_password").val('')
+			$.ajax({
+				url: "/index/me/转账提交",
+				type: "post",
+				data: {coin_type: coin_type, to_user_id: to_user_id, number: number, level_password: level_password},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = "/index/me/转账"
+						}, 1000);
+					}
+				}
+			})
+		})
+	</script>
+</body>
+</html>

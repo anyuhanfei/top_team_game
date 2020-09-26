@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/deal.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.mui-pull-right{
+			margin-top: 10px;
+		}
+		.head_color{
+			background-color: rgba(0,0,0,0);
+		}
+		.mill_bg{
+			background: url(/static/index/img/矿机背景@2x.png);
+			background-size: 100% 100%;
+			padding: 20% 0 20% 5%;
+		}
+		.trading_floor{
+			width: 100%;
+		}
+		.trading_floor .mui-control-item.mui-active::before{
+			width: 45px;
+		}
+		.a_btn{
+			width: 80px;
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color" onclick="location.href='/index/me'"></a>
+		<h1 class="mui-title">{:lang('矿机')}</h1>
+		<a href="/index/me/矿机记录" class="mui-pull-right white_color">{:lang('矿机收益')}</a>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="mill_bg">
+				<div>{:lang('矿机数量')}:{$mill_number}</div>
+				<div>{:lang('矿机收益')}:{$mill_earnings} TTP</div>
+			</div>
+			<div class="getRecordTit mui-segmented-control trading_floor">
+				<a href="#get3" class="mui-control-item mui-active">{:lang('运行中')}</a>
+				<a href="#get4" class="mui-control-item">{:lang('已过期')}</a>
+			</div>
+			<!-- 随意切换显示各个方面的内容 -->
+			<div class="getRecordList mui-content-padded">
+				<div id="get3" class="mui-control-content mui-active">
+					{volist name="mills" id="vo"}
+					{if condition="$vo->status == 0"}
+					<div class="public_box_bg">
+						<div class="green_color">{:lang('TTP矿机')}</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('价值')}:{$vo->价值}USDT</div>
+							<div>{:lang('收益')}/{:lang('天')}:{$vo->收益天}TTP</div>
+						</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('预计收益')}:{$vo->预计收益}TTP</div>
+							<div>{:lang('运行周期')}:{$vo->收益周期}{:lang('天')}</div>
+						</div>
+						<div>{:lang('运行时间')}:{$vo->已运行时间}H</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('获得时间')}:{$vo->insert_time}</div>
+						</div>
+					</div>
+					{/if}
+					{/volist}
+				</div>
+				<div id="get4" class="mui-control-content">
+					{volist name="mills" id="vo"}
+					{if condition="$vo->status == 1"}
+					<div class="public_box_bg">
+						<div class="green_color">{:lang('TTP矿机')}</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('价值')}:{$vo->价值}USDT</div>
+							<div>{:lang('收益')}/{:lang('天')}:{$vo->收益天}TTP</div>
+						</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('收益')}:{$vo->预计收益}TTP</div>
+							<div>{:lang('运行周期')}:{$vo->收益周期}{:lang('天')}</div>
+						</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('获得时间')}:{$vo->insert_time}</div>
+						</div>
+					</div>
+					{/if}
+					{/volist}
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/index/js/href_jump.js"></script>
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="/static/index/js/mui.min.js"></script>
+		<link href="/static/index/css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="/static/index/css/public.css" />
+		<link rel="stylesheet" type="text/css" href="/static/index/css/deal.css" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+		</script>
+		<style type="text/css">
+			.trading_floor {
+				width: 35%;
+			}
+
+			.trading_floor .mui-control-item.mui-active::before {
+				width: 45px;
+			}
+
+			.a_btn {
+				background-color: rgba(0, 0, 0, 0);
+				margin: 0;
+				color: #3ae2c1;
+				border: 1px solid #3ae2c1;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav head_color">
+			<a href="/index/deal" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+			<h1 class="mui-title">{:lang('交易记录')}</h1>
+		</header>
+		<div class="mui-content mui-scroll-wrapper content_bg">
+			<div class="mui-scroll">
+				<div class="getRecordTit mui-segmented-control trading_floor">
+					<a href="#get3" class="mui-control-item mui-active">{:lang('挂单中')}</a>
+					<a href="#get4" class="mui-control-item">{:lang('已完成')}</a>
+				</div>
+				<!-- 随意切换显示各个方面的内容 -->
+				<div class="getRecordList mui-content-padded">
+					<div id="get3" class="mui-control-content mui-active">
+						{volist name="deals" id="vo"}
+						{if condition="$vo.status == 0"}
+						<div class="public_box_bg" id="deal{$vo.deal_id}">
+							<div class="green_color">{if condition="$vo.buy_user_id == 0"}{:lang('出售')}{else /}{:lang('购买')}{/if}</div>
+							<div class="flexbox_nowrap flexbox_nowrap_between">
+								<div>{:lang('数量')}:{$vo.TT} TTP</div>
+								<div>{:lang('单价')}:{$vo.price} USDT</div>
+							</div>
+							<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+							<div class="flexbox_nowrap flexbox_nowrap_between">
+								<div>{:lang('订单时间')}:{$vo.insert_time}</div>
+								<a href="javascript:;" class="a_btn" onclick="cancel('{$vo.deal_id}')">{:lang('撤单')}</a>
+							</div>
+						</div>
+						{/if}
+						{/volist}
+						<!-- <div class="public_box_bg">
+							<div class="green_color">求购</div>
+							<div class="flexbox_nowrap flexbox_nowrap_between">
+								<div>数量:10 TTP</div>
+								<div>单价:10 USDT</div>
+							</div>
+							<div>总价:10 USDT</div>
+							<div class="flexbox_nowrap flexbox_nowrap_between">
+								<div>订单时间:2020-01-01 11:11:11</div>
+								<a href="javascript:;" class="a_btn">撤单</a>
+							</div>
+						</div> -->
+					</div>
+					<div id="get4" class="mui-control-content ">
+						{volist name="deals" id="vo"}
+						{if condition="$vo.status == 1"}
+						<div class="public_box_bg">
+							<div class="green_color">{if condition="$vo.buy_user_id == $user_id"}{:lang('买入')}{else /}{:lang('卖出')}{/if}</div>
+							<div>{:lang('对方ID')}: {if condition="$vo.buy_user_id == $user_id"}{$vo.sell_user_id}{else /}{$vo.buy_user_id}{/if}</div>
+							<div>{:lang('数量')}:{$vo.TTP} TTP</div>
+							<div>{:lang('单价')}:{$vo.price} USDT</div>
+							<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+							<div>{:lang('订单时间')}:{$vo.insert_time}</div>
+						</div>
+						{/if}
+						{/volist}
+						<!-- <div class="public_box_bg">
+							<div class="green_color">卖出</div>
+							<div>出售方:15225456442</div>
+							<div>数量:10 TTP</div>
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<div>订单时间:2020-01-01 11:11:11</div>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="/static/index/js/jquery.min.js"></script>
+		<script src="/static/index/js/public.js"></script>
+		<script type="text/javascript">
+			function cancel(deal_id){
+				$.ajax({
+					url: "/index/deal/撤销",
+					type: "post",
+					data: {deal_id: deal_id},
+					success: function(data){
+						data = JSON.parse(data);
+						mui.toast(data.msg);
+						if(data.code == 1){
+							$("#deal" + deal_id).hide();
+						}
+					}
+				})
+			}
+		</script>
+	</body>
+</html>

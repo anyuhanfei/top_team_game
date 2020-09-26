@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.public_box_bg{
+			padding: 0;
+			padding-left: 10px;
+			border-color: #267a6c;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/me/安全" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{if condition="$type == 'p'"}{:lang('修改登录密码')}{else /}{:lang('修改二级密码')}{/if}</h1>
+		<!-- <h1 class="mui-title">修改二级密码</h1> -->
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box input_box">
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_start">
+					<div>{:lang('原密码')}:</div>
+					<input type="password" id="old_password" placeholder="{:lang('请输入')}">
+				</div>
+			</div>
+			<div class="public_box input_box">
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_start">
+					<div>{:lang('新密码')}:</div>
+					<input type="password" id="password" placeholder="{:lang('请输入')}">
+				</div>
+			</div>
+			<div class="public_box input_box">
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_start">
+					<div>{:lang('确认密码')}:</div>
+					<input type="password" id="password_confirm" placeholder="{:lang('请输入')}">
+				</div>
+			</div>
+			<a href="javascript:;" class="a_btn a_big_btn">{:lang('提交')}</a>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		$(".a_big_btn").click(function(){
+			var old_password = $("#old_password").val();
+			var password = $("#password").val();
+			var password_confirm = $("#password_confirm").val();
+			$.ajax({
+				url: "/index/me/修改密码提交",
+				type: "post",
+				data: {type: "{$type}", old_password: old_password, password: password, password_confirm: password_confirm},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						$("#old_password").val('');
+						$("#password").val('');
+						$("#password_confirm").val('');
+					}
+				}
+			})
+		})
+	</script>
+</body>
+</html>

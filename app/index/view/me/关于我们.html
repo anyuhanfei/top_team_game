@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="/static/index/js/mui.min.js"></script>
+		<link href="/static/index/css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="/static/index/css/public.css" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+		</script>
+		<style type="text/css">
+			.public_box_bg {
+				padding: 0;
+				border-color: #3ae2c1;
+				height: 100%;
+			}
+			.content_overflow {
+				top: 25px;
+				width: 90%;
+				margin:0 5%;
+			}
+			.about_count img{
+				width: 100%;
+				height: 120px;
+			}
+		</style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav head_bg">
+			<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+			<h1 class="mui-title">{:lang('关于我们')}</h1>
+		</header>
+		<div class="mui-content mui-scroll-wrapper content_bg">
+			<div class="public_box_bg public_box">
+				<div class=" mui-scroll-wrapper content_overflow">
+					<div class="mui-scroll ">
+						<div class="about_count">
+							{$content | raw}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="/static/index/js/jquery.min.js"></script>
+		<script src="/static/index/js/public.js"></script>
+		<script>
+		</script>
+	</body>
+</html>

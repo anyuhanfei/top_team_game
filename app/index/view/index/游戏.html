@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/game.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.tickets_bg{
+			background: url(/static/index/img/tickets_bg.png);
+			background-size: 100% 100%;
+			grid-template-columns:1fr 2fr 1fr;
+			margin: 0;
+			margin-bottom: 20px;
+		}
+		.grid_box_item{
+			padding: 15px 0;
+		}
+		.grid_box_item div{
+			color: #000
+		}
+		.grid_box_item .buy_btn{
+			width: 62px;
+			color: #fff;
+			margin: 7px 0;
+			margin-bottom: 0;
+			border-radius: 50px;
+			background-color: #000;
+		}
+		.message_reply{
+			height: 195px;
+		}
+		.game_show{
+			display: none;
+		}
+		.public_box input{
+			width: 100%;
+			border: 1px solid #eee;
+			margin: 10px 0;
+		}
+		.public_box .close,.public_box .yes{
+			width: 85px;
+			margin: 0;
+			border: 1px solid #eee;
+		}
+		.public_box .close{
+			color: #fff;
+			background-color: rgba(0,0,0,0);
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_top">
+		<!-- <a href="my.html" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a> -->
+		<!-- <h1 class="mui-title">游戏</h1> -->
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="game_top_bg">
+				<a href="/index/游戏记录" class="game-right white_color">
+					<img src="/static/index/img/参团明细@2x.png" class="img_size">
+					<span>{:lang("参团明细")}</span>
+				</a>
+				<div class="mui-text-center center_padding">
+					<div>{:lang("今日总局数")}</div>
+					<h4 class="public_padding">{$usercount->今日最大局数}</h4>
+				</div>
+				<div class="grid_box">
+					<div class="mui-text-center">{:lang("已完局数")}:{$usercount->今日局数}</div>
+					<div class="mui-text-center">{:lang("任务局数")}: <span class="green_color">{$rw}</span> </div>
+				</div>
+			</div>
+			<div class="border_bot">
+				<div class="public_box">
+					<div class="tickets_bg grid_box">
+						<div></div>
+						<div class="grid_box_item">
+							<div>{:lang("我的门票")}</div>
+							<div>{if condition="$user->usercount->has_门票 == 1"}{:lang("购买")}:{$user->usercount->门票购买_time}{/if}</div>
+							<div>{if condition="$user->usercount->has_门票 == 1"}{:lang("剩余时间")}: <?php echo ceil((strtotime($user->usercount->门票购买_time) + (7 * 86400) - time()) / (60 * 60 * 24)); ?>{:lang("天")}{/if}</div>
+						</div>
+						<div class="grid_box_item">
+							{if condition="$user->usercount->has_门票 == 1"}
+							{else /}
+							<a href="javascript:;" class="a_btn buy_btn">{:lang("购买")}</a>
+							{/if}
+						</div>
+					</div>
+					<h4>{:lang("选择质押金额")} <span>({:lang("自动参加")})</span> </h4>
+					<div class="flexbox_nowrap">
+						<div class="flexbox_check">
+						<label for="aa">
+							<input id="aa" name="pledge" value="20" type="radio">
+							<div class="radio_box">20USDT</div>
+						</label>
+						</div>
+						<div class="flexbox_check">
+						<label for="bbb">
+							<input id="bbb" name="pledge" value="100" type="radio">
+							<div class="radio_box">100USDT</div>
+						</label>
+						</div>
+						<div class="flexbox_check">
+						<label for="c">
+							<input id="c" name="pledge" value="200" type="radio">
+							<div class="radio_box">200USDT</div>
+						</label>
+						</div>
+					</div>
+					<a href="javascript:;" class="a_big_btn a_btn" id="auto">{:lang("确认质押")}</a>
+				</div>
+			</div>
+			<div class="public_box">
+				<a href="javascript:;" class="a_big_btn a_btn btn_join">{:lang("直接参加")}</a>
+			</div>
+		</div>
+	</div>
+	<div class="mui-backdrop game_show">
+		<div class="message_reply">
+			<div class="message_reply_title mui-text-center">
+				<h4>{:lang("购买门票")} <span>({:lang("有效期")}{$day}{:lang("天")})</span>{:lang("需支付")} </h4>
+			</div>
+			<div class="message_reply_content">
+				<h4 class="green_color mui-text-center">{$price} TTP</h4>
+				<div class="input_box public_box">
+						<input type="password" id="level_password" placeholder="{:lang('请输入二级密码')}">
+					<div class="flexbox_nowrap flexbox_nowrap_between">
+						<a href="javascript:;" class="a_btn close">{:lang("取消")}</a>
+						<a href="javascript:;" class="a_btn yes">{:lang("确定")}</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<nav class="mui-bar mui-bar-tab nav_bg">
+	    <a href="/" target="_blank" class="mui-tab-item ">
+			<span class="mui-icon iconfont icon_1"></span>
+	        <span class="mui-tab-label">{:lang("首页")}</span>
+	    </a>
+	    <a href="/index/游戏" target="_blank" class="mui-tab-item mui-active">
+	        <span class="mui-icon iconfont icon_2"></span>
+	        <span class="mui-tab-label">{:lang("游戏")}</span>
+	    </a>
+		<a href="/index/deal" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_3"></span>
+		    <span class="mui-tab-label">{:lang("交易")}</span>
+		</a>
+		<a href="/index/me" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_4"></span>
+		    <span class="mui-tab-label">{:lang("我的")}</span>
+		</a>
+	</nav>
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		$('.flexbox_check').click(function(){
+			let aa=$('input[name="pledge"]:checked').val();
+			console.log(aa)
+		})
+		$('.buy_btn').click(()=>{
+			$('.game_show').show()
+		})
+		$('.close').click(function(){
+			$('.game_show').hide()
+		})
+		$('.yes').click(function(){
+			$('.game_show').hide()
+			var level_password = $("#level_password").val()
+			$("#level_password").val('')
+			$.ajax({
+				url: "/index/购买门票",
+				type: "post",
+				data: {level_password: level_password},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = "/index/游戏";
+						}, 500);
+					}
+				}
+			})
+		})
+
+		$("#auto").click(function(){
+			let usdt=$('input[name="pledge"]:checked').val();
+			$.ajax({
+				url: "/index/游戏/自动参与",
+				type: "post",
+				data: {usdt: usdt},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+				}
+			})
+		})
+
+		$(".btn_join").click(function(){
+			$.ajax({
+				url: "/index/游戏/手动参与",
+				type: "post",
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+				}
+			})
+		})
+	</script>
+</body>
+</html>

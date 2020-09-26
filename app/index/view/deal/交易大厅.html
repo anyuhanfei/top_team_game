@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/deal.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+</head>
+<body>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box">
+				<div class="flexbox_nowrap flexbox_nowrap_between head_box">
+					<div class="flexbox_nowrap">
+						<img src="/static/index/img/ETH.png" class="img_size">
+						<h4>TTP/ <span>USDT</span> </h4>
+					</div>
+					<a href="/index/deal/交易记录">{:lang('交易记录')}</a>
+				</div>
+				<div class="getRecordTit mui-segmented-control">
+					<a href="#get1" class="mui-control-item mui-active">{:lang('买入')}</a>
+					<a href="#get2" class="mui-control-item">{:lang('卖出')}</a>
+				</div>
+				<!-- 随意切换显示各个方面的内容 -->
+				<div class="getRecordList mui-content-padded">
+					<div id="get1" class="mui-control-content mui-active">
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<div>{:lang('数量')}:</div>
+							<input type="number" value="0" id="buy_number">
+							<div class="green_color">TT</div>
+						</div>
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<div>{:lang('单价')}:</div>
+							<input type="number" value="{$usdt2tt}" style="width: 75%;" readonly>
+							<div class="green_color">USDT</div>
+						</div>
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<input type="password" id="buy_level_password" placeholder="{:lang('请输入二级密码')}">
+						</div>
+						<a href="javascript:;" class="a_big_btn a_btn" id="buy">{:lang('买入')}</a>
+					</div>
+					<div id="get2" class="mui-control-content">
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<div>{:lang('数量')}:</div>
+							<input type="number" value="0" id="sell_number">
+							<div class="green_color">TT</div>
+						</div>
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<div>{:lang('单价')}:</div>
+							<input type="number" value="{$usdt2tt}" style="width: 75%;" readonly>
+							<div class="green_color">USDT</div>
+						</div>
+						<div class="input_box flexbox_nowrap flexbox_nowrap_start">
+							<input type="password" id="sell_level_password" placeholder="{:lang('请输入二级密码')}">
+						</div>
+						<a href="javascript:;" class="a_big_btn a_btn" id="sell">{:lang('卖出')}</a>
+					</div>
+				</div>
+				<div class="flexbox_nowrap flexbox_nowrap_between public_padding">
+					<div class="green_color">{:lang('交易大厅')}</div>
+					<a href="/index/deal/交易单" class="green_color">{:lang('查看全部')}</a>
+				</div>
+				<div class="getRecordTit mui-segmented-control trading_floor">
+					<a href="#get3" class="mui-control-item mui-active">{:lang('买入')}</a>
+					<a href="#get4" class="mui-control-item">{:lang('卖出')}</a>
+				</div>
+				<!-- 随意切换显示各个方面的内容 -->
+				<div class="getRecordList mui-content-padded">
+					<div id="get3" class="mui-control-content mui-active">
+						{volist name="deals" id="vo"}
+						{if condition="$vo.buy_user_id == 0"}
+						<div class="public_box_bg" id="deal{$vo.deal_id}">
+							<div>{:lang('数量')}:{$vo.TT} TTP</div>
+							<div class="grid_box">
+								<div>{:lang('单价')}:{$vo.price} USDT</div>
+								<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+								<a href="javascript:;" class="a_btn" onclick="deal('{$vo.deal_id}')">{:lang('购买')}</a>
+							</div>
+						</div>
+						{/if}
+						{/volist}
+						<!-- <div class="public_box_bg">
+							<div>数量:10 TTP</div>
+							<div class="grid_box">
+								<div>单价:10 USDT</div>
+								<div>总价:10 USDT</div>
+								<a href="javascript:;" class="a_btn">购买</a>
+							</div>
+						</div> -->
+					</div>
+					<div id="get4" class="mui-control-content">
+						{volist name="deals" id="vo"}
+						{if condition="$vo.sell_user_id == 0"}
+						<div class="public_box_bg" id="deal{$vo.deal_id}">
+							<div>{:lang('数量')}:{$vo.TT} TTP</div>
+							<div class="grid_box">
+								<div>{:lang('单价')}:{$vo.price} USDT</div>
+								<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+								<a href="javascript:;" class="a_btn" onclick="deal('{$vo.deal_id}')">{:lang('出售')}</a>
+							</div>
+						</div>
+						{/if}
+						{/volist}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="mui-backdrop sell_show">
+		<div class="message_reply">
+			<div class="message_reply_title mui-text-right">
+				<div class="mui-text-center">确认订单</div>
+			</div>
+			<div class="message_reply_content public_box">
+				<div>数量:10 TTP</div>
+				<div>单价:10 USDT</div>
+				<div>总价:100 USDT</div>
+				<input type="password" placeholder="请输入二级密码">
+				<div class="flexbox_nowrap flexbox_nowrap_between public_padding">
+					<a href="javascript:;" class="a_btn close">取消</a>
+					<a href="javascript:;" class="a_btn yes">确定</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<nav class="mui-bar mui-bar-tab nav_bg">
+	    <a href="/" target="_blank" class="mui-tab-item ">
+			<span class="mui-icon iconfont icon_1"></span>
+	        <span class="mui-tab-label">{:lang('首页')}</span>
+	    </a>
+	    <a href="/index/游戏" target="_blank" class="mui-tab-item ">
+	        <span class="mui-icon iconfont icon_2"></span>
+	        <span class="mui-tab-label">{:lang('游戏')}</span>
+	    </a>
+		<a href="/index/deal" target="_blank" class="mui-tab-item mui-active">
+		    <span class="mui-icon iconfont icon_3"></span>
+		    <span class="mui-tab-label">{:lang('交易')}</span>
+		</a>
+		<a href="/index/me" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_4"></span>
+		    <span class="mui-tab-label">{:lang('我的')}</span>
+		</a>
+	</nav>
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/layer/layer.js"></script>
+	<style>
+		.layui-layer-content {
+			color:black;
+		}
+	</style>
+	<script type="text/javascript">
+		$('.sell').click(()=>{
+			$('.sell_show').show()
+		})
+		$('.close').click(()=>{
+			$('.sell_show').hide()
+		})
+		$('.yes').click(()=>{
+			$('.sell_show').hide()
+		})
+
+		$("#buy").click(function(){
+			var number = $("#buy_number").val();
+			var level_password = $("#buy_level_password").val();
+			$("#buy_level_password").val('');
+			$.ajax({
+				url: "/index/deal/挂单",
+				type: "post",
+				data: {type: 'buy', number: number, level_password: level_password},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						var str = '<div class="public_box_bg">'
+						str += '<div>数量:' + number + ' TTP</div>'
+						str += '<div class="grid_box">'
+						str += '<div>单价:' + "{$usdt2tt}" + ' USDT</div>'
+						str += '<div>总价:' + number * parseFloat("{$usdt2tt}") + ' USDT</div>'
+						str += "</div>"
+						str += "</div>"
+						$("#get4").html(str + $("#get4").html())
+					}
+				}
+			})
+		})
+
+		$("#sell").click(function(){
+			var number = $("#sell_number").val();
+			var level_password = $("#sell_level_password").val();
+			$("#sell_level_password").val('');
+			$.ajax({
+				url: "/index/deal/挂单",
+				type: "post",
+				data: {type: 'sell', number: number, level_password: level_password},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						var str = '<div class="public_box_bg">'
+						str += '<div>数量:' + number + ' TTP</div>'
+						str += '<div class="grid_box">'
+						str += '<div>单价:' + "{$usdt2tt}" + ' USDT</div>'
+						str += '<div>总价:' + number * parseFloat("{$usdt2tt}") + ' USDT</div>'
+						str += "</div>"
+						str += "</div>"
+						$("#get3").html(str + $("#get3").html())
+					}
+				}
+			})
+		})
+
+		function deal(deal_id){
+			layer.confirm('是否确认交易?', {
+				btn: ['确定','取消'] //按钮
+			}, function(){
+				layer.closeAll();
+				$.ajax({
+					url: "/index/deal/交易",
+					type: "post",
+					data: {deal_id: deal_id},
+					success: function(data){
+						data = JSON.parse(data)
+						mui.toast(data.msg);
+						if(data.code == 1){
+							$("#deal" + deal_id).hide();
+						}
+					}
+				})
+			});
+		}
+	</script>
+</body>
+</html>

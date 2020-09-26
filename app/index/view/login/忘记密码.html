@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/login.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.public_box_bg{
+			padding: 0;
+		}
+		.wrold_box{
+			padding: 10px;
+		}
+		.wrold_box textarea{
+			background-color: rgba(0,0,0,0);
+			display: block;
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box">
+				<a href="login.html" class="flexbox_nowrap flexbox_nowrap_start public_padding">
+					<div class="mui-icon mui-icon-left-nav"></div>
+					<h4>{:lang("忘记密码")}?</h4>
+				</a>
+				<div class="head_box">
+					<img src="/static/index/img/分红@2x.png" class="head_img">
+					<div class="title"> <span class="green_color mui-text-center">TOP</span>TEAE </div>
+				</div>
+				<div class="public_box_bg wrold_box">
+					<div>{:lang("助记词")}({:lang("请按照依次填写助记词")})</div>
+					<textarea name="" rows="5" maxlength="150" id="助记词" style="font-size: 15px;"></textarea>
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="password" placeholder="{:lang('请设置登录密码')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="password_confirm" placeholder="{:lang('确认登录密码')}">
+				</div>
+				<a href="javascript:;" class="a_btn a_big_btn">{:lang("提交")}</a>
+				
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		$(".a_big_btn").click(function(){
+			var 助记词 = $("#助记词").val();
+			var password = $("#password").val();
+			var password_confirm = $("#password_confirm").val();
+			$.ajax({
+				url: "/index/忘记密码提交",
+				type: "post",
+				data: {助记词: 助记词, password: password, password_confirm: password_confirm},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = '/index/登录'
+						}, 1000);
+					}
+				}
+			})
+		})
+	</script>
+</body>
+</html>

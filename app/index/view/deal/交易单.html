@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/deal.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.mui-pull-right{
+			margin-top: 10px;
+		}
+		.trading_floor {
+			width: 35%;
+		}
+		
+		.a_btn {
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/deal" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('交易大厅')}</h1>
+		<a href="/index/deal/交易记录" class="mui-pull-right white_color">{:lang('交易记录')}</a>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="getRecordTit mui-segmented-control trading_floor">
+				<a href="#get3" class="mui-control-item mui-active">{:lang('买入')}</a>
+				<a href="#get4" class="mui-control-item">{:lang('卖出')}</a>
+			</div>
+			<!-- 随意切换显示各个方面的内容 -->
+			<div class="getRecordList mui-content-padded">
+				<div id="get3" class="mui-control-content mui-active">
+					{volist name="deals" id="vo"}
+					{if condition="$vo.buy_user_id == 0"}
+					<div class="public_box_bg" id="deal{$vo.deal_id}">
+						<div>{:lang('数量')}:{$vo.TT} TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('单价')}:{$vo.price} USDT</div>
+							<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+							<a href="javascript:;" class="a_btn" onclick="deal('{$vo.deal_id}')">{:lang('购买')}</a>
+						</div>
+					</div>
+					{/if}
+					{/volist}
+					<!-- <div class="public_box_bg">
+						<div>数量:10 TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<a href="javascript:;" class="a_btn">购买</a>
+						</div>
+					</div> -->
+				</div>
+				<div id="get4" class="mui-control-content ">
+					{volist name="deals" id="vo"}
+					{if condition="$vo.sell_user_id == 0"}
+					<div class="public_box_bg" id="deal{$vo.deal_id}">
+						<div>{:lang('数量')}:{$vo.TT} TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('单价')}:{$vo.price} USDT</div>
+							<div>{:lang('总价')}:{$vo.USDT} USDT</div>
+							<a href="javascript:;" class="a_btn" onclick="deal('{$vo.deal_id}')">{:lang('卖出')}</a>
+						</div>
+					</div>
+					{/if}
+					{/volist}
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/layer/layer.js"></script>
+	<style>
+		.layui-layer-content {
+			color:black;
+		}
+	</style>
+	<script type="text/javascript">
+		function deal(deal_id){
+			layer.confirm("{:lang('是否确认交易?')}", {
+				btn: ["{:lang('确定')}","{:lang('取消')}"] //按钮
+			}, function(){
+				layer.closeAll();
+				$.ajax({
+					url: "/index/deal/交易",
+					type: "post",
+					data: {deal_id: deal_id},
+					success: function(data){
+						data = JSON.parse(data)
+						mui.toast(data.msg);
+						if(data.code == 1){
+							$("#deal" + deal_id).hide();
+						}
+					}
+				})
+			});
+		}
+	</script>
+</body>
+</html>

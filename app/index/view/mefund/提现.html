@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.public_box_bg{
+			border-color: #3ae2c1;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="javascript:;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('提币')}</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box">
+				<div class="public_box_bg">
+					<input type="text" value="{$user->$type}" readonly>
+				</div>
+				<div class="public_box_bg">
+					<input type="number" id="number" value="0" placeholder="{:lang('请输入数量')}" >
+				</div>
+				<div class="mui-text-right">{:lang('可用余额')}:<i class="coin">{$user->userfund->$type}</i>{$type}</div>
+				<div class="public_box_bg">
+					<input type="password" id="level_password" value="" placeholder="{:lang('请输入二级密码')}">
+				</div>
+				<div class="mui-text-right">{:lang('矿工费')}:{$fee}%</div>
+				<a href="javascript:;" class="a_btn a_big_btn">{:lang('确认提币')}</a>
+			</div>
+		</div>
+	</div>
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		$(".a_big_btn").click(function(){
+			var number = $("#number").val();
+			var level_password = $("#level_password").val();
+			$("#level_password").val('')
+			$.ajax({
+				url: "/index/me/提现提交",
+				type: "post",
+				data: {number: number, level_password: level_password, type: "{$type}"},
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = "/index/me/提现";
+						}, 1000);
+					}
+				}
+			})
+		})
+	</script>
+</body>
+</html>

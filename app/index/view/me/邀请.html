@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.content_bg{
+			margin-top: 44px;
+			background-image: url(/static/index/img/邀请好友_02.png);
+			background-size: 100% 100%;
+		}
+		.invite_img{
+			width: 120px;
+			display: block;
+		}
+		.flexbox_nowrap{
+			margin: 10px;
+			margin-top: 80%;
+			padding: 10%;
+			border-radius: 5px;
+			border: 1px solid #267a6c;
+			background-color: #000000;
+		}
+		.flexbox_nowrap_between input{
+			width: 100px;
+			margin: 0 auto;
+			text-align: center;
+			padding: 0;
+			color: #3ae2c1;
+			background-color: rgba(0,0,0,0);
+		}
+		.a_btn{
+			margin-top: 10px;
+			width: 90px;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('邀请好友')}</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="flexbox_nowrap flexbox_nowrap_between">
+				<img src="{$user.invite_qrcode}" class="invite_img">
+				<div class="mui-text-center">
+					<div class="green_color">{:lang('邀请码')}</div>
+					<input type="text" value="{$user.invite_code}" id="taokouling">
+					<!-- <a href="javascript:;" class="a_btn">复制邀请码</a> -->
+					<!-- <textarea name=""  id="taokouling" rows="5" maxlength="50" value="" style="font-size: 15px;">啊啊啊啊</textarea> -->
+					<a href="javascript:;" id="copyCode" class="a_btn a_big_btn" data-clipboard-target="#taokouling" data-clipboard-action="copy">{:lang('复制邀请码')}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/index/js/code.js"></script>
+	<script type="text/javascript">
+		// 复制
+		var clipboard = new Clipboard('.a_btn');
+		    clipboard.on('success', function(e){
+		        console.log(e);
+				mui.toast("{:lang('复制成功')}");
+		        document.getElementById('taokouling').blur();
+		    });
+		    clipboard.on('error', function(e){
+				mui.toast("{:lang('复制失败，请长按复制')}");
+		    });
+	</script>
+</body>
+</html>

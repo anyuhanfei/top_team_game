@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.my_top_bg {
+			width: 100%;
+			background: url(/static/index/img/我的背景@2x.png);
+			background-size: 100% 100%;
+		}
+		
+		.my_top {
+			width: 80%;
+			margin: 10%;
+			margin-top: 15px;
+			padding-bottom: 5%;
+		}
+		.full_btn,.put_btn{
+			width: 80px;
+			background-color: rgba(0,0,0,0);
+			margin: 10px 10px;
+		}
+		.full_btn{
+			margin-left: 0;
+			color: #3ae2c1;
+			border: 1px solid #3ae2c1;
+		}
+		.put_btn{
+			border: 1px solid #eee;
+			color: #fff;
+		}
+		
+		.my_info {
+			padding-left: 20px;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/me/资产" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{$coin_type}</h1>
+		<!-- <h1 class="mui-title">TTP</h1> -->
+		<!-- <h1 class="mui-title">TTA</h1> -->
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="my_top_bg">
+				<div class=" my_top">
+					<div>{:lang('可用金额')}:{$coin_amount}</div>
+					<div class="flexbox_nowrap flexbox_nowrap_start">
+						{if condition="$coin_type == 'USDT'"}
+						<a href="/index/me/充值" class="a_btn full_btn">{:lang('充币')}</a>
+						<a href="/index/me/提现?type=USDT" class="a_btn put_btn">{:lang('提币')}</a>
+						{elseif condition="$coin_type == 'TTA'"}
+						<a href="/index/me/充值" class="a_btn full_btn">{:lang('充币')}</a>
+						{elseif condition="$coin_type == 'TTP'"}
+						<a href="/index/me/充值" class="a_btn full_btn">{:lang('充币')}</a>
+						<a href="/index/me/提现?type=TTP" class="a_btn put_btn">{:lang('提币')}</a>
+						<a href="/index/deal" class="a_btn put_btn">{:lang('交易')}</a>
+						{elseif condition="$coin_type == '能量石'"}
+						<a href="/index/me/兑换" class="a_btn full_btn">{:lang('兑换')}</a>
+						{/if}
+					</div>
+				</div>
+			</div>
+			<div class="public_box">
+				<div class="flexbox_nowrap flexbox_nowrap_start">
+					<img src="/static/index/img/收支明细@2x.png" class="img_size">
+					<div class="green_color">{:lang('收支明细')}</div>
+				</div>
+				{volist name="log" id="vo"}
+				<div class="public_box_bg">
+					<div class="flexbox_nowrap flexbox_nowrap_between">
+						<div class="green_color">{:lang($vo.fund_type)}</div>
+						<div class="green_color">{if condition="$vo.fund_type != '转账'"}{:lang($vo.content)}{/if}</div>
+					</div>
+					<div>{:lang('数量')}:{$vo.number}</div>
+					<div>{:lang('时间')}:{$vo.insert_time}</div>
+				</div>
+				{/volist}
+			</div>
+		</div>
+	</div>
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

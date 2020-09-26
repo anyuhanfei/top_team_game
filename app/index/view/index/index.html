@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/swiper.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/index.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.green_color{
+			font-size: 17px;
+		}
+		.img_big_size{
+			margin: auto;
+		}
+		.type_box{
+			margin-left: 30px;
+			height: 42px;
+		}
+		.grid_box{
+			grid-template-columns: 1fr 1fr 7fr;
+			margin: 10px;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_bg">
+		<h1 class="mui-title"><span class="green_color">TOP</span>TEAM</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="scroll_bg">
+				<div class="swiper-container">
+					<!-- 轮播 -->
+				    <div class="swiper-wrapper">
+						{volist name="banners" id="vo"}
+				        <div class="swiper-slide">
+							<img src="{$vo.image}"/>
+						</div>
+						{/volist}
+				    </div>
+				</div>
+				<a href="javascript:;" class="notice_box">
+					<div class="grid_box">
+						<img src="/static/index/img/公告@2x.png" class="img_size">
+						<span class="white_color">{:lang("公告")}:</span>
+						<marquee id="pmd" class="white_color" direction="left" scrolldelay="90" width="85%" vspace="1">{$notice}</marquee>
+					</div>
+				</a>
+			</div>
+			<div class="public_box">
+				<div class="mui-row">
+					<a href="/index/游戏" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/游戏.png" class="img_big_size">
+						<div>{:lang("游戏")}</div>
+					</a>
+					<a href="/index/me/资产" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/资产@2x.png" class="img_big_size">
+						<div>{:lang("资产")}</div>
+					</a>
+					<a href="/index/me/矿机" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/矿机@2x.png" class="img_big_size">
+						<div>{:lang("矿机")}</div>
+					</a>
+					<a href="/index/me/收益记录" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/分红@2x.png" class="img_big_size">
+						<div>{:lang("分红")}</div>
+					</a>
+				</div>
+				<div class="mui-row public_padding">
+					<a href="/index/游戏记录" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/玩家收益@2x.png" class="img_big_size">
+						<div>{:lang("玩家收益")}</div>
+					</a>
+					<a href="/index/me/转账" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/转账@2x.png" class="img_big_size">
+						<div>{:lang("转账")}</div>
+					</a>
+					<a href="/index/me/coin/能量石" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/能量石@2x.png" class="img_big_size">
+						<div>{:lang("能量石")}</div>
+					</a>
+					<a href="/index/更多" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
+						<img src="/static/index/img/更多@2x.png" class="img_big_size">
+						<div>{:lang("更多")}</div>
+					</a>
+				</div>
+				<div id="echart" style="width: 100%;height: 180px;"></div>
+			</div>
+			<div>
+				<span class="green_color green_bot">{:lang("行情")}</span>
+			</div>
+			<div class="mui-row public_padding">
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div>{:lang("币种")}</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div>{:lang("最新价")}</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div>{:lang("24H涨幅")}</div>
+				</div>
+			</div>
+			<div class="mui-row public_padding border_bot">
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
+						<img src="/static/index/img/ETH.png" class="img_size">
+						<div>{$btc->coin}</div>
+					</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
+						<div>${$btc->last_number}</div>
+					</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<a href=""class="a_btn {if condition='$btc.vol > 0'}{else /}a_btn_danger{/if}">{if condition="$btc.vol > 0"}+{else /}-{/if}{$btc->vol}%</a>
+				</div>
+			</div>
+			<div class="mui-row public_padding border_bot">
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
+						<img src="/static/index/img/BTC.png" class="img_size">
+						<div>{$eth->coin}</div>
+					</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
+						<div>${$eth->last_number}</div>
+					</div>
+				</div>
+				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
+					<a href=""class="a_btn {if condition='$eth.vol > 0'}{else /}a_btn_danger{/if}">{if condition="$eth.vol > 0"}+{else /}-{/if}{$eth->vol}%</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<nav class="mui-bar mui-bar-tab nav_bg">
+	    <a href="/" target="_blank" class="mui-tab-item mui-active">
+			<span class="mui-icon iconfont icon_1"></span>
+	        <span class="mui-tab-label">{:lang("首页")}</span>
+	    </a>
+	    <a href="/index/游戏" target="_blank" class="mui-tab-item">
+	        <span class="mui-icon iconfont icon_2"></span>
+	        <span class="mui-tab-label">{:lang("游戏")}</span>
+	    </a>
+		<a href="/index/deal" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_3"></span>
+		    <span class="mui-tab-label">{:lang("交易")}</span>
+		</a>
+		<a href="/index/me" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_4"></span>
+		    <span class="mui-tab-label">{:lang("我的")}</span>
+		</a>
+	</nav>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/index/js/swiper.js"></script>
+	<script src="/static/index/js/echarts.min.js"></script>
+	<script type="text/javascript">
+		// 基于准备好的dom，初始化echarts实例
+		var myChart = echarts.init(document.getElementById('echart'));
+		option = {
+		    title: {
+		        text: '{:lang("TTP趋势图")}',
+		        left: 'center',
+		        textStyle:{
+		            color:'#fff'
+		        }
+		    },
+		    grid: {
+		        top:'20%',
+		        left: '3%',
+		        right: '4%',
+		        bottom: '5%',
+		        containLabel: true
+		    },
+		    xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: ["{$tt_prices[6]['id']}", "{$tt_prices[5]['id']}", "{$tt_prices[4]['id']}", "{$tt_prices[3]['id']}", "{$tt_prices[2]['id']}", "{$tt_prices[1]['id']}", "{$tt_prices[0]['id']}"],
+				axisLabel: {
+							textStyle: {
+								color: '#fff'
+							}
+						}
+		    },
+		    yAxis: {
+		        type: 'value',
+				axisLabel: {
+							textStyle: {
+								color: '#fff'
+							}
+						}
+		    },
+		    
+		    series: [{
+		        data: ["{$tt_prices[6]['price']}", "{$tt_prices[5]['price']}", "{$tt_prices[4]['price']}", "{$tt_prices[3]['price']}", "{$tt_prices[2]['price']}", "{$tt_prices[1]['price']}", "{$tt_prices[0]['price']}"],
+		        type: 'line',
+		        areaStyle: {},
+		        itemStyle:{ 
+		            normal:{ 
+		              color:'#06fffd', //折点颜色
+		              lineStyle:{ 
+		                 color:'#06fffd' //折线颜色
+		                      } 
+		             } 
+		       }
+		    }]
+		};
+		// 使用刚指定的配置项和数据显示图表。
+		myChart.setOption(option);
+		
+		// $('.mui-icon-closeempty').click(function(){
+		// 	$('.rule_show').hide()
+		// })
+		// $('.mui-pull-right').click(function(){
+		// 	$('.rule_show').show()
+		// })
+		var swiper = new Swiper('.swiper-container', {
+		      spaceBetween: 0,//每个轮播图的外边距大小  0为无缝移动
+		      centeredSlides: true,
+			  loop:true,
+		      autoplay: {
+		        delay: 2500,
+		        disableOnInteraction: false,
+		      },
+		      pagination: {
+		        el: '.swiper-pagination',
+		        clickable: true,
+		      }
+		    });
+	</script>
+</body>
+</html>

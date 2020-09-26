@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/login.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.public_box_bg{
+			padding: 0;
+		}
+		.wrap_wrold{
+			flex-wrap: wrap;
+			justify-content: flex-start;
+		}
+		.wrap_wrold div{
+			text-align: center;
+			width: 50px;
+		}
+		.wrold_box{
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="public_box">
+				<a href="login.html" class="flexbox_nowrap flexbox_nowrap_start public_padding">
+					<div class="mui-icon mui-icon-left-nav"></div>
+					<h4>{:lang('注册')}</h4>
+				</a>
+				<div class="head_box">
+					<img src="/static/index/img/分红@2x.png" class="head_img">
+					<div class="title"> <span class="green_color mui-text-center">TOP</span>TEAE </div>
+				</div>
+				<div class="public_box_bg wrold_box">
+					<div>{:lang('助记词')}({:lang('助记词用于恢复登录二级密码,请将它按顺序准确写道纸上,并妥善保管。')})</div>
+					<!-- <div class="public_box"> -->
+						<div class="flexbox_nowrap wrap_wrold">
+							{$z}
+						</div>
+					<!-- </div> -->
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="password" placeholder="{:lang('请设置登录密码')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="password_confirm" placeholder="{:lang('确认登录密码')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="level_password" placeholder="{:lang('请设置二级密码')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="password" id="level_password_confirm" placeholder="{:lang('确认二级密码')}">
+				</div>
+				<div class="public_box_bg">
+					<input type="text" id="invite_code" value="{$code}" placeholder="{:lang('请输入邀请码')}">
+				</div>
+				<a href="javascript:;" class="a_btn a_big_btn">{:lang('注册')}</a>
+				
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script src="/static/layer/layer.js"></script>
+	<style>
+		.layui-layer-content {
+			color:black;
+		}
+	</style>
+	<script type="text/javascript">
+		$(".a_big_btn").click(function(){
+			var 助记词 = "{$z}";
+			var password = $("#password").val();
+			var password_confirm = $("#password_confirm").val();
+			var level_password = $("#level_password").val();
+			var level_password_confirm = $("#level_password_confirm").val();
+			var invite_code = $("#invite_code").val();
+			$.ajax({
+				url: "/index/注册提交",
+				type: "post",
+				data: {助记词: 助记词, password: password, password_confirm: password_confirm, level_password: level_password, level_password_confirm: level_password_confirm, invite_code: invite_code},
+				success: function(data){
+					data = JSON.parse(data)
+					layer.alert(data.msg, function(index){
+						location.href = "/index/登录";
+						layer.close(index);
+					});
+				}
+			})
+		})
+	</script>
+</body>
+</html>
