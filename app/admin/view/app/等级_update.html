@@ -1,0 +1,93 @@
+{extend name="base" /}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">等级设置</div>
+                    </div>
+                    <div class="card-body" style="padding: 15px 200px 10px;">
+                        <div class="form-group">
+                            <label for="level_name">等级名称(中文)</label>
+                            <input type="text" class="form-control" value="{$detail->level_name}" id="level_name">
+                            <small id="emailHelp" class="form-text text-muted text-danger">不能超过20个字符</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="level_name_us">等级名称(英文)</label>
+                            <input type="text" class="form-control" value="{$detail->level_name_us}" id="level_name_us">
+                            <small id="emailHelp" class="form-text text-muted text-danger">不能超过20个字符</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="直推人数">所需直推人数</label>
+                            <input type="text" class="form-control" id="直推人数" value="{$detail->直推人数}">
+                        </div>
+                        <div class="form-group">
+                            <label for="团队人数">所需团队人数</label>
+                            <input type="text" class="form-control" id="团队人数" value="{$detail->团队人数}">
+                        </div>
+                        <div class="form-group">
+                            <label for="奖励">奖励(%)</label>
+                            <input type="text" class="form-control" id="奖励" value="{$detail->奖励}">
+                        </div>
+                        <div class="form-group">
+                            <label for="增加局数">增加局数</label>
+                            <input type="text" class="form-control" id="增加局数" value="{$detail->增加局数}">
+                        </div>
+                        <div class="form-group">
+                            <label for="矿机加速">矿机加速(%)</label>
+                            <input type="text" class="form-control" id="矿机加速" value="{$detail->矿机加速}">
+                        </div>
+                        <div class="card-action" style="display: flex; justify-content: center;">
+                            <button class="btn btn-success" style="margin-right: 10px;" id="submit">提交</button>
+                            <button class="btn btn-danger" id="cancel">返回</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="custom_js"}
+<script>
+//取消
+$("#cancel").click(function(){
+    location.href = "/admin/app/等级";
+})
+
+//提交
+$("#submit").click(function(){
+    var fd = new FormData();
+    fd.append('level_id', "{$detail.level_id}");
+    fd.append('level_name', $("#level_name").val());
+    fd.append('level_name_us', $("#level_name_us").val());
+    fd.append('直推人数', $("#直推人数").val());
+    fd.append('团队人数', $("#团队人数").val());
+    fd.append('奖励', $("#奖励").val());
+    fd.append('增加局数', $("#增加局数").val());
+    fd.append('矿机加速', $("#矿机加速").val());
+    $.ajax({
+        url: "/admin/app/等级/update/submit",
+        type: "post",
+        processData: false,
+        contentType: false,
+        data: fd,
+        success: function(data){
+            data = JSON.parse(data)
+            if(data.code == 3){
+                custom_notify('danger', '会员等级设置', data.msg);
+            }else if(data.code == 2){
+                custom_notify('warning', '会员等级设置', data.msg);
+            }else{
+                custom_notify('success', '会员等级设置', data.msg);
+            }
+        }
+    })
+})
+</script>
+
+
+{/block}

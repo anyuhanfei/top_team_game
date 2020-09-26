@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="css/checked.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="setting.html" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">语言切换</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="border_bot_green ">
+				<div class="line_left">中文</div>
+				<label for="aa" class="flexbox_nowrap flexbox_nowrap_between">
+					<input id="aa" name="lanuage" value="chinese" type="radio" checked="">
+					<div class="radio_box"></div>
+				</label>
+			</div>
+			<div class="border_bot_green">
+				<div class="line_left">English</div>
+				<label for="bb" class="flexbox_nowrap flexbox_nowrap_between">
+					<input id="bb" name="lanuage" value="English" type="radio">
+					<div class="radio_box"></div>
+				</label>
+			</div>
+		</div>
+	</div>
+	
+	<script src="js/jquery.min.js"></script>
+	<script src="js/public.js"></script>
+	<script type="text/javascript">
+		$('.border_bot_green').click(()=>{
+			let aa=$('input[name="lanuage"]:checked').val();
+			console.log(aa)
+		})
+	</script>
+</body>
+</html>

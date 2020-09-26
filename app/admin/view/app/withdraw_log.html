@@ -1,0 +1,133 @@
+{extend name="base" /}
+
+{block name="custom_css"}
+<link rel="stylesheet" href="/static/dcalendar.picker/dcalendar.picker.css">
+{/block}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">提现管理</div>
+                        <div class="card-sub text-warning">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-inline" role="form" action="" method="post">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="user_identity" id="user_identity" value="{$user_identity}" placeholder="会员id" style="width: 150px;">
+                            </div>
+                            <div class="form-group">
+                                <select class="form-control form-control" name="stock_code" id="stock_code">
+                                    <option value="">选择币种</option>
+                                    {foreach $stock_codes as $key=> $value}
+                                    <option value="{$value['stock_code']}" {if condition="$stock_code == $value['stock_code']"}selected{/if}>{$value['stock_code']}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input id='mydatepicker1' type="text" class="form-control" name="start_time" placeholder="起始时间" value="" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <input id='mydatepicker2' type="text" class="form-control" name="end_time" placeholder="结束时间" value="" autocomplete="off">
+                            </div>
+                            <button type="submit" class="btn btn-default" id="search_submit">搜索</button>&nbsp&nbsp
+                            <button type="button" class="btn btn-default" id="from_close">清空</button>
+                        </form>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">会员</th>
+                                    <th scope="col">币种</th>
+                                    <th scope="col">金额</th>
+                                    <th scope="col">手续费</th>
+                                    <th scope="col">地址</th>
+                                    <th scope="col" style="width: 15%;">hash</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">创建时间</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="list" id="vo"}
+                                <tr id="tr{$vo->id}">
+                                    <td>{$vo.id}</td>
+                                    <td>{$vo.user_id}</td>
+                                    <td>{$vo.code}</td>
+                                    <td>{$vo.balance}</td>
+                                    <td>{$vo.poundage}</td>
+                                    <td>{$vo.to_addr}</td>
+                                    <td>{$vo.hash}</td>
+                                    <td>{$vo.inspect_status_text}</td>
+                                    <td>{$vo.create_time}</td>
+                                    <td>
+                                        {if condition="$vo.inspect_status == 0"}
+                                        <button class="btn btn-success btn-xs" onclick="status('{$vo.swift_no}', 1)">通过</button>
+                                        <button class="btn btn-success btn-xs" onclick="status('{$vo.swift_no}', 2)">驳回</button>
+                                        {/if}
+                                    </td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                        {$list->render() | raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="custom_js"}
+<script type="text/javascript" src="/static/dcalendar.picker/dcalendar.picker.js"></script>
+<script>
+    $('#mydatepicker1').dcalendarpicker({
+        format:'yyyy-mm-dd'
+    });
+    $('#mydatepicker2').dcalendarpicker({
+        format:'yyyy-mm-dd'
+    });
+
+    setTimeout(function(){
+        var start_time = "{$start_time}";
+        var end_time = "{$end_time}";
+        if(start_time != ''){
+            $("#mydatepicker1").val(start_time);
+        }
+        if(end_time != ''){
+            $("#mydatepicker2").val(end_time);
+        }
+    }, 200);
+
+    $("#from_close").click(function(){
+        $("#user_identity").val('');
+        $("#stock_code").val('');
+        $("#mydatepicker1").val('');
+        $("#mydatepicker2").val('');
+        $("#search_submit").click();
+    })
+
+    function status(swift_no, status){
+        $.ajax({
+            url: "/admin/user/withdraw/submit/" + swift_no,
+            type: "post",
+            data: {status: status},
+            success: function(data){
+                data = JSON.parse(data)
+                layer.msg(data.msg)
+                if(data.code == 1){
+                    setTimeout(() => {
+                        location.href = "/admin/user/log/withdraw"
+                    }, 1500);
+                }
+            }
+        })
+    }
+</script>
+{/block}

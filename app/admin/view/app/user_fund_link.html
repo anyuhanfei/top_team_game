@@ -1,0 +1,142 @@
+{extend name="base" /}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">会员链上资产管理</div>
+                        <div class="card-sub text-warning">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-inline" role="form" action="" method="post" style="width: 100%;">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="user_identity" id="user_identity" value="{$user_identity}" placeholder="会员id" style="width: 150px;">
+                            </div>
+                            <div class="form-group">
+                                <select class="form-control form-control" name="stock_code_search" id="stock_code_search">
+                                    <option value="">选择币种</option>
+                                    {volist name="token_config" id="vo"}
+                                    <option value="{$vo.stock_code}" {if condition="$vo.stock_code == $stock_code_search"}checked{/if}>{$vo.stock_code}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-default" id="search_submit">搜索</button>&nbsp;&nbsp;
+                            <button type="button" class="btn btn-default" id="from_close">清空</button>
+
+                            <div style="margin-left: 30%;" class="form-group">
+                                <select class="form-control form-control" name="stock_code" id="stock_code">
+                                    <option value="">选择币种</option>
+                                    {volist name="token_config" id="vo"}
+                                    <option value="{$vo.stock_code}">{$vo.stock_code}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                            <a style="margin-left: 20px;" type="fee" class="btn btn-default" id="fee">一键分发矿工费</a>
+                            <a style="margin-left: 20px;" type="cc" class="btn btn-default" id="cc">一键归集</a>
+                        </form>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="7%">
+                                        <input style="left:30px;" type="checkbox" id="user" name="user">
+                                    </th>
+                                    <th scope="col" width="7%">会员id</th>
+                                    <th scope="col" width="7%">昵称</th>
+                                    <th scope="col" width="18%">资金</th>
+                                    <th scope="col" width="18%">地址</th>
+                                    <th scope="col" width="5%">认证</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="list" id="vo"}
+                                <tr id="tr">
+                                    <td>
+                                        <input class="checkbox_user" style="left:30px;" type="checkbox" name="user_id" value="{$vo.user_id}">
+                                    </td>
+                                    <td>{$vo.user_id}</td>
+                                    <td>{$vo.nickname}</td>
+                                    <td><?php $i=1; ?>{foreach $vo['coin'] as $key=>$value}{$key}: {$value}{if condition="$i%2==0"}<br/>{else /}&nbsp;&nbsp;&nbsp;&nbsp;{/if}<?php $i++; ?>{/foreach}</td>
+                                    <td>{$vo.address}</td>
+                                    <td>{if condition="!$vo.coin"}未认证{else /}已认证{/if}</td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                        {$list->render() | raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="custom_js"}
+<script>
+    $("#user").change(function(event){
+        that = this
+        $('input[name="user_id"]').each(function(){
+            if(that.checked == true){  //点击开启
+                this.checked = true
+            }else{
+                this.checked = false
+            }
+        })
+    })
+
+    $("#fee").click(function(){
+        var user_ids = '';
+        $('input[name="user_id"]:checked').each(function(){
+            user_ids += $(this).val()+',';
+        });
+        var stock_code = $("#stock_code").val();
+        $.ajax({
+            url: "/admin/user/fund/fee/submit",
+            type: "post",
+            data: {user_ids: user_ids, stock_code: stock_code},
+            success: function(data){
+                data = JSON.parse(data)
+                layer.msg(data.msg);
+                if(data.status == 1){
+                	setTimeout(() => {
+                        location.href.go(0)
+                    }, 1500);
+                }
+            }
+        })
+    })
+
+    $("#cc").click(function(){
+        var user_ids = '';
+        $('input[name="user_id"]:checked').each(function(){
+            user_ids += $(this).val()+',';
+        });
+        var stock_code = $("#stock_code").val();
+        $.ajax({
+            url: "/admin/user/fund/cc/submit",
+            type: "post",
+            data: {user_ids: user_ids, stock_code: stock_code},
+            success: function(data){
+                data = JSON.parse(data)
+                layer.msg(data.msg);
+                if(data.status == 1){
+                    setTimeout(() => {
+                        location.href.go(0)
+                    }, 1500);
+                }
+            }
+        })
+    })
+
+    $("#from_close").click(function(){
+        $("#user_identity").val('');
+        $("#stock_code_search").val('');
+        location.href = "/admin/user/fund/link";
+    })
+</script>
+{/block}

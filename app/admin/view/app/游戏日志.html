@@ -1,0 +1,134 @@
+
+{extend name="base" /}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">游戏日志</div>
+                        <div class="card-sub text-warning">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="10%"></th>
+                                    <th scope="col" width="20%">游戏编号</th>
+                                    <th scope="col" width="20%">创建时间</th>
+                                    <th scope="col" width="20%">结算时间</th>
+                                    <th scope="col" width="20%"></th>
+                                    <th scope="col" width="10%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td id="td{$vo.id}" data-status="0" onclick="show('{$vo.id}')">
+                                        <i class="la la-caret-right"></i>
+                                    </td>
+                                    <td><b>{$vo.id}</b></td>
+                                    <td><b>{$vo.insert_time}</b></td>
+                                    <td><b>{$vo.end_time}</b></td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_one}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_one == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_one == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_two}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_two == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_two == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_three}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_three == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_three == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_four}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_four == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_four == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_five}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_five == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_five == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_six}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_six == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_six == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_seven}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_seven == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_seven == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_eight}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_eight == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_eight == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_nine}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_nine == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_nine == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                <tr id="tr{$vo.id}" class="tr{$vo.id}" style="display: none;">
+                                    <td></td>
+                                    <td>会员编号: {$vo.player_id_ten}</td>
+                                    <td>是否是质押: {if condition="$vo.is_auto_ten == 1"}是{else /}否{/if}</td>
+                                    <td>是否中奖: {if condition="$vo.is_win_ten == 1"}是{else /}否{/if}</td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="custom_js"}
+<div class="col-md-12" id="div_show_content" style="display: none;">
+    <div class="card">
+        <div class="card-body" id="show_content">
+
+        </div>
+    </div>
+</div>
+
+<script>
+    //展示
+    function show(id){
+        var module = $("#td"+id);
+        if(module.data('status') == '0'){
+            //没展示
+            module.html('<i class="la la-caret-down"></i>');
+            module.data('status', '1');
+            $(".tr" + id).attr('style', '');
+        }else{
+            //需要关闭
+            module.html('<i class="la la-caret-right"></i>');
+            module.data('status', '0');
+            $(".tr" + id).attr('style', 'display: none;');
+        }
+    }
+</script>
+{/block}

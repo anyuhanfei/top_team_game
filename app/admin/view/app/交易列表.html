@@ -1,0 +1,63 @@
+{extend name="base" /}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">交易列表</div>
+                        <div class="card-sub text-warning">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-inline" role="form" action="" method="post">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="sell_user_id" id="sell_user_id" value="{$sell_user_id}" placeholder="会员id" style="width: 150px;">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="buy_user_id" id="buy_user_id" value="{$buy_user_id}" placeholder="会员id" style="width: 150px;">
+                            </div>
+                            <button type="submit" class="btn btn-default" id="search_submit">搜索</button>&nbsp&nbsp
+                            <button type="button" class="btn btn-default" id="from_close">清空</button>
+                        </form>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="7%">#</th>
+                                    <th scope="col" width="10%">卖家id</th>
+                                    <th scope="col" width="10%">买家id</th>
+                                    <th scope="col" width="8%">TT</th>
+                                    <th scope="col" width="8%">USDT</th>
+                                    <th scope="col" width="8%">单价</th>
+                                    <th scope="col" width="8%">状态</th>
+                                    <th scope="col">挂单时间</th>
+                                    <th scope="col">完成时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="list" id="vo"}
+                                <tr id="tr">
+                                    <td>{$vo.id}</td>
+                                    <td>{$vo.sell_user_id}</td>
+                                    <td>{$vo->buy_user_id}</td>
+                                    <td>{$vo->TT}</td>
+                                    <td>{$vo->USDT}</td>
+                                    <td>{$vo->price}</td>
+                                    <td>{$vo->status_text}</td>
+                                    <td>{$vo->insert_time}</td>
+                                    <td>{$vo->end_time}</td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                        {$list->render() | raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="css/checked.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="my.html" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">账户管理</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="border_bot_green account_box">
+				<div class="line_left">主账号</div>
+				<label for="aa" class="flexbox_nowrap flexbox_nowrap_between">
+					<input id="aa" name="account" value="1" type="radio" checked="">
+					<div class="radio_box"></div>
+				</label>
+			</div>
+			<div class="border_bot_green account_box">
+				<div class="line_left">HAAHHAAH</div>
+				<label for="bb" class="flexbox_nowrap flexbox_nowrap_between">
+					<input id="bb" name="account" value="2" type="radio">
+					<div class="radio_box"></div>
+				</label>
+			</div>
+			<div class="border_bot_green flexbox_nowrap flexbox_nowrap_start">
+				<img src="img/添加账号@2x.png" class="img_size">
+				<div>添加账号</div>
+			</div>
+		</div>
+	</div>
+	<div class="mui-backdrop add_show">
+		<div class="message_reply">
+			<div class="message_reply_title mui-text-center">添加子账户</div>
+			<div class="message_reply_content">
+				<div>昵称</div>
+				<input type="text" placeholder="请添加子账户昵称">
+				<div class="flexbox_nowrap flexbox_nowrap_between">
+					<a href="javascript:;" class="a_btn close">取消</a>
+					<a href="javascript:;" class="a_btn yes">确定</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/public.js"></script>
+	<script type="text/javascript">
+		$('.account_box').click(()=>{
+			let aa=$('input[name="account"]:checked').val();
+			console.log(aa)
+		})
+		$('.flexbox_nowrap_start').click(function(){
+			$('.add_show').show()
+		})
+		$('.close').click(function(){
+			$('.add_show').hide()
+		})
+		$('.yes').click(function(){
+			$('.add_show').hide()
+		})
+	</script>
+</body>
+</html>

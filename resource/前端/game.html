@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="css/game.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.tickets_bg{
+			background: url(img/tickets_bg.png);
+			background-size: 100% 100%;
+			grid-template-columns:1fr 2fr 1fr;
+			margin: 0;
+			margin-bottom: 20px;
+		}
+		.grid_box_item{
+			padding: 15px 0;
+		}
+		.grid_box_item div{
+			color: #000
+		}
+		.grid_box_item .buy_btn{
+			width: 62px;
+			color: #fff;
+			margin: 7px 0;
+			margin-bottom: 0;
+			border-radius: 50px;
+			background-color: #000;
+		}
+		.message_reply{
+			height: 195px;
+		}
+		.game_show{
+			display: none;
+		}
+		.public_box input{
+			width: 100%;
+			border: 1px solid #eee;
+			margin: 10px 0;
+		}
+		.public_box .close,.public_box .yes{
+			width: 85px;
+			margin: 0;
+			border: 1px solid #eee;
+		}
+		.public_box .close{
+			color: #fff;
+			background-color: rgba(0,0,0,0);
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_top">
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="game_top_bg">
+				<a href="play_earning.html" class="game-right white_color">
+					<img src="img/参团明细@2x.png" class="img_size">
+					<span>参团明细</span>
+				</a>
+				<div class="mui-text-center center_padding">
+					<div>今日总局数</div>
+					<h4 class="public_padding">100</h4>
+				</div>
+				<div class="grid_box">
+					<div class="mui-text-center">已完局数:60</div>
+					<div class="mui-text-center">剩余局数: <span class="green_color">40</span> </div>
+				</div>
+			</div>
+			<div class="border_bot">
+				<div class="public_box">
+					<div class="tickets_bg grid_box">
+						<div></div>
+						<div class="grid_box_item">
+							<div>我的门票</div>
+							<div>购买:2020-01-01 11:11:11</div>
+						</div>
+						<div class="grid_box_item">
+							<a href="javascript:;" class="a_btn buy_btn">购买</a>
+						</div>
+					</div>
+					<h4>选择质押金额 <span>(自动参加)</span> </h4>
+					<div class="flexbox_nowrap">
+						<div class="flexbox_check">
+						<label for="aa">
+							<input id="aa" name="pledge" value="20USDT" type="radio">
+							<div class="radio_box">20USDT</div>
+						</label>
+						</div>
+						<div class="flexbox_check">
+						<label for="bbb">
+							<input id="bbb" name="pledge" value="100USDT" type="radio">
+							<div class="radio_box">100USDT</div>
+						</label>
+						</div>
+						<div class="flexbox_check">
+						<label for="c">
+							<input id="c" name="pledge" value="200USDT" type="radio">
+							<div class="radio_box">200USDT</div>
+						</label>
+						</div>
+					</div>
+					<a href="javascript:;" class="a_big_btn a_btn">确认质押</a>
+				</div>
+			</div>
+			<div class="public_box">
+				<a href="javascript:;" class="a_big_btn a_btn btn_join">直接参加</a>
+			</div>
+		</div>
+	</div>
+	<div class="mui-backdrop game_show" style="display: none;">
+		<div class="message_reply">
+			<div class="message_reply_title mui-text-center">
+				<h4>购买门票 <span>(有效期7天)</span>需支付 </h4>
+			</div>
+			<div class="message_reply_content">
+				<h4 class="green_color mui-text-center">100.00 TTP</h4>
+				<div class="input_box public_box">
+						<input type="password" placeholder="请输入二级密码">
+					<div class="flexbox_nowrap flexbox_nowrap_between">
+						<a href="javascript:;" class="a_btn close">取消</a>
+						<a href="javascript:;" class="a_btn yes">确定</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<nav class="mui-bar mui-bar-tab nav_bg">
+	    <a href="index.html" target="_blank" class="mui-tab-item ">
+			<span class="mui-icon iconfont icon_1"></span>
+	        <span class="mui-tab-label">首页</span>
+	    </a>
+	    <a href="game.html" target="_blank" class="mui-tab-item mui-active">
+	        <span class="mui-icon iconfont icon_2"></span>
+	        <span class="mui-tab-label">游戏</span>
+	    </a>
+		<a href="deal.html" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_3"></span>
+		    <span class="mui-tab-label">交易</span>
+		</a>
+		<a href="my.html" target="_blank" class="mui-tab-item">
+		    <span class="mui-icon iconfont icon_4"></span>
+		    <span class="mui-tab-label">我的</span>
+		</a>
+	</nav>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/public.js"></script>
+	<script type="text/javascript">
+		$('.flexbox_check').click(function(){
+			let aa=$('input[name="pledge"]:checked').val();
+			console.log(aa)
+		})
+		$('.buy_btn').click(()=>{
+			$('.game_show').show()
+		})
+		$('.close').click(function(){
+			$('.game_show').hide()
+		})
+		$('.yes').click(function(){
+			$('.game_show').hide()
+		})
+	</script>
+</body>
+</html>

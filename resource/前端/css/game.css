@@ -1,0 +1,56 @@
+.head_top{
+	background: rgba(0,0,0,0);
+}
+.game_top_bg{
+	background: url(../img/游戏_01.png);
+	background-size: 100% 100%;
+}
+.game-right{
+	position: absolute;
+	right: 10px;
+}
+.game-right img{
+	margin: auto;
+}
+.game_top_bg .center_padding{
+	/* padding-bottom: 10%; */
+}
+.grid_box{
+	margin-top: 10%;
+	padding: 0.625rem 0;
+	background-color: rgba(58,226,193,0.4);
+}
+.grid_box .mui-text-center:first-child::after{
+	content: '';
+	width: 1px;
+	height: 20px;
+	position: absolute;
+	right: 50%;
+	background-color: #fff;
+}
+.flexbox_nowrap label{
+	position: relative;
+}
+.flexbox_nowrap input[type=radio]{
+	opacity: 0;
+}
+.flexbox_nowrap .radio_box{
+	position: absolute;
+	top: 0px;
+	left: -30px;
+	margin-right:5px ;
+	display: block;
+	height: 25px;
+	width: 70px;
+	text-align: center;
+	line-height: 25px;
+	border: 1px solid #267a6c;
+}
+.flexbox_nowrap input[type=radio]:checked+.radio_box{
+	background-color: #267a6c;
+}
+.btn_join{
+	background-color: rgba(0,0,0,0);
+	border: 1px solid #267a6c;
+	color: #fff;
+}

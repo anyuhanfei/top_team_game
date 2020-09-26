@@ -1,0 +1,35 @@
+.border_bot_green label{
+	width: 100%;
+}
+.border_bot_green input[type=radio]{
+	opacity: 0;
+}
+.line_left{
+	position: absolute;
+}
+.border_bot_green .radio_box{
+	height: 20px;
+	width: 20px;
+}
+.border_bot_green input[type=radio]:checked+.radio_box{
+	background-image: url(../img/对号@2x.png);
+	background-size: 100% 100%;
+}
+.message_reply_content input{
+	margin-top: 5%;
+	background-color: rgba(0,0,0,0);
+	border: 1px solid #fff;
+}
+.message_reply{
+	height: 215px;
+}
+.img_size{margin-left: 0;}
+.a_btn{
+	width: 80px;
+	margin: 0;
+	margin-top: 5%;
+}
+.close{
+	/* background-color: rgba(0,0,0,0); */
+	border: 1px solid #fff;
+}

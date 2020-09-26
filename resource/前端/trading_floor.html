@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="css/deal.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.mui-pull-right{
+			margin-top: 10px;
+		}
+		.trading_floor {
+			width: 35%;
+		}
+		
+		.a_btn {
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="deal.html" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">交易大厅</h1>
+		<a href="trading_record.html" class="mui-pull-right white_color">交易记录</a>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="getRecordTit mui-segmented-control trading_floor">
+				<a href="#get3" class="mui-control-item mui-active">买入</a>
+				<a href="#get4" class="mui-control-item">卖出</a>
+			</div>
+			<!-- 随意切换显示各个方面的内容 -->
+			<div class="getRecordList mui-content-padded">
+				<div id="get3" class="mui-control-content mui-active">
+					<div class="public_box_bg">
+						<div>数量:10 TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<a href="javascript:;" class="a_btn">购买</a>
+						</div>
+					</div>
+					<div class="public_box_bg">
+						<div>数量:10 TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<a href="javascript:;" class="a_btn">购买</a>
+						</div>
+					</div>
+				</div>
+				<div id="get4" class="mui-control-content ">
+					<div class="public_box_bg">
+						<div>数量:10 TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<a href="javascript:;" class="a_btn">卖出</a>
+						</div>
+					</div>
+					<div class="public_box_bg">
+						<div>数量:10 TTP</div>
+						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>单价:10 USDT</div>
+							<div>总价:10 USDT</div>
+							<a href="javascript:;" class="a_btn">卖出</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="js/jquery.min.js"></script>
+	<script src="js/public.js"></script>
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

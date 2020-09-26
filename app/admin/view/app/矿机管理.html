@@ -1,0 +1,54 @@
+{extend name="base" /}
+
+{block name="content"}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">矿机管理</div>
+                        <div class="card-sub text-warning">
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-inline" role="form" action="" method="post">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="user_id" id="user_id" value="{$user_id}" placeholder="会员id" style="width: 150px;">
+                            </div>
+                            <button type="submit" class="btn btn-default" id="search_submit">搜索</button>&nbsp&nbsp
+                            <button type="button" class="btn btn-default" id="from_close">清空</button>
+                        </form>
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">会员编码</th>
+                                    <th scope="col">当前周期</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">创建</th>
+                                    <th scope="col">结算时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="list" id="vo"}
+                                <tr id="tr">
+                                    <td>{$vo.mill_id}</td>
+                                    <td>{$vo.user_id}</td>
+                                    <td>{$vo->当前周期}</td>
+                                    <td>{$vo->status_text}</td>
+                                    <td>{$vo->insert_time}</td>
+                                    <td>{$vo->end_time}</td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                        {$list->render() | raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
