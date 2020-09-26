@@ -156,6 +156,9 @@ class Index extends Base{
         if(time() - Session::get('game_time') < 60){
             return return_data(2, '', Lang::get('手动参与游戏的间隔时间为1分钟'));
         }
+        if(GameQueue::where('user_id', $this->user_id)->where('is_pop', 0)->find()){
+            return return_data(2, '', Lang::get('正在游戏中, 请等待'));
+        }
         Db::startTrans();
         $res_one = GameQueue::create([
             'user_id'=> $this->user_id

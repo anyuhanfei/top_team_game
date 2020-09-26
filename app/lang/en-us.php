@@ -264,4 +264,5 @@ return [
     '下级成为有效会员'=> 'Subordinates become valid members',
     '下级第一次购买门票的上级奖励'=> "The subordinate's first purchase of the ticket is rewarded by the superior",
     '请购买门票'=> 'Please buy tickets',
+    '正在游戏中, 请等待'=> 'In the game, please wait',
 ];

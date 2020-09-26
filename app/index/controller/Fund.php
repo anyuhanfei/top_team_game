@@ -126,6 +126,9 @@ class Fund extends Base{
                 if(random_int(1, 10) >= 5){
                     continue;
                 }
+                if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
+                    continue;
+                }
                 GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> 1]);
                 $质押->已玩局数 += 1;
                 $质押->save();
