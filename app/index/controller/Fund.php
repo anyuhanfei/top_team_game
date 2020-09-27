@@ -141,6 +141,7 @@ class Fund extends Base{
      */
     public static function 游戏(){
         $sleep_time = 30;
+        self::$cache_settings['游戏房间玩家数量'] = self::$cache_settings['游戏房间玩家数量'] > 10 ? 10 : self::$cache_settings['游戏房间玩家数量'];
         if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
             return;
         }
@@ -167,12 +168,35 @@ class Fund extends Base{
         $inning = GameInning::where('end_time', NULL)->select();
         $number_array = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
         foreach($inning as $v){
-            $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
+            for($i = 1; $i <= self::$cache_settings['中奖人数']; $i++){
+                //中奖
+                $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
+                $is_win_field = 'is_win_' . $number_array[$nowin];
+                while($v->$is_win_field != 0){  //说明这个人已经有结果了, 换一个没结果的
+                    $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
+                    $is_win_field = 'is_win_' . $number_array[$nowin];
+                }
+                $player_id_field = 'player_id_' . $number_array[$nowin];
+                $is_auto_field = 'is_auto_' . $number_array[$nowin];
+                //中奖奖励
+                $v->$is_win_field = 1;
+                if($v->$is_auto_field == 1){ //是自动, 仅添加记录
+                    $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
+                    $auto->中奖局数 += 1;
+                    $auto->save();
+                }else{ //直接发钱
+                    $user_fund = IdxUserFund::find($v->$player_id_field);
+                    $user_fund->USDT += self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费'];
+                    $user_fund->save();
+                    LogUserFund::create_data($v->$player_id_field, self::$cache_settings['中奖打赏金额'], 'USDT', '游戏中奖', '游戏中奖');
+                    LogUserFund::create_data($v->$player_id_field, '-' . self::$cache_settings['中奖支付矿工费'], 'USDT', '游戏中奖支付矿工费', '游戏中奖支付矿工费');
+                }
+            }
             for($i = 1; $i <= self::$cache_settings['游戏房间玩家数量']; $i++){
                 $player_id_field = 'player_id_' . $number_array[$i];
                 $is_auto_field = 'is_auto_' . $number_array[$i];
                 $is_win_field = 'is_win_' . $number_array[$i];
-                if($nowin == $i){// 未中奖
+                if($v->$is_win_field == 0){// 未中奖
                     $v->$is_win_field = 2;
                     if($v->$is_auto_field == 1){ //是自动, 仅添加记录
                        $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
@@ -184,19 +208,6 @@ class Fund extends Base{
                             'insert_date'=> date("Y-m-d", time()),
                             'insert_time'=> date("Y-m-d H:i:s", time())
                         ]);
-                    }
-                }else{ //中奖
-                    $v->$is_win_field = 1;
-                    if($v->$is_auto_field == 1){ //是自动, 仅添加记录
-                        $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
-                        $auto->中奖局数 += 1;
-                        $auto->save();
-                    }else{ //直接发钱
-                        $user_fund = IdxUserFund::find($v->$player_id_field);
-                        $user_fund->USDT += self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费'];
-                        $user_fund->save();
-                        LogUserFund::create_data($v->$player_id_field, self::$cache_settings['中奖打赏金额'], 'USDT', '游戏中奖', '游戏中奖');
-                        LogUserFund::create_data($v->$player_id_field, '-' . self::$cache_settings['中奖支付矿工费'], 'USDT', '游戏中奖支付矿工费', '游戏中奖支付矿工费');
                     }
                 }
             }

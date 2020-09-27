@@ -145,6 +145,9 @@ class Index extends Base{
             return return_data(2, '', Lang::get('请购买门票'));
         }
         $cache_settings = Cache::get('settings');
+        if($cache_settings['每日游戏开始时间'] > date("H:i", time()) || $cache_settings['每日游戏结束时间'] < date("H:i", time())){
+            return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
+        }
         $user_fund = IdxUserFund::find($this->user_id);
         if($user_fund->USDT < $cache_settings['下注金额']){
             return return_data(2, '', Lang::get('USDT余额不足'));
@@ -183,6 +186,9 @@ class Index extends Base{
             return return_data(2, '', Lang::get('请购买门票'));
         }
         $cache_settings = Cache::get('settings');
+        if($cache_settings['每日游戏开始时间'] > date("H:i", time()) || $cache_settings['每日游戏结束时间'] < date("H:i", time())){
+            return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
+        }
         $usdt = Request::instance()->param('usdt', 0);
         if($usdt != 20 && $usdt != 100 && $usdt != 200){
             return return_data(2, '', Lang::get('非法操作'));
