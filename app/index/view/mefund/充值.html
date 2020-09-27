@@ -32,10 +32,10 @@
 		<div class="mui-scroll">
 			<div class="public_box">
 				<div class="public_box_bg">
-					<img src="/static/index/img/fx_m.png" class="img_style">
+					<img src="{$address_qrcode}" class="img_style">
 					<!-- <div class="public_box public_box_bg"> -->
 						<!-- <textarea name=""  rows="5" maxlength="50" value="" style="font-size: 15px;">啊啊啊啊</textarea> -->
-					<input type="text" value="dsdhksdhkh" id="taokouling">
+					<input type="text" value="{$address}" readonly id="taokouling">
 					<!-- </div> -->
 				</div>
 				<a href="javascript:;" id="copyCode" class="a_btn a_big_btn" data-clipboard-target="#taokouling" data-clipboard-action="copy">{:lang('复制私钥')}</a>

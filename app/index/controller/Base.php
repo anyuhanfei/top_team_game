@@ -27,6 +27,7 @@ class Base{
                 $settings_array[$v['sign']] = $v['value'];
             }
             Cache::set('settings', $settings_array, 30);
+            sleep(0.3);
         }
         // 等级设置
         if(!Cache::get('level')){
@@ -39,6 +40,7 @@ class Base{
                 }
             }
             Cache::set('level', $level, 30);
+            sleep(0.3);
         }
         // 今日价格
         if(!Cache::get('today_tt_price')){
@@ -51,6 +53,7 @@ class Base{
                 ]);
             }
             Cache::set('today_tt_price', $price->price, 6000);
+            sleep(0.3);
         }
 
         //语言

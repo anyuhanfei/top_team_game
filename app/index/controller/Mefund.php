@@ -179,7 +179,7 @@ class Mefund extends Index{
 
     public function 矿机(){
         $cache_settings = Cache::get('settings');
-        $mills = IdxUserMill::where('user_id', $this->user_id)->select();
+        $mills = IdxUserMill::where('user_id', $this->user_id)->order('mill_id desc')->select();
         $mill_earnings = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->sum('number');
         $mill_number = 0;
         foreach($mills as &$mill){

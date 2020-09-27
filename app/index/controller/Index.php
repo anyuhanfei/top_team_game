@@ -149,8 +149,10 @@ class Index extends Base{
             return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
         }
         $user_fund = IdxUserFund::find($this->user_id);
-        if($user_fund->USDT < $cache_settings['下注金额']){
-            return return_data(2, '', Lang::get('USDT余额不足'));
+        if($user_fund->number <= 0){
+            if($user_fund->USDT < $cache_settings['下注金额']){
+                return return_data(2, '', Lang::get('USDT余额不足'));
+            }
         }
         $user_count = IdxUserCount::find($this->user_id);
         if($user_count->今日最大局数 <= $user_count->今日局数){
@@ -166,9 +168,14 @@ class Index extends Base{
         $res_one = GameQueue::create([
             'user_id'=> $this->user_id
         ]);
-        $user_fund->USDT -= $cache_settings['下注金额'];
+        if($user_fund->number <= 0){
+            $user_fund->USDT -= $cache_settings['下注金额'];
+            LogUserFund::create_data($this->user_id, '-' . $cache_settings['下注金额'], 'USDT', '参与游戏', '参与游戏');
+        }else{
+            $user_fund->number -= 1;
+            LogUserFund::create_data($this->user_id, '-1', '免费次数', '参与游戏', '参与游戏');
+        }
         $res_two = $user_fund->save();
-        LogUserFund::create_data($this->user_id, '-' . $cache_settings['下注金额'], 'USDT', '参与游戏', '参与游戏');
         if($res_one && $res_two){
             $user_count->今日局数 += 1;
             $user_count->save();
