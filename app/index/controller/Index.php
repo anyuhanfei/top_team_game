@@ -90,7 +90,7 @@ class Index extends Base{
     public function 购买门票(){
         $level_password = Request::instance()->param('level_password', '');
         $price = Cache::get('settings')['门票价格'] * Cache::get('today_tt_price');
-        if($level_password == $this->user->level_password){
+        if($level_password != $this->user->level_password){
             return return_data(2, '', Lang::get('二级密码输入错误'));
         }
         $user_fund = IdxUserFund::find($this->user_id);
@@ -153,11 +153,11 @@ class Index extends Base{
         if($user_count->今日最大局数 <= $user_count->今日局数){
             return return_data(2, '', Lang::get('今日可玩局数已完成'));
         }
-        if(time() - Session::get('game_time') < 60){
-            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为1分钟'));
-        }
         if(GameQueue::where('user_id', $this->user_id)->where('is_pop', 0)->find()){
             return return_data(2, '', Lang::get('正在游戏中, 请等待'));
+        }
+        if(time() - Session::get('game_time') < 60){
+            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为1分钟'));
         }
         Db::startTrans();
         $res_one = GameQueue::create([

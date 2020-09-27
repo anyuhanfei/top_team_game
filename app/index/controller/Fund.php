@@ -149,23 +149,17 @@ class Fund extends Base{
             if(count($queue) != self::$cache_settings['游戏房间玩家数量']){
                 break;
             }
+            $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> time()];
+            $number_array = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+            $i = 0;
             foreach($queue as $v){
                 $v->is_pop = 1;
                 $v->save();
+                $create_array['player_id_' . $number_array[$i]] = $v->user_id;
+                $create_array['is_auto_' . $number_array[$i]] = $v->is_auto;
+                $i++;
             }
-            GameInning::create([
-                'player_id_one'=> $queue[0]->user_id, 'is_auto_one'=> $queue[0]->is_auto,
-                'player_id_two'=> $queue[1]->user_id, 'is_auto_two'=> $queue[1]->is_auto,
-                'player_id_three'=> $queue[2]->user_id, 'is_auto_three'=> $queue[2]->is_auto,
-                'player_id_four'=> $queue[3]->user_id, 'is_auto_four'=> $queue[3]->is_auto,
-                'player_id_five'=> $queue[4]->user_id, 'is_auto_five'=> $queue[4]->is_auto,
-                'player_id_six'=> $queue[5]->user_id, 'is_auto_six'=> $queue[5]->is_auto,
-                'player_id_seven'=> $queue[6]->user_id, 'is_auto_seven'=> $queue[6]->is_auto,
-                'player_id_eight'=> $queue[7]->user_id, 'is_auto_eight'=> $queue[7]->is_auto,
-                'player_id_nine'=> $queue[8]->user_id, 'is_auto_nine'=> $queue[8]->is_auto,
-                'player_id_ten'=> $queue[9]->user_id, 'is_auto_ten'=> $queue[9]->is_auto,
-                'insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> time()
-            ]);
+            GameInning::create($create_array);
             sleep(1);
             $sleep_time = $sleep_time - 1 >= 0 ? $sleep_time - 1 : 0;
         }
@@ -173,8 +167,8 @@ class Fund extends Base{
         $inning = GameInning::where('end_time', NULL)->select();
         $number_array = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
         foreach($inning as $v){
-            $nowin = random_int(1, 10);
-            for($i = 1; $i <= 10; $i++){
+            $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
+            for($i = 1; $i <= self::$cache_settings['游戏房间玩家数量']; $i++){
                 $player_id_field = 'player_id_' . $number_array[$i];
                 $is_auto_field = 'is_auto_' . $number_array[$i];
                 $is_win_field = 'is_win_' . $number_array[$i];
