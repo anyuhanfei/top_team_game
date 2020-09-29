@@ -4,6 +4,7 @@ namespace app\admin\controller;
 use think\facade\Session;
 use think\facade\Request;
 use think\facade\View;
+use think\facade\Db;
 
 use app\admin\controller\Admin;
 
@@ -78,6 +79,11 @@ class Webset extends Admin{
                 if($setting){
                     $setting->value = $v;
                     $setting->save();
+                    if($k == 'fee_number'){
+                        Db::table('dict')->where('name', 'erc20_minner')->update([
+                            'value'=> $v,
+                        ]);
+                    }
                 }
             }
         }
