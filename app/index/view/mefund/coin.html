@@ -46,7 +46,14 @@
 <body>
 	<header class="mui-bar mui-bar-nav head_color">
 		<a href="/index/me/资产" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
-		<h1 class="mui-title">{$coin_type}</h1>
+		<h1 class="mui-title">
+			{if condition="$coin_type == '能量石'"}
+				Energy stone
+			{elseif condition="$coin_type == '门票'"}
+				tickets
+			{else /}
+				{$coin_type}
+			{/if}</h1>
 		<!-- <h1 class="mui-title">TTP</h1> -->
 		<!-- <h1 class="mui-title">TTA</h1> -->
 	</header>

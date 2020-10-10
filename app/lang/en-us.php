@@ -290,4 +290,11 @@ return [
     '请输入转入金额'=> 'Please enter the transfer amount',
     '当前余额'=> 'current balance',
     '归集'=> 'NotionalPooling',
+    '门票'=> 'tickets',
+    '转入'=> 'shift to',
+    '手续费'=> 'fee',
+    '请输入对方UID'=> 'Please enter their UID',
+    '子账号转账'=> 'Subaccount transfer',
+    '全网转账'=> 'So transfer',
+    '我的助记词'=> 'My mnemonic',
 ];
