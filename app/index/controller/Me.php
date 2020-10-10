@@ -25,10 +25,28 @@ class Me extends Index{
     }
 
     public function 关于我们(){
-        if(Cookie::get('think_var') == 'zh-cn'){
+        if(Cookie::get('think_lang') == 'zh-cn'){
             View::assign('content', CmsArticle::where('title', '关于我们(中文)')->value('content'));
         }else{
             View::assign('content', CmsArticle::where('title', '关于我们(英文)')->value('content'));
+        }
+        return View::fetch();
+    }
+
+    public function ttp销毁(){
+        if(Cookie::get('think_lang') == 'zh-cn'){
+            View::assign('content', CmsArticle::where('title', 'TTP销毁(中文)')->value('content'));
+        }else{
+            View::assign('content', CmsArticle::where('title', 'TTP销毁(英文)')->value('content'));
+        }
+        return View::fetch();
+    }
+
+    public function 百问百答(){
+        if(Cookie::get('think_lang') == 'zh-cn'){
+            View::assign('content', CmsArticle::where('title', '百问百答(中文)')->value('content'));
+        }else{
+            View::assign('content', CmsArticle::where('title', '百问百答(英文)')->value('content'));
         }
         return View::fetch();
     }
@@ -67,6 +85,10 @@ class Me extends Index{
         $user_data->id_card_code = $id_card;
         $res = $user_data->save();
         return $res ? return_data(1, '', Lang::get('认证成功'), '实名认证') : return_data(2, '', Lang::get('认证失败'));
+    }
+
+    public function 助记词(){
+        return View::fetch();
     }
 
     public function 忘记二级密码(){
@@ -147,12 +169,12 @@ class Me extends Index{
         $team_number_level_one = 0;
         $team_number_level_two = 0;
         $team = [];
-        foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $this->user_id)->select() as $v){
+        foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $this->user_id)->order('register_time desc')->select() as $v){
             $v->level = 1;
             $team[] = $v;
             $team_number += 1;
             $team_number_level_one += 1;
-            foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $v->user_id)->select() as $vv){
+            foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $v->user_id)->order('register_time desc')->select() as $vv){
                 $vv->level = 2;
                 $team[] = $vv;
                 $team_number += 1;
@@ -175,11 +197,12 @@ class Me extends Index{
             $this->user->invite_qrcode = png_erwei('http://' . $_SERVER['HTTP_HOST'] . '/index/注册?code=' . $this->user->invite_code, $this->user->user_id);
             $this->user->save();
         }
+        View::assign('bgi', Cookie::get('think_lang') == 'zh-cn' ? '2' : '3');
         return View::fetch();
     }
 
     public function 语言(){
-        $this->user->language = Session::get('think_lang');
+        $this->user->language = Cookie::get('think_lang');
         $this->user->save();
     }
 

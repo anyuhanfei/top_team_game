@@ -15,49 +15,60 @@
 			border-color: #3ae2c1;
 			padding: 0;
 		}
+        select{
+			background-color: rgba(0,0,0,0);
+			margin: 0;
+		}
+		select option{
+			background-color: rgba(0,0,0,0);
+			color: #333;
+		}
 	</style>
 </head>
 <body>
 	<header class="mui-bar mui-bar-nav head_color">
-		<a href="javascript:;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
-		<h1 class="mui-title">{:lang('提币')}</h1>
+		<a href="/index/me/coin/能量石" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('转入')}</h1>
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
 			<div class="public_box">
-				<div class="public_box_bg">
-					<input type="text" value="{$user->$type}" readonly>
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between">
+					<select id="type">
+                        <option value="TTP">TTP(当前余额:{$user.userfund.TTP})</option>
+                        <option value="TTA">TTA(当前余额:{$user.userfund.TTA})</option>
+                    </select>
 				</div>
 				<div class="public_box_bg">
-					<input type="number" id="number" value="0" placeholder="{:lang('请输入数量')}" >
+					<input type="number" id="number" value="0" placeholder="{:lang('请输入转入金额')}">
 				</div>
-				<div class="mui-text-right">{:lang('可用余额')}:<i class="coin">{$user->userfund->$type}</i>{$type}</div>
 				<div class="public_box_bg">
 					<input type="password" id="level_password" value="" placeholder="{:lang('请输入二级密码')}">
 				</div>
-				<div class="mui-text-right">{:lang('矿工费')}:{$fee}</div>
-				<a href="javascript:;" class="a_btn a_big_btn">{:lang('确认提币')}</a>
+				<a href="javascript:;" class="a_btn a_big_btn">{:lang('确认兑换')}</a>
 			</div>
 		</div>
 	</div>
+
 	<script src="/static/index/js/jquery.min.js"></script>
 	<script src="/static/index/js/public.js"></script>
 	<script type="text/javascript">
 		$(".a_big_btn").click(function(){
+			var type = $("#type").val();
 			var number = $("#number").val();
 			var level_password = $("#level_password").val();
 			$("#level_password").val('')
 			$.ajax({
-				url: "/index/me/提现提交",
+				url: "/index/me/转入提交",
 				type: "post",
-				data: {number: number, level_password: level_password, type: "{$type}"},
+				data: {type: type, number: number, level_password: level_password},
 				success: function(data){
 					data = JSON.parse(data)
 					mui.toast(data.msg)
 					if(data.code == 1){
 						setTimeout(() => {
-							location.href = "/index/me/提现?type={$type}";
-						}, 1000);
+                            location.href = "/index/me/转入";
+                        }, 1000);
 					}
 				}
 			})

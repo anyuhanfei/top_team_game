@@ -96,6 +96,9 @@ class App extends Admin{
 
     public function tt价格(){
         $list = IdxTtPrice::order('id desc')->paginate(20);
+        foreach($list as &$v){
+            $v->is_update = strtotime($v->id) > strtotime(date("Y-m-d", time())) ? 1 : 0;
+        }
         View::assign('list', $list);
         View::assign('next_date', date("Y-m-d", strtotime($list[0]->id) + (60 * 60 * 24)));
         return View::fetch();
@@ -103,12 +106,49 @@ class App extends Admin{
 
     public function tt价格_add_submit(){
         $price = Request::instance()->param('price', 0);
-        $next_date =date("Y-m-d", strtotime(IdxTtPrice::order('id desc')->value('id')) + (60 * 60 * 24));
-        $obj = new IdxTtPrice();
-        $res = $obj->create([
-            'id'=> $next_date,
-            'price'=> $price
-        ]);
+        $id = Request::instance()->param('id', 0);
+        if($price <= 0){
+            return return_data(2, '', '请输入正确的USDT金额');
+        }
+        if($id == 0){
+            $next_date =date("Y-m-d", strtotime(IdxTtPrice::order('id desc')->value('id')) + (60 * 60 * 24));
+            $obj = new IdxTtPrice();
+            $res = $obj->create([
+                'id'=> $next_date,
+                'price'=> $price
+            ]);
+            $day = $next_date;
+        }else{
+            if($price <= 0){
+                return return_data(2, '', '请输入正确的USDT金额');
+            }
+            $obj = IdxTtPrice::find($id);
+            if(!$obj){
+                return return_data(2, '', '非法操作');
+            }
+            $obj->price = $price;
+            $res = $obj->save();
+            $day = $obj->id;
+        }
+        if($res){
+            return return_data(1, '', '设置成功', '设置或更新' . $day . '的TT价格');
+        }else{
+            return return_data(2, '', '设置失败');
+        }
+    }
+
+    public function tt价格_update_submit(){
+        $id = Request::insance()->param('id', 0);
+        $price = Request::instance()->param('price', 0);
+        if($price <= 0){
+            return return_data(2, '', '请输入正确的USDT金额');
+        }
+        $obj = IdxTtPrice::find($id);
+        if(!$obj){
+            return return_data(2, '', '非法操作');
+        }
+        $obj->price = $price;
+        $res = $obj->save();
         if($res){
             return return_data(1, '', '设置成功', '设置TT价格');
         }else{

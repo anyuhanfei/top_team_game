@@ -77,7 +77,7 @@
 						<div class="public_box_bg">
 							<div class="green_color">{if condition="$vo.buy_user_id == $user_id"}{:lang('买入')}{else /}{:lang('卖出')}{/if}</div>
 							<div>{:lang('对方ID')}: {if condition="$vo.buy_user_id == $user_id"}{$vo.sell_user_id}{else /}{$vo.buy_user_id}{/if}</div>
-							<div>{:lang('数量')}:{$vo.TTP} TTP</div>
+							<div>{:lang('数量')}:{$vo.TT} TTP</div>
 							<div>{:lang('单价')}:{$vo.price} USDT</div>
 							<div>{:lang('总价')}:{$vo.USDT} USDT</div>
 							<div>{:lang('订单时间')}:{$vo.insert_time}</div>

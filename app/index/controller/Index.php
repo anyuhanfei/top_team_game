@@ -65,7 +65,7 @@ class Index extends Base{
         $tt_prices = IdxTtPrice::where('id', '<=', date('Y-m-d', time()))->order('id desc')->limit(7)->select();
         foreach($tt_prices as &$v){
             $v->id = substr($v->id, 5);
-            $v->price = 1 / $v->price;
+            $v->price = $v->price;
         }
         View::assign('tt_prices', $tt_prices);
         //币种价格

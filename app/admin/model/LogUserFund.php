@@ -4,6 +4,8 @@ namespace app\admin\model;
 use think\Model;
 use think\facade\Env;
 
+use app\admin\model\IdxUser;
+
 
 class LogUserFund extends Model{
     protected $table = 'log_user_fund';
@@ -20,6 +22,7 @@ class LogUserFund extends Model{
     public static function create_data($user_id, $number, $coin_type, $fund_type, $content, $remark = '', $insert_time = ''){
         self::create([
             'user_id'=> $user_id,
+            'user_identity'=> IdxUser::where('user_id', $user_id)->value('phone'),
             'number'=> $number,
             'coin_type'=> $coin_type,
             'fund_type'=> $fund_type,

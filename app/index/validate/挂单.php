@@ -2,11 +2,13 @@
 namespace app\index\validate;
 
 use think\Validate;
+use think\facade\Cache;
 use think\facade\Session;
 
 use app\index\validate\Base;
 
 use app\admin\model\IdxUserFund;
+use app\admin\model\IdxTtPrice;
 
 
 class 挂单 extends Base{
@@ -36,10 +38,16 @@ class 挂单 extends Base{
         if($value <= 0){
             return "请填写大于0的整数";
         }
+        $user_fund = IdxUserFund::find(Session::get('user_id'));
         if($data['type'] == 'sell'){
-            $user_fund = IdxUserFund::find(Session::get('user_id'));
-            if($user_fund->TTP < $value){
+            $fee = $data['number'] * Cache::get('settings')['c2c_ttp_fee'] * 0.01;
+            if($user_fund->TTP < $value + $fee){
                 return "TTP余额不足";
+            }
+        }else{
+            $fee = IdxTtPrice::where('id', '<=', date('Y-m-d', time()))->order('id desc')->value('price') * $data['number'] * Cache::get('settings')['c2c_usdt_fee'] * 0.01;
+            if($user_fund->USDT < $value + $fee){
+                return "USDT余额不足";
             }
         }
         return true;

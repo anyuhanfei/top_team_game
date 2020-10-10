@@ -11,6 +11,7 @@ use app\admin\model\IdxUser;
 use app\admin\model\IdxUserCount;
 use app\admin\model\IdxUserFund;
 use app\admin\model\IdxUserData;
+use app\admin\model\SysLevel;
 
 
 class User extends Admin{
@@ -31,21 +32,18 @@ class User extends Admin{
         $user_id = Request::instance()->param('user_id', '');
         $top_user_id = Request::instance()->param('top_user_id', '');
         $nickname = Request::instance()->param('nickname', '');
-        $user_identity = Request::instance()->param('user_identity', '');
-        $top_user_identity = Request::instance()->param('top_user_identity', '');
+        $level_id = Request::instance()->param('level_id', '');
+        $vip = Request::instance()->param('vip', '');
         $user = new IdxUser;
         $user = ($user_id != '') ? $user->where('user_id', $user_id) : $user;
         $user = ($top_user_id != '') ? $user->where('top_id', $top_user_id) : $user;
+        $user = ($level_id != '') ? $user->where('level', $level_id) : $user;
+        $user = ($vip !== '') ? $user->where('vip', $vip) : $user;
         $user = ($nickname != '') ? $user->where('nickname', 'like', '%' . $nickname . '%') : $user;
-        $user = ($user_identity != '') ? $user->where($this->user_identity, 'like', '%'. $user_identity . '%') : $user;
-        if($top_user_identity != ''){
-            $top_id = IdxUser::where($this->user_identity, 'like', '%' . $top_user_identity . '%')->find();
-            if($top_id){
-            	$user = $user->where('top_id', $top_id->user_id);
-            }
-        }
-        $list = $user->order('user_id desc')->paginate($this->page_number, false,['query'=>request()->param()]);
-        $this->many_assign(['list'=> $list, 'user_id'=> $user_id, 'nickname'=> $nickname, 'top_user_id'=> $top_user_id, 'top_user_identity'=> $top_user_identity, 'search_user_identity'=> $user_identity]);
+        $list = $user->order('register_time desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $this->many_assign(['list'=> $list, 'user_id'=> $user_id, 'nickname'=> $nickname, 'top_user_id'=> $top_user_id, 'level_id'=> $level_id, 'vip'=> $vip]);
+        $level = SysLevel::select();
+        View::assign('level', $level);
         return View::fetch();
     }
 

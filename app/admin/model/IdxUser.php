@@ -175,7 +175,7 @@ class IdxUser extends Model{
     public static function create_data($助记词, $password, $top_id = 0, $nickname = '', $level_password = '', $pan_user_id = 0){
         $password_salt = create_captcha(6, 'lowercase+uppercase+figure');
         $user_id = create_captcha(9);
-        while(self::find($user_id)){
+        while($user_id <= 100000000 && self::find($user_id)){
             $user_id = create_captcha(9);
         }
         $Base = new Base();

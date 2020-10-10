@@ -9,6 +9,8 @@ use think\facade\Lang;
 use app\index\controller\Base;
 
 use app\admin\model\IdxUser;
+use app\admin\model\SysSet;
+use app\admin\model\SysSetting;
 
 
 class Login extends Base{
@@ -49,6 +51,7 @@ class Login extends Base{
     public function 注册(){
         View::assign('z', read_word());
         View::assign('code', Request::instance()->param('code'));
+        View::assign('invest', SysSetting::where('sign', '注册推荐码')->value('value'));
         return View::fetch();
     }
 
@@ -64,9 +67,9 @@ class Login extends Base{
             return return_data(2, '', Lang::get($validate->getError()));
         }
         $top_id = IdxUser::where('invite_code', $invite_code)->value('user_id');
-        $res = IdxUser::create_data($助记词, $password, $top_id, '会员' . create_captcha(8, 'lowercase+uppercase+figure'), $level_password);
+        $res = IdxUser::create_data($助记词, $password, $top_id, create_captcha(8, 'lowercase+uppercase+figure'), $level_password);
         if($res){
-            return return_data(1, $res, Lang::get('注册成功, ID号为') . $res);
+            return return_data(1, $res, Lang::get('注册成功, ID号为') . $res . '. 此ID请牢记，登陆系统时使用');
         }else{
             return return_data(2, '', Lang::get('注册失败'));
         }

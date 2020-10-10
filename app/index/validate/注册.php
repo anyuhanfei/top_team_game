@@ -5,13 +5,14 @@ use think\Validate;
 use think\facade\Session;
 
 use app\admin\model\IdxUser;
+use app\admin\model\SysSetting;
 
 use app\index\validate\Base;
 
 
 class 注册 extends Base{
     protected $rule = [
-        'invite_code'=> 'require|checkInviteCode',
+        'invite_code'=> 'checkInviteCode',
         'password'=> 'require|confirm:password_confirm|checkPasswordRule',
         'password_confirm'=> 'require',
         'level_password'=> 'require|confirm:level_password_confirm|checkLevelPasswordRule',
@@ -19,7 +20,6 @@ class 注册 extends Base{
     ];
 
     protected $message = [
-        'invite_code.require'=> '请填写推荐码',
         'password.require'=> '请填写登录密码',
         'password.confirm'=> '填写确认登录密码与登录密码不一致',
         'password_confirm.require'=> '请填写确认登录密码',
@@ -29,9 +29,15 @@ class 注册 extends Base{
     ];
 
     public function checkInviteCode($value, $rule, $data){
-        $user = IdxUser::where('invite_code', $value)->find();
-        if(!$user){
-            return '无效邀请码';
+        return SysSetting::where('sign', '注册推荐码')->value('value');
+        if(SysSetting::where('sign', '注册推荐码')->value('value') == 'on'){
+            if($value == ''){
+                return "请输入推荐码";
+            }
+            $user = IdxUser::where('invite_code', $value)->find();
+            if(!$user){
+                return '无效邀请码';
+            }
         }
         return true;
     }

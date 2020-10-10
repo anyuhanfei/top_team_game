@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/checked.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.mui-pull-right{
+			margin-top: 10px;
+		}
+		.public_box textarea{
+			background-color: rgba(0,0,0,0);
+			height: 60px;
+			margin:5px 0;
+			border: 1px solid #fff;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('子账号资产管理')}</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			{volist name="accounts" id="vo"}
+			{if condition="$vo.is_login == 0"}
+			<div class="border_bot_green account_box">
+				<div class="line_left">{$vo.nickname}</div>
+				<div>&nbsp;</div>
+				<label for="aa" class="flexbox_nowrap flexbox_nowrap_between">
+					<div class="radio_box">USDT:{$vo.userfund.USDT}</div>
+					<div class="radio_box">TTP:{$vo.userfund.TTP}</div>
+					<div class="radio_box">&nbsp;</div>
+					<div class="radio_box">&nbsp;</div>
+				</label>
+			</div>
+			{/if}
+			{/volist}
+			<div class="border_bot_green flexbox_nowrap flexbox_nowrap_start">
+				<img src="/static/index/img/收支明细@2x.png" class="img_size">
+				<div>{:lang('一键归集')}</div>
+			</div>
+		</div>
+		
+	</div>
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		$(".flexbox_nowrap_start").click(function(){
+			$.ajax({
+				url: "/index/me/归集",
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = "/index/me/子资产管理"
+						}, 1000);
+					}
+				}
+			})
+		})
+	</script>
+</body>
+</html>

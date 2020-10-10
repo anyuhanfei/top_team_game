@@ -15,6 +15,7 @@ use app\admin\model\IdxUserFund;
 use app\admin\model\LogUserFund;
 use app\admin\model\IdxUserMill;
 use app\admin\model\UserCharge;
+use app\admin\model\IdxUser;
 
 
 class Mefund extends Index{
@@ -27,7 +28,7 @@ class Mefund extends Index{
     }
 
     public function coin($coin_type){
-        if($coin_type != 'USDT' && $coin_type != 'TTP' && $coin_type != 'TTA' && $coin_type != '能量石'){
+        if($coin_type != 'USDT' && $coin_type != 'TTP' && $coin_type != 'TTA' && $coin_type != '能量石' && $coin_type != '门票'){
             return redirect('/index/非法操作');
         }
         $log = LogUserFund::where('coin_type', $coin_type)->where('user_id', $this->user_id)->order('id desc')->select();
@@ -103,7 +104,7 @@ class Mefund extends Index{
     public function 提现(){
         $type = Request::instance()->param('type', '');
         View::assign('type', $type);
-        View::assign('fee', Cache::get('settings')['提现手续费']);
+        View::assign('fee', Cache::get('settings')[$type . '提现手续费']);
         return View::fetch();
     }
 
@@ -117,7 +118,7 @@ class Mefund extends Index{
             return return_data(2, '', Lang::get($validate->getError()));
         }
         Db::startTrans();
-        $fee = Cache::get('settings')['提现手续费'];
+        $fee = Cache::get('settings')[$type . '提现手续费'];
         $user_fund = IdxUserFund::find($this->user_id);
         $user_fund->$type -= $number + $fee;
         $res_one = $user_fund->save();
@@ -151,29 +152,62 @@ class Mefund extends Index{
     }
 
     public function 转账提交(){
+        $type = Request::instance()->param('type', '');
         $coin_type = Request::instance()->param('coin_type', '');
         $to_user_id = Request::instance()->param('to_user_id', '');
         $number = Request::instance()->param('number', 0);
         $level_password = Request::instance()->param('level_password', '');
         $validate = new \app\index\validate\转账();
-        if(!$validate->check(['coin_type'=> $coin_type, 'to_user_id'=> $to_user_id, 'number'=> $number, 'level_password'=> $level_password])){
+        if(!$validate->check(['type'=> $type, 'coin_type'=> $coin_type, 'to_user_id'=> $to_user_id, 'number'=> $number, 'level_password'=> $level_password])){
             return return_data(2, '', Lang::get($validate->getError()));
         }
         Db::startTrans();
         $from_user_fund = IdxUserFund::find($this->user_id);
         $to_user_fund = IdxUserFund::find($to_user_id);
-        $from_user_fund->$coin_type -= $number;
+        $fee = $type == 'z' ? 0 : $number * Cache::get('settings')['转账fee'] * 0.01;
+        $from_user_fund->$coin_type -= $number + $fee;
         $to_user_fund->$coin_type += $number;
         $res_one = $from_user_fund->save();
         $res_two = $to_user_fund->save();
         if($res_one && $res_two){
-            LogUserFund::create_data($from_user_fund->user_id, '-' . $number, $coin_type, '转账', '给'. $to_user_id .'转账');
-            LogUserFund::create_data($to_user_fund->user_id, $number, $coin_type, '转账', $this->user_id . '给我转账');
+            LogUserFund::create_data($from_user_fund->user_id, '-' . $number, $coin_type, '转账', '转账');
+            if($fee > 0){
+                LogUserFund::create_data($from_user_fund->user_id, '-' . $fee, $coin_type, '转账', '转账手续费');
+            }
+            LogUserFund::create_data($to_user_fund->user_id, $number, $coin_type, '转账', '向我转账');
             Db::commit();
             return return_data(1, '', Lang::get('转账成功'), '给' . $to_user_id . '转账');
         }else{
             Db::rollback();
             return return_data(2, '', Lang::get('转账失败'));
+        }
+    }
+
+    public function 转入(){
+        return View::fetch();
+    }
+
+    public function 转入提交(){
+        $type = Request::instance()->param('type', '');
+        $number = Request::instance()->param('number', 0);
+        $level_password = Request::instance()->param('level_password', '');
+        $validate = new \app\index\validate\转入();
+        if(!$validate->check(['type'=> $type, 'number'=> $number, 'level_password'=> $level_password])){
+            return return_data(2, '', Lang::get($validate->getError()));
+        }
+        Db::startTrans();
+        $user_fund = IdxUserFund::find($this->user_id);
+        $user_fund->$type -= $number;
+        $user_fund->门票 += $number;
+        $res = $user_fund->save();
+        if($res){
+            LogUserFund::create_data($this->user_id, '-' . $number, $type, '转入门票', '转入门票');
+            LogUserFund::create_data($this->user_id, $number, '门票', '转入门票', '转入门票');
+            Db::commit();
+            return return_data(1, '', Lang::get('转入成功'), '转入门票');
+        }else{
+            Db::rollback();
+            return return_data(2, '', Lang::get('转入失败'));
         }
     }
 
@@ -202,5 +236,54 @@ class Mefund extends Index{
         $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->order('id desc')->select();
         View::assign('log', $log);
         return View::fetch();
+    }
+
+    public function 子资产管理(){
+        $accounts = $this->get_账号s();
+        foreach ($accounts as &$v) {
+            $v['userfund'] = IdxUserFund::find($v['id']);
+        }
+        View::assign('accounts', $accounts);
+        return View::fetch();
+    }
+
+    public function 归集(){
+        Db::startTrans();
+        $user_fund = IdxUserFund::find($this->user_id);
+        $pan_users = IdxUser::where('pan_user_id', $this->user_id)->select();
+        $usdt_all = 0;
+        $ttp_all = 0;
+        foreach($pan_users as $v){
+            $pan_user_fund = IdxUserFund::find($v->user_id);
+            $usdt_all += $pan_user_fund->USDT;
+            $ttp_all += $pan_user_fund->TTP;
+            $usdt_temp = $pan_user_fund->USDT;
+            $ttp_temp = $pan_user_fund->TTP;
+            $pan_user_fund->USDT = 0;
+            $pan_user_fund->TTP = 0;
+            $pan_user_fund->save();
+            if($usdt_temp > 0){
+                LogUserFund::create_data($v->user_id, '-' . $usdt_temp, 'USDT', '归集', '归集');
+            }
+            if($ttp_temp > 0){
+                LogUserFund::create_data($v->user_id, '-' . $ttp_temp, 'TTP', '归集', '归集');
+            }
+        }
+        $user_fund->USDT += $usdt_all;
+        $user_fund->TTP += $ttp_all;
+        $res = $user_fund->save();
+        if($res){
+            if($usdt_all > 0){
+                LogUserFund::create_data($this->user_id, $usdt_all, 'USDT', '归集', '归集');
+            }
+            if($ttp_all > 0){
+                LogUserFund::create_data($this->user_id, $ttp_all, 'TTP', '归集', '归集');
+            }
+            Db::commit();
+            return return_data(1, '', Lang::get('操作成功'), '归集');
+        }else{
+            Db::rollback();
+            return return_data(2, '', Lang::get('操作失败'));
+        }
     }
 }

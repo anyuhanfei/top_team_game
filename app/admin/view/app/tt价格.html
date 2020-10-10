@@ -15,7 +15,8 @@
                         <div class="card-title">TTP价格设置</div>
                         <div class="card-sub text-warning">
                             请提前设置TTP价格, 若当日未设置TTP价格, 那么当日TTP价格将与前一日价格相同.<br/>
-                            TTP价值为:  1USDT兑换TTP的比例
+                            TTP价值为:  1TTP兑换USDT的比例.<br/>
+                            当日及其之前日期的价格比例不可修改
                         </div>
                     </div>
                     <div class="card-body">
@@ -24,7 +25,7 @@
                                 {$next_date}
                             </div>
                             <div class="form-group">
-                                <input type="text" class="form-control" name="price" id="price"placeholder="请填写TTP价值" style="width: 150px;">
+                                <input type="text" class="form-control" name="price" id="price"placeholder="1TTP兑换USDT的比例" style="width: 150px;">
                             </div>
                             <button type="button" class="btn btn-default" id="add_submit">设置</button>&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" id="from_close">清空</button>
@@ -41,7 +42,12 @@
                                 {volist name="list" id="c"}
                                 <tr>
                                     <td>{$c.id}</td>
-                                    <td>{$c.price}</td>
+                                    <td id="price{$c.id}">{$c.price}</td>
+                                    <td>
+                                        {if condition="$c.is_update == 1"}
+                                        <button class="btn btn-warning btn-xs" onclick="update('{$c.id}')">编辑</button>
+                                        {/if}
+                                    </td>
                                 </tr>
                                 {/volist}
                             </tbody>
@@ -79,5 +85,27 @@
             }
         })
     })
+
+    function update(id){
+        layer.prompt({title: '请输入新的TTP兑换USDT的比例', formType: 3}, function(pass, index){
+            layer.close(index);
+            $.ajax({
+                url: "/admin/app/tt价格/add/submit",
+                type: "post",
+                data: {price: pass, id: id},
+                success: function(data){
+                    data = JSON.parse(data)
+                    if(data.status == 3){
+                        custom_notify('danger', '兑换比例设置', data.msg);
+                    }else if(data.status == 2){
+                        custom_notify('warning', '兑换比例设置', data.msg);
+                    }else{
+                        custom_notify('success', '兑换比例设置', data.msg);
+                        $("#price" + id).html(pass)
+                    }
+                }
+            })
+        });
+    }
 </script>
 {/block}
