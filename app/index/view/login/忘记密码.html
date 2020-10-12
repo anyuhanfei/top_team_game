@@ -29,9 +29,16 @@
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
 			<div class="public_box">
-				<a href="/index/登录" class="flexbox_nowrap flexbox_nowrap_start public_padding">
-					<div class="mui-icon mui-icon-left-nav"></div>
-					<h4>{:lang("忘记密码")}?</h4>
+				<a href="###" class="flexbox_nowrap flexbox_nowrap_start public_padding">
+					<div class="mui-icon mui-icon-left-nav"  onclick="location.href='/index/登录'"></div>
+					<h4 onclick="location.href='/index/登录'">{:lang("忘记密码")}?</h4>
+					<div class="flexbox_nowrap flexbox_nowrap_between select_box">
+						<select id="language">
+							<option value="zh-cn" {if condition="$language == '中文'"}selected{/if}>中文</option>
+							<option value="en-us" {if condition="$language == 'English'"}selected{/if}>English</option>
+						</select>
+						<div>▼</div>
+					</div>
 				</a>
 				<div class="head_box">
 					<img src="/static/index/img/logo.png" class="head_img">
@@ -74,6 +81,10 @@
 					}
 				}
 			})
+		})
+
+		$("#language").change(function(){
+			location.href = "/index/忘记密码?language=" + $("#language").val();
 		})
 	</script>
 </body>

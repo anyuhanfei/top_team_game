@@ -22,3 +22,22 @@
 	padding: 0;
 	padding-left: 10px;
 }
+.select_box{
+	width: 32%;
+	border: 1px solid #3AE2C1;
+	margin-left: auto;
+}
+.select_box div{
+	color: #3AE2C1;
+}
+.select_box select{
+	display: block;
+	text-align: center;
+	background-color: rgba(0,0,0,0);
+	margin: 0;
+	padding: 5px 10px;
+}
+.select_box select option{
+	background-color: rgba(0,0,0,0);
+	color: #333;
+}

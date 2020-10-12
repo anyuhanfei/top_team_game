@@ -174,7 +174,7 @@ return [
     '确认登录密码'=> 'Confirm login password',
     '提交'=> 'submit',
     '注册'=> 'register',
-    '助记词用于恢复登录二级密码,请将它按顺序准确写道纸上,并妥善保管。'=> 'Mnemonic is used to restore the login second password, Please write it exactly on the paper in the correct order, And keep it safe.',
+    '助记词用于恢复登录二级密码,请将它按顺序准确记录,并妥善保管。'=> 'Mnemonic is used to restore the login second password, Please write it exactly on the paper in the correct order, And keep it safe.',
     '请设置二级密码'=> 'Please set the second password',
     '确认二级密码'=> 'Confirm second password',
     '请输入邀请码'=> 'Please enter the invitation code',

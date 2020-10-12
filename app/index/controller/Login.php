@@ -4,6 +4,7 @@ namespace app\index\controller;
 use think\facade\View;
 use think\facade\Request;
 use think\facade\Session;
+use think\facade\Cookie;
 use think\facade\Lang;
 
 use app\index\controller\Base;
@@ -15,6 +16,7 @@ use app\admin\model\SysSetting;
 
 class Login extends Base{
     public function 登录(){
+        View::assign('think_lang', Cookie::get('think_lang'));
         return View::fetch();
     }
 

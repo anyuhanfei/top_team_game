@@ -18,7 +18,14 @@
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
 			<div class="public_box">
-				<h4 class="login_title">{:lang("登录")}</h4>
+				<div class="flexbox_nowrap flexbox_nowrap_between select_box">
+					<select id="language">
+					  <option value="zh-cn" {if condition="$language == '中文'"}selected{/if}>中文</option>
+					  <option value="en-us" {if condition="$language == 'English'"}selected{/if}>English</option>
+					</select>
+					<div>▼</div>
+				</div>
+				<!-- <h4 class="login_title">{:lang("登录")}</h4> -->
 				<div class="head_box">
 					<img src="/static/index/img/logo.png" class="head_img">
 					<div class="title"> <span class="green_color mui-text-center">&nbsp;</span> </div>
@@ -59,6 +66,10 @@
 					}
 				}
 			})
+		})
+
+		$("#language").change(function(){
+			location.href = "/index/登录?language=" + $("#language").val();
 		})
 	</script>
 </body>

@@ -58,9 +58,9 @@ class Base{
 
         //语言
         if(Cookie::get('think_lang') == 'zh-cn'){
-            View::assign('language', 'English');
-        }else{
             View::assign('language', '中文');
+        }else{
+            View::assign('language', 'English');
         }
     }
 

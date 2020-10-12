@@ -17,7 +17,7 @@ class Language{
                 return redirect($url);
             }
         }
-        if(is_null(Cookie::get('think_var'))){
+        if(is_null(Cookie::get('think_lang'))){
             Cookie::set('think_lang', 'zh-cn');
         }
         return $next($request);
