@@ -237,6 +237,9 @@ class Me extends Index{
 
     public function 添加子账号(){
         $nickname = Request::instance()->param('nickname', '');
+        if($nickname == ''){
+            return return_data(2, '', '昵称不能为空');
+        }
         if($this->user->pan_user_id != 0){
             return return_data(2, '', Lang::get('请在主账号下进行此操作'));
         }
