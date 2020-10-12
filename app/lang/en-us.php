@@ -301,4 +301,5 @@ return [
     '微信号'=> 'Wechat ID',
     '暂未开放...'=> 'Temporarily not opened...',
     '价格'=> ' price',
+    '正在开发中...'=> 'being developed...'
 ];

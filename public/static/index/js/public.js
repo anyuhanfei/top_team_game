@@ -55,9 +55,7 @@ function upload(e, i) {
 	}
 }
 // 点击显示提示框
-$('.w_toast').click(function () {
-	mui.toast('正在开发中... <br/>being developed...');
-})
+
 // 时间戳转换年月日时分秒
 function daytime(time){
 	let time_chuo =time;
