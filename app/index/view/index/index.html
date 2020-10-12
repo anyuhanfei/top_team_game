@@ -27,6 +27,9 @@
 			grid-template-columns: 1fr 1fr 7fr;
 			margin: 10px;
 		}
+		.a_btn{
+			margin-top: 5px;
+		}
 		/* #echart{
 			margin-top: 15px;
 		} */
@@ -94,7 +97,7 @@
 						<div>{:lang("更多")}</div>
 					</a>
 				</div>
-				<div style="height:20px; text-align: center; margin-top: 10px;">TTP价格：{$tt_prices[0]['price']}USDT</div>
+				<div style="height:20px; text-align: center; margin-top: 10px;">TTP{:lang("价格")}：{$tt_prices[0]['price']}USDT</div>
 				<div id="echart" style="width: 100%; height: 180px;"></div>
 			</div>
 			<div>
@@ -119,8 +122,8 @@
 					</div>
 				</div>
 				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
-					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
-						<div>${$btc->last_number}</div>
+					<div class="type_box" style="margin: 0; line-height: 42px;">
+						${$btc->last_number}
 					</div>
 				</div>
 				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
@@ -135,7 +138,7 @@
 					</div>
 				</div>
 				<div class="mui-col-sm-4 mui-col-xs-4 mui-text-center">
-					<div class="type_box flexbox_nowrap flexbox_nowrap_start">
+					<div class="type_box" style="margin: 0; line-height: 42px;">
 						<div>${$eth->last_number}</div>
 					</div>
 				</div>

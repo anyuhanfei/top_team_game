@@ -299,5 +299,6 @@ return [
     '我的助记词'=> 'My mnemonic',
     '微信二维码'=> 'WeChat qr code',
     '微信号'=> 'Wechat ID',
-    '暂未开放...'=> 'Temporarily not opened...'
+    '暂未开放...'=> 'Temporarily not opened...',
+    '价格'=> ' price'
 ];
