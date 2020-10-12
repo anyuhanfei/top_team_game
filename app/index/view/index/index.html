@@ -154,7 +154,7 @@
 			<span class="mui-icon iconfont icon_1"></span>
 	        <span class="mui-tab-label">{:lang("首页")}</span>
 	    </a>
-	    <a href="/index/游戏" target="_blank" class="mui-tab-item">
+	    <a href="###" target="_blank" class="mui-tab-item" id="game">
 	        <span class="mui-icon iconfont icon_2"></span>
 	        <span class="mui-tab-label">{:lang("游戏")}</span>
 	    </a>
@@ -173,6 +173,8 @@
 	<script src="/static/index/js/swiper.js"></script>
 	<script src="/static/index/js/echarts.min.js"></script>
 	<script type="text/javascript">
+		mui('.mui-bar-tab').on('tap', '#game', function () { mui.toast("{:lang('暂未开放...')}") });
+
 		// 基于准备好的dom，初始化echarts实例
 		var myChart = echarts.init(document.getElementById('echart'));
 		option = {
