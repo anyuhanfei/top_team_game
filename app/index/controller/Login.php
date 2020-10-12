@@ -65,7 +65,6 @@ class Login extends Base{
         $level_password = Request::instance()->param('level_password', '');
         $level_password_confirm = Request::instance()->param('level_password_confirm', '');
         $validate = new \app\index\validate\注册();
-        var_dump(SysSetting::where('sign', '注册推荐码')->value('value'));
         if(SysSetting::where('sign', '注册推荐码')->value('value') == 'on'){
             if($invite_code == ''){
                 return return_data(2, '', Lang::get('请输入推荐码'));

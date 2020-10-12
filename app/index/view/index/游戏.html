@@ -221,20 +221,17 @@
 			})
 		})
 
-		setTimeout(() => {
-			if("{$a}" != 'a'){
-				if("{$language}" == "English"){
-					mui.alert('Temporarily not opened...', 'hint', 'affirm', function(){
-						location.href = "/index";
-					})
-				}else{
-					mui.alert('暂未开放...', '提示', '确认', function(){
-						location.href = "/index";
-					})
-				}
+		if("{$a}" != 'a'){
+			if("{$language}" == "English"){
+				mui.alert('Temporarily not opened...', 'hint', 'affirm', function(){
+					location.href = "/index";
+				})
+			}else{
+				mui.alert('暂未开放...', '提示', '确认', function(){
+					location.href = "/index";
+				})
 			}
-		}, 10);
-		
+		}
 	</script>
 </body>
 </html>
