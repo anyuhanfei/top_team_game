@@ -297,4 +297,6 @@ return [
     '子账号转账'=> 'Subaccount transfer',
     '全网转账'=> 'So transfer',
     '我的助记词'=> 'My mnemonic',
+    '微信二维码'=> 'WeChat qr code',
+    '微信号'=> 'Wechat ID',
 ];

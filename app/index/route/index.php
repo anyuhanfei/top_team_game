@@ -37,6 +37,7 @@ Route::rule('/退出登录', 'index/login/退出登录');
 //个人中心
 Route::get('/me', 'index/me/index');
 Route::get('/me/账户管理', 'index/me/账户管理');
+Route::get('/me/客服', 'index/me/客服');
 Route::post('/me/添加子账号', 'index/me/添加子账号');
 Route::post('/me/切换账号', 'index/me/切换账号');
 Route::get('/me/子资产管理', 'index/mefund/子资产管理');

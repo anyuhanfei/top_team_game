@@ -38,7 +38,9 @@
 				<label for="aa" class="flexbox_nowrap flexbox_nowrap_between">
 					<div class="radio_box">USDT:{$vo.userfund.USDT}</div>
 					<div class="radio_box">TTP:{$vo.userfund.TTP}</div>
-					<div class="radio_box">&nbsp;</div>
+					<div class="radio_box" style="width: 30px;">
+						<a href="###" onclick="gj({$vo.id})" class="a_btn" style="margin-top: -25%; width: 50px;">归集</a>
+					</div>
 					<div class="radio_box">&nbsp;</div>
 				</label>
 			</div>
@@ -68,6 +70,21 @@
 				}
 			})
 		})
+
+		function gj(id){
+			$.ajax({
+				url: "/index/me/归集?id=" + id,
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						setTimeout(() => {
+							location.href = "/index/me/子资产管理"
+						}, 1000);
+					}
+				}
+			})
+		}
 	</script>
 </body>
 </html>

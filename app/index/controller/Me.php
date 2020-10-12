@@ -12,7 +12,7 @@ use app\index\controller\Index;
 use app\admin\model\CmsArticle;
 use app\admin\model\IdxUserData;
 use app\admin\model\IdxUser;
-
+use app\admin\model\SysAd;
 
 class Me extends Index{
     public function __construct(){
@@ -245,5 +245,11 @@ class Me extends Index{
         }
         IdxUser::create_data(read_word(), '', $this->user_id, $nickname, '', $this->user_id);
         return return_data(1, '', Lang::get('添加成功'), '添加子账号');
+    }
+
+    public function 客服(){
+        View::assign('wx', SysAd::where('sign', '微信号')->value('value'));
+        View::assign('wx_img', SysAd::where('sign', '微信二维码')->value('image'));
+        return View::fetch();
     }
 }

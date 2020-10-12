@@ -250,42 +250,76 @@ class Mefund extends Index{
     }
 
     public function 归集(){
-        Db::startTrans();
-        $user_fund = IdxUserFund::find($this->user_id);
-        $pan_users = IdxUser::where('pan_user_id', $this->user_id)->select();
-        $usdt_all = 0;
-        $ttp_all = 0;
-        foreach($pan_users as $v){
-            $pan_user_fund = IdxUserFund::find($v->user_id);
-            $usdt_all += $pan_user_fund->USDT;
-            $ttp_all += $pan_user_fund->TTP;
+        $id = Request::instance()->param('id', 0);
+        if($id != 0){
+            Db::startTrans();
+            $user_fund = IdxUserFund::find($this->user_id);
+            $pan_users = IdxUser::where('pan_user_id', $this->user_id)->select();
+            $usdt_all = 0;
+            $ttp_all = 0;
+            foreach($pan_users as $v){
+                $pan_user_fund = IdxUserFund::find($v->user_id);
+                $usdt_all += $pan_user_fund->USDT;
+                $ttp_all += $pan_user_fund->TTP;
+                $usdt_temp = $pan_user_fund->USDT;
+                $ttp_temp = $pan_user_fund->TTP;
+                $pan_user_fund->USDT = 0;
+                $pan_user_fund->TTP = 0;
+                $pan_user_fund->save();
+                if($usdt_temp > 0){
+                    LogUserFund::create_data($v->user_id, '-' . $usdt_temp, 'USDT', '归集', '归集');
+                }
+                if($ttp_temp > 0){
+                    LogUserFund::create_data($v->user_id, '-' . $ttp_temp, 'TTP', '归集', '归集');
+                }
+            }
+            $user_fund->USDT += $usdt_all;
+            $user_fund->TTP += $ttp_all;
+            $res = $user_fund->save();
+            if($res){
+                if($usdt_all > 0){
+                    LogUserFund::create_data($this->user_id, $usdt_all, 'USDT', '归集', '归集');
+                }
+                if($ttp_all > 0){
+                    LogUserFund::create_data($this->user_id, $ttp_all, 'TTP', '归集', '归集');
+                }
+                Db::commit();
+                return return_data(1, '', Lang::get('操作成功'), '归集');
+            }else{
+                Db::rollback();
+                return return_data(2, '', Lang::get('操作失败'));
+            }
+        }else{
+            Db::startTrans();
+            $user_fund = IdxUserFund::find($this->user_id);
+            $z_user = IdxUser::find($id);
+            if($z_user->pan_user_id != $this->user_id){
+                return return_data(2, '', '非法操作');
+            }
+            $pan_user_fund = IdxUserFund::find($id);
             $usdt_temp = $pan_user_fund->USDT;
             $ttp_temp = $pan_user_fund->TTP;
             $pan_user_fund->USDT = 0;
             $pan_user_fund->TTP = 0;
             $pan_user_fund->save();
+            $user_fund->USDT += $usdt_temp;
+            $user_fund->TTP += $ttp_temp;
+            $res = $user_fund->save();
             if($usdt_temp > 0){
-                LogUserFund::create_data($v->user_id, '-' . $usdt_temp, 'USDT', '归集', '归集');
+                LogUserFund::create_data($id, '-' . $usdt_temp, 'USDT', '归集', '归集');
+                LogUserFund::create_data($this->user_id, $usdt_temp, 'USDT', '归集', '归集');
             }
             if($ttp_temp > 0){
-                LogUserFund::create_data($v->user_id, '-' . $ttp_temp, 'TTP', '归集', '归集');
+                LogUserFund::create_data($id, '-' . $ttp_temp, 'TTP', '归集', '归集');
+                LogUserFund::create_data($this->user_id, $ttp_temp, 'TTP', '归集', '归集');
             }
-        }
-        $user_fund->USDT += $usdt_all;
-        $user_fund->TTP += $ttp_all;
-        $res = $user_fund->save();
-        if($res){
-            if($usdt_all > 0){
-                LogUserFund::create_data($this->user_id, $usdt_all, 'USDT', '归集', '归集');
+            if($res){
+                Db::commit();
+                return return_data(1, '', Lang::get('操作成功'), '归集');
+            }else{
+                Db::rollback();
+                return return_data(2, '', Lang::get('操作失败'));
             }
-            if($ttp_all > 0){
-                LogUserFund::create_data($this->user_id, $ttp_all, 'TTP', '归集', '归集');
-            }
-            Db::commit();
-            return return_data(1, '', Lang::get('操作成功'), '归集');
-        }else{
-            Db::rollback();
-            return return_data(2, '', Lang::get('操作失败'));
         }
     }
 }
