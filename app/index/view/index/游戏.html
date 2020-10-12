@@ -156,6 +156,14 @@
 		    <span class="mui-tab-label">{:lang("我的")}</span>
 		</a>
 	</nav>
+	<style>
+		.mui-popup-title {
+			color:#000;
+		}
+		.mui-popup-text {
+			color:#000;
+		}
+	</style>
 	<script src="/static/index/js/jquery.min.js"></script>
 	<script src="/static/index/js/public.js"></script>
 	<script type="text/javascript">
@@ -212,6 +220,21 @@
 				}
 			})
 		})
+
+		setTimeout(() => {
+			if("{$a}" != 'a'){
+				if("{$language}" == "English"){
+					mui.alert('Temporarily not opened...', 'hint', 'affirm', function(){
+						location.href = "/index";
+					})
+				}else{
+					mui.alert('暂未开放...', '提示', '确认', function(){
+						location.href = "/index";
+					})
+				}
+			}
+		}, 10);
+		
 	</script>
 </body>
 </html>

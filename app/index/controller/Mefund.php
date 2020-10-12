@@ -16,7 +16,7 @@ use app\admin\model\LogUserFund;
 use app\admin\model\IdxUserMill;
 use app\admin\model\UserCharge;
 use app\admin\model\IdxUser;
-
+use app\admin\model\IdxUserCount;
 
 class Mefund extends Index{
     public function __construct(){
@@ -64,10 +64,12 @@ class Mefund extends Index{
         $money = $number * $能量石兑换比例;
         $user_fund = IdxUserFund::find($this->user_id);
         $user_fund->能量石 -= $money;
-        $user_fund->number += $number;
-        $res = $user_fund->save();
+        $res_one = $user_fund->save();
+        $user_count = IdxUserCount::find($this->user_id);
+        $user_count->今日最大局数 += $number;
+        $res_two = $user_count->save();
         LogUserFund::create_data($this->user_id, '-' . $money, '能量石', '兑换', '能量石兑换可玩次数');
-        if($res){
+        if($res_two && $res_one){
             return return_data(1, '', Lang::get('兑换成功'), '能量石兑换');
         }else{
             return return_data(2, '', Lang::get('兑换失败'));

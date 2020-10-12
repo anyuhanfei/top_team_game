@@ -124,6 +124,7 @@ class Index extends Base{
     }
 
     public function 游戏(){
+        View::assign('a', Request::instance()->param('a'));
         //统计
         $user_count = IdxUserCount::find($this->user_id);
         if($user_count->today_date != date("Y-m-d", time())){
