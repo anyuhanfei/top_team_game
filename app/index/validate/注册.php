@@ -29,7 +29,8 @@ class 注册 extends Base{
     ];
 
     public function checkInviteCode($value, $rule, $data){
-        return SysSetting::where('sign', '注册推荐码')->value('value');
+        var_dump(SysSetting::where('sign', '注册推荐码')->value('value'));
+        return 'aaaa';
         if(SysSetting::where('sign', '注册推荐码')->value('value') == 'on'){
             if($value == ''){
                 return "请输入推荐码";

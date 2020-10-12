@@ -99,14 +99,14 @@
 				data: {助记词: 助记词, password: password, password_confirm: password_confirm, level_password: level_password, level_password_confirm: level_password_confirm, invite_code: invite_code},
 				success: function(data){
 					data = JSON.parse(data)
-					if(data.code == 1){
-						layer.alert(data.msg, function(index){
-							location.href = "/index/登录";
-							layer.close(index);
-						});
-					}else{
-						layer.msg(data.msg)
-					}
+					// if(data.code == 1){
+					// 	layer.alert(data.msg, function(index){
+					// 		location.href = "/index/登录";
+					// 		layer.close(index);
+					// 	});
+					// }else{
+					// 	mui.toast(data.msg)
+					// }
 				}
 			})
 		})
