@@ -300,5 +300,5 @@ return [
     '微信二维码'=> 'WeChat qr code',
     '微信号'=> 'Wechat ID',
     '暂未开放...'=> 'Temporarily not opened...',
-    '价格'=> ' price'
+    '价格'=> ' price',
 ];
