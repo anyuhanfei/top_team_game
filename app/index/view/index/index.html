@@ -62,7 +62,7 @@
 			</div>
 			<div class="public_box">
 				<div class="mui-row">
-					<a href="###" class="mui-col-sm-3 mui-col-xs-3 mui-text-center" onclick="a()">
+					<a href="/index/游戏" class="mui-col-sm-3 mui-col-xs-3 mui-text-center">
 						<img src="/static/index/img/游戏.png" class="img_big_size">
 						<div>{:lang("游戏")}</div>
 					</a>
@@ -154,7 +154,7 @@
 			<span class="mui-icon iconfont icon_1"></span>
 	        <span class="mui-tab-label">{:lang("首页")}</span>
 	    </a>
-	    <a href="###" target="_blank" class="mui-tab-item" id="game">
+	    <a href="/index/游戏" target="_blank" class="mui-tab-item" id="game">
 	        <span class="mui-icon iconfont icon_2"></span>
 	        <span class="mui-tab-label">{:lang("游戏")}</span>
 	    </a>
@@ -173,10 +173,6 @@
 	<script src="/static/index/js/swiper.js"></script>
 	<script src="/static/index/js/echarts.min.js"></script>
 	<script type="text/javascript">
-		mui('.mui-bar-tab').on('tap', '#game', function () { mui.toast("{:lang('暂未开放...')}") });
-		function a(){
-			mui.toast("{:lang('暂未开放...')}")
-		}
 		// 基于准备好的dom，初始化echarts实例
 		var myChart = echarts.init(document.getElementById('echart'));
 		option = {

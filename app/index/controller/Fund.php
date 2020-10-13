@@ -142,9 +142,9 @@ class Fund extends Base{
     public static function 游戏(){
         $sleep_time = 30;
         self::$cache_settings['游戏房间玩家数量'] = self::$cache_settings['游戏房间玩家数量'] > 10 ? 10 : self::$cache_settings['游戏房间玩家数量'];
-        if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
-            return;
-        }
+        // if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
+        //     return;
+        // }
         while(true){
             $queue = GameQueue::where('is_pop', 0)->order('id asc')->limit(self::$cache_settings['游戏房间玩家数量'])->select();
             if(count($queue) != self::$cache_settings['游戏房间玩家数量']){

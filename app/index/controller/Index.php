@@ -98,11 +98,11 @@ class Index extends Base{
             return return_data(2, '', Lang::get('二级密码输入错误'));
         }
         $user_fund = IdxUserFund::find($this->user_id);
-        if($user_fund->TTP < $price){
-            return return_data(2, '', Lang::get('TTP余额不足'));
+        if($user_fund->门票 < $price){
+            return return_data(2, '', Lang::get('门票余额不足'));
         }
         Db::startTrans();
-        $user_fund->TTP -= $price;
+        $user_fund->门票 -= $price;
         $res_one = $user_fund->save();
         $user_count = IdxUserCount::find($this->user_id);
         $user_count->has_门票 = 1;
@@ -118,7 +118,7 @@ class Index extends Base{
                     LogUserFund::create_data($this->user->top_id, Cache::get('settings')['有效会员奖励'], '能量石', '下级成为有效会员', '下级第一次购买门票的上级奖励');
                 }
             }
-            LogUserFund::create_data($this->user_id, '-' . $price, 'TTP', '购买门票', '购买门票');
+            LogUserFund::create_data($this->user_id, '-' . $price, '门票', '购买门票', '购买门票');
             Db::commit();
             return return_data(1, '', Lang::get('购买成功'), '购买门票');
         }else{
@@ -128,7 +128,6 @@ class Index extends Base{
     }
 
     public function 游戏(){
-        View::assign('a', Request::instance()->param('a'));
         //统计
         $user_count = IdxUserCount::find($this->user_id);
         if($user_count->today_date != date("Y-m-d", time())){
@@ -163,11 +162,11 @@ class Index extends Base{
         if($user_count->今日最大局数 <= $user_count->今日局数){
             return return_data(2, '', Lang::get('今日可玩局数已完成'));
         }
-        if(GameQueue::where('user_id', $this->user_id)->where('is_pop', 0)->find()){
-            return return_data(2, '', Lang::get('正在游戏中, 请等待'));
-        }
-        if(time() - Session::get('game_time') < 60){
-            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为1分钟'));
+        // if(GameQueue::where('user_id', $this->user_id)->where('is_pop', 0)->find()){
+        //     return return_data(2, '', Lang::get('正在游戏中, 请等待'));
+        // }
+        if(time() - Session::get('game_time') < 10){
+            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为10秒'));
         }
         Db::startTrans();
         $res_one = GameQueue::create([
@@ -210,25 +209,25 @@ class Index extends Base{
             return return_data(2, '', Lang::get('USDT余额不足'));
         }
         $usdt_array = [20=> 1, 100=> 20, 200=> 50];
-        if(GameAuto::where('user_id', $this->user_id)->where('质押日期', date("Y-m-d", time()))->find()){
-            return return_data(2, '', Lang::get('今日已质押, 无法多次质押'));
-        }
+        // if(GameAuto::where('user_id', $this->user_id)->where('质押日期', date("Y-m-d", time()))->find()){
+        //     return return_data(2, '', Lang::get('今日已质押, 无法多次质押'));
+        // }
         $user_count = IdxUserCount::find($this->user_id);
-        if($user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt]){
+        if($user_count->今日最大局数 <= $user_count->今日局数){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
         Db::startTrans();
         $res_one = GameAuto::create([
             'user_id'=> $this->user_id,
             '质押USDT'=> $usdt,
-            '可玩局数'=> $usdt_array[$usdt],
+            '可玩局数'=> $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt],
             '质押日期'=> date("Y-m-d", time())
         ]);
         $user_fund->USDT -= $usdt;
         $res_two = $user_fund->save();
         LogUserFund::create_data($this->user_id, '-' . $usdt, 'USDT', '自动质押', '自动质押');
         if($res_one && $res_two){
-            $user_count->今日局数 += $usdt_array[$usdt];
+            $user_count->今日局数 += $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
             $user_count->save();
             Db::commit();
             return return_data(1, '', Lang::get('质押成功'), '自动参与游戏');
