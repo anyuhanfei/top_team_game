@@ -54,6 +54,10 @@ class Index extends Base{
         View::assign('user', $this->user);
     }
 
+    public function 启动图(){
+        return View::fetch();
+    }
+
     public function index(){
         //轮播图
         $banners = SysAd::where('sign', 'index_banner')->select();

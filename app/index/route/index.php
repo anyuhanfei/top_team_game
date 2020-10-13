@@ -8,6 +8,7 @@ Route::post('/语言切换', 'index/base/语言切换');
 
 // 首页
 Route::get('/', 'index/index/index');
+Route::get('/启动图', 'index/index/启动图');
 Route::get('/更多', 'index/index/更多');
 Route::get('/非法操作', 'index/base/非法操作');
 
