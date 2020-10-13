@@ -188,7 +188,7 @@ class IdxUser extends Model{
             'nickname'=> $nickname,
             'top_id'=> $top_id,
             'pan_user_id'=> $pan_user_id,
-            'register_time'=> date('Y-m-d', time())
+            'register_time'=> date('Y-m-d H:i:s', time())
         ]);
         if($res){
             IdxUserData::create(['user_id'=> $res->user_id]);
