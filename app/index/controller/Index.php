@@ -280,7 +280,7 @@ class Index extends Base{
             //我是子账号
             $accounts = [['id'=> $this->user->pan_user_id, 'nickname'=> Lang::get('主账号'), 'is_login'=> 0]];
         }
-        foreach(IdxUser::where('pan_user_id', $accounts[0]['id'])->select() as $v){
+        foreach(IdxUser::where('pan_user_id', $accounts[0]['id'])->order('register_time desc')->select() as $v){
             $accounts[] = ['id'=> $v->user_id, 'nickname'=> $v->nickname, 'is_login'=> ($v->user_id == $this->user_id ? 1 : 0)];
         }
         return $accounts;

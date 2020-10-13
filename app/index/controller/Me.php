@@ -240,6 +240,9 @@ class Me extends Index{
         if($nickname == ''){
             return return_data(2, '', '昵称不能为空');
         }
+        if(IdxUser::where('nickname', $nickname)->find()){
+            return return_data(2, '', '此昵称已存在');
+        }
         if($this->user->pan_user_id != 0){
             return return_data(2, '', Lang::get('请在主账号下进行此操作'));
         }
