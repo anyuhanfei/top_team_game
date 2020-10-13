@@ -34,6 +34,7 @@ class Fund extends Base{
      */
     public static function 发放奖励(){
         self::结算();
+        return;
         //计算今日所有奖金
         $data = SysData::find();
         $money = $data->推广玩家收益;
@@ -119,17 +120,17 @@ class Fund extends Base{
      * 每分钟执行一次
      */
     public static function 自动参与(){
-        sleep(random_int(1, 30));
+        sleep(random_int(1, 3));
         $质押s = GameAuto::where('质押日期', date("Y-m-d", time()))->select();
         foreach($质押s as $质押){
             if($质押->可玩局数 > $质押->已玩局数){
-                if(random_int(1, 10) >= 5){
-                    continue;
-                }
-                if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
-                    continue;
-                }
-                GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> 1]);
+                // if(random_int(1, 10) >= 5){
+                //     continue;
+                // }
+                // if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
+                //     continue;
+                // }
+                GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> $质押->id]);
                 $质押->已玩局数 += 1;
                 $质押->save();
             }
@@ -140,7 +141,7 @@ class Fund extends Base{
      * 每分钟执行一次
      */
     public static function 游戏(){
-        $sleep_time = 30;
+        $sleep_time = 3;
         self::$cache_settings['游戏房间玩家数量'] = self::$cache_settings['游戏房间玩家数量'] > 10 ? 10 : self::$cache_settings['游戏房间玩家数量'];
         // if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
         //     return;
@@ -180,8 +181,8 @@ class Fund extends Base{
                 $is_auto_field = 'is_auto_' . $number_array[$nowin];
                 //中奖奖励
                 $v->$is_win_field = 1;
-                if($v->$is_auto_field == 1){ //是自动, 仅添加记录
-                    $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
+                if($v->$is_auto_field != 0){ //是自动, 仅添加记录
+                    $auto = GameAuto::find($v->$is_auto_field);
                     $auto->中奖局数 += 1;
                     $auto->save();
                 }else{ //直接发钱
@@ -198,8 +199,8 @@ class Fund extends Base{
                 $is_win_field = 'is_win_' . $number_array[$i];
                 if($v->$is_win_field == 0){// 未中奖
                     $v->$is_win_field = 2;
-                    if($v->$is_auto_field == 1){ //是自动, 仅添加记录
-                       $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
+                    if($v->$is_auto_field != 0){ //是自动, 仅添加记录
+                       $auto = GameAuto::find($v->$is_auto_field);
                        $auto->未中奖局数 += 1;
                        $auto->save();
                     }else{ //直接发矿机
@@ -266,8 +267,8 @@ class Fund extends Base{
         foreach($queue as $v){
             $v->is_pop = 1;
             $v->save();
-            if($v->is_auto == 1){ //是自动
-                $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->user_id)->find();
+            if($v->is_auto != 0){ //是自动
+                $auto = GameAuto::find($v->is_auto);
                 $auto->已玩局数 -= 1;
                 $auto->save();
             }else{ //非自动, 直接返钱
@@ -280,9 +281,10 @@ class Fund extends Base{
         // 质押结算
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            $money = self::$游戏质押规格[$auto->可玩局数];
+            $money = self::$游戏质押规格[$auto->type];
             $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             for($i = 0; $i < $auto->未中奖局数; $i++){
+                $money -= 20;
                 IdxUserMill::create([
                     'user_id'=> $auto->user_id,
                     'insert_date'=> date("Y-m-d", time()),
@@ -292,7 +294,9 @@ class Fund extends Base{
             $user_fund = IdxUserFund::find($auto->user_id);
             $user_fund->USDT += $money;
             $user_fund->save();
-            LogUserFund::create_data($v->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+            LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+            $auto->status = 1;
+            $auto->save();
         }
     }
 }

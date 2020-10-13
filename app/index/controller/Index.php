@@ -219,9 +219,11 @@ class Index extends Base{
         Db::startTrans();
         $res_one = GameAuto::create([
             'user_id'=> $this->user_id,
+            'type'=> $usdt_array[$usdt],
             '质押USDT'=> $usdt,
             '可玩局数'=> $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt],
-            '质押日期'=> date("Y-m-d", time())
+            '质押日期'=> date("Y-m-d", time()),
+            'insert_time'=> date("Y-m-d H:i:s", time())
         ]);
         $user_fund->USDT -= $usdt;
         $res_two = $user_fund->save();
