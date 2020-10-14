@@ -69,7 +69,7 @@
 					<input type="password" id="level_password_confirm" placeholder="{:lang('确认二级密码')}">
 				</div>
 				<div class="public_box_bg">
-					<input type="text" id="invite_code" value="{$code}" placeholder="{:lang('请输入邀请码')}">
+					<input type="text" id="invite_code" value="{$code}" {if condition="$code != ''"}readonly{/if} placeholder="{:lang('请输入邀请码')}">
 				</div>
 				<a href="javascript:;" class="a_btn a_big_btn">{:lang('注册')}</a>
 				
