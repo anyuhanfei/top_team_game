@@ -148,10 +148,10 @@ class Deal extends Index{
         $res_one = $deal->save();
         $user_fund = IdxUserFund::find($this->user_id);
         if($deal->buy_user_id == 0){
-            $user_fund->TTP += $deal->TT;
+            $user_fund->TTP += $deal->TT + $deal->TT_fee;
             LogUserFund::create_data($this->user_id, $deal->TT, 'TTP', '交易撤销', '撤销');
         }else{
-            $user_fund->USDT += $deal->USDT;
+            $user_fund->USDT += $deal->USDT + $deal->USDT_fee;
             LogUserFund::create_data($this->user_id, $deal->USDT, 'USDT', '交易撤销', '撤销');
         }
         $res_two = $user_fund->save();
