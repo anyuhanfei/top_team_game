@@ -86,7 +86,12 @@
 		}
 	</style>
 	<script type="text/javascript">
+		var a = 0;
 		$(".a_big_btn").click(function(){
+			if(a != 0){
+				return
+			}
+			a = 1
 			var 助记词 = "{$z}";
 			var password = $("#password").val();
 			var password_confirm = $("#password_confirm").val();
@@ -107,6 +112,7 @@
 					}else{
 						mui.toast(data.msg)
 					}
+					a = 0
 				}
 			})
 		})
