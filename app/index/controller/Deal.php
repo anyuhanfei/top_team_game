@@ -137,7 +137,7 @@ class Deal extends Index{
         if(!$deal){
             return return_data(2, '', Lang::get('非法操作'));
         }
-        if($deal->buy_user_id != $this->user_id && $deal->sell_user_fund != $this->user_id){
+        if($deal->buy_user_id != $this->user_id && $deal->sell_user_id != $this->user_id){
             return return_data(2, '', Lang::get('非法操作'));
         }
         if($deal->status != 0){
