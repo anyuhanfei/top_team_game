@@ -33,6 +33,8 @@ class Fund extends Base{
      * 一天执行一次
      */
     public static function 发放奖励(){
+        self::升级();
+        return;
         self::结算();
         return;
         //计算今日所有奖金
@@ -204,8 +206,10 @@ class Fund extends Base{
                        $auto->未中奖局数 += 1;
                        $auto->save();
                     }else{ //直接发矿机
+                        $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
                         IdxUserMill::create([
                             'user_id'=> $v->$player_id_field,
+                            'price'=> $add_tt,
                             'insert_date'=> date("Y-m-d", time()),
                             'insert_time'=> date("Y-m-d H:i:s", time())
                         ]);
@@ -222,16 +226,43 @@ class Fund extends Base{
         }
     }
 
-    public static function 升级($user_id){
-        $user = IdxUser::find($user_id);
-        self::$cache_level = Cache::get('level');
-        foreach(self::$cache_level as $level){
-            if($level->level_id <= $user->level){
-                continue;
+    public static function 升级(){
+        //清空等级
+        IdxUser::where('is_admin_up_level', 0)->update(['level'=> 0]);
+        //获取全部会员
+        $users = IdxUser::select();
+        $users_data = [];
+        foreach($users as $user){
+            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'zjh'=> 0, 'zh'=> 0, 'th'=> 0, 'level'=> 0];
+        }
+        //获取合格人数
+        foreach($users as &$user){
+            if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
+                $users_data[$user->user_id]['zjh'] = 1;
+                if($user->top_id != 0){
+                    $top_user = IdxUser::find($user->top_id);
+                    $users_data[$user->top_id]['zh'] += 1;
+                    $users_data[$user->top_id]['th'] += 1;
+                    if($top_user->top_id != 0){
+                        $users_data[$top_user->top_id]['th'] += 1;
+                    }
+                }
             }
-            if($user->usercount->down_team_number >= $level->直推人数 && $user->usercount->team_number >= $level->团队人数){
-                $user->level = $level->level_id;
-                $user->save();
+        }
+        //判断条件
+        self::$cache_level = Cache::get('level');
+        foreach($users_data as $user_data){
+            foreach(self::$cache_level as $level){
+                if($user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数']){
+                    $user_data['level'] = $level['level_id'];
+                }
+            }
+            if($user_data['level'] != 0){
+                $user = IdxUser::find();
+                if($user->is_admin_up_level == 0){
+                    $user->level = $user_data['level'];
+                    $user->save();
+                }
             }
         }
         return true;
@@ -239,16 +270,16 @@ class Fund extends Base{
 
     public static function 矿机生产($user_id){
         $user_fund = IdxUserFund::find($user_id);
-        $矿机s = IdxUserMill::where('status', 0)->select();
-        $today_tt_price = Cache::get('today_tt_price');
-        $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
+        $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
+        // $today_tt_price = Cache::get('today_tt_price');
+        // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
             while($矿机->insert_date != date("Y-m-d", time())){
                 //给钱
-                $user_fund->TTP += $add_tt;
+                $user_fund->TTP += $矿机->price;
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", strtotime($矿机->insert_date) + (24 * 60 * 60));
-                LogUserFund::create_data($user_id, $add_tt, 'TT', '矿机生产', '矿机生产');
+                LogUserFund::create_data($user_id, $矿机->price, 'TT', '矿机生产', '矿机生产');
                 $矿机->当前周期 += 1;
                 if($矿机->当前周期 >= self::$cache_settings['收益周期']){
                     $矿机->status = 1;
@@ -285,8 +316,10 @@ class Fund extends Base{
             $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             for($i = 0; $i < $auto->未中奖局数; $i++){
                 $money -= 20;
+                $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
                 IdxUserMill::create([
                     'user_id'=> $auto->user_id,
+                    'price'=> $add_tt,
                     'insert_date'=> date("Y-m-d", time()),
                     'insert_time'=> date("Y-m-d H:i:s", time())
                 ]);

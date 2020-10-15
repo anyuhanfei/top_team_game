@@ -10,7 +10,6 @@ use think\facade\Db;
 use think\facade\Cache;
 
 use app\admin\model\IdxUser;
-
 use app\admin\model\AutoValue;
 use app\admin\model\SysAd;
 use app\admin\model\IdxTtPrice;
@@ -21,6 +20,9 @@ use app\admin\model\IdxUserFund;
 use app\admin\model\GameQueue;
 use app\admin\model\GameAuto;
 use app\admin\model\GameInning;
+
+use app\index\controller\Base;
+use app\index\controller\Fund;
 
 class Index extends Base{
     protected $user = null;
@@ -59,6 +61,7 @@ class Index extends Base{
     }
 
     public function index(){
+        Fund::矿机生产($this->user_id);
         //轮播图
         $banners = SysAd::where('sign', 'index_banner')->select();
         view::assign('banners', $banners);
