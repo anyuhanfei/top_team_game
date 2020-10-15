@@ -33,12 +33,10 @@ class Fund extends Base{
      * 一天执行一次
      */
     public static function 发放奖励(){
-        self::升级();
-        return;
+        $users_data = self::升级();
         self::结算();
-        return;
         //计算今日所有奖金
-        $data = SysData::find();
+        $data = SysData::find(1);
         $money = $data->推广玩家收益;
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
@@ -52,25 +50,34 @@ class Fund extends Base{
             $vip_fund->save();
             LogUserFund::create_data($vip->user_id, $节点可得金额, 'USDT', '奖金', '创世节点奖励');
         }
-        //直推链接奖励
-        $user_count = IdxUserCount::where('有效直推人数', '>', 0)->where('today_date', date("Y-m-d", time()))->where('今日局数', self::$cache_settings['每日最大局数'])->select();
-        $直推链接总奖励 = self::$cache_settings['直推玩家奖励PCT'] * 0.01 * $money;
-        $直推链接可得金额 = $直推链接总奖励 / count($user_count);
-        foreach($user_count as $v){
-            $user_fund = IdxUserFund::find($v->user_id);
-            $user_fund->USDT += $直推链接可得金额;
-            $user_fund->save();
-            LogUserFund::create_data($v->user_id, $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
+        //直推链接奖励 and 间接链接奖励
+        $z_num = 0;
+        $j_num = 0;
+        foreach($users_data as $user_data){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
+                $z_num += 1;
+            }
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+                $j_num += 1;
+            }
         }
-        //间接链接奖励
-        $user_count = IdxUserCount::where('有效间推人数', '>', 0)->where('today_date', date("Y-m-d", time()))->where('今日局数', self::$cache_settings['每日最大局数'])->select();
+        $直推链接总奖励 = self::$cache_settings['直推玩家奖励PCT'] * 0.01 * $money;
+        $直推链接可得金额 = $直推链接总奖励 / ($z_num == 0 ? 1 : $z_num);
         $间推链接总奖励 = self::$cache_settings['间推玩家奖励PCT'] * 0.01 * $money;
-        $间推链接可得金额 = $间推链接总奖励 / count($user_count);
-        foreach($user_count as $v){
-            $user_fund = IdxUserFund::find($v->user_id);
-            $user_fund->USDT += $间推链接可得金额;
-            $user_fund->save();
-            LogUserFund::create_data($v->user_id, $间推链接可得金额, 'USDT', '奖金', '间推链接奖励');
+        $间推链接可得金额 = $间推链接总奖励 / ($j_num == 0 ? 1 : $j_num);
+        foreach($users_data as $user_data){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
+                $user_fund = IdxUserFund::find($user_data['user_id']);
+                $user_fund->USDT += $直推链接可得金额;
+                $user_fund->save();
+                LogUserFund::create_data($user_data['user_id'], $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
+            }
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+                $user_fund = IdxUserFund::find($user_data['user_id']);
+                $user_fund->USDT += $间推链接可得金额;
+                $user_fund->save();
+                LogUserFund::create_data($user_data['user_id'], $间推链接可得金额, 'USDT', '奖金', '间推链接奖励');
+            }
         }
         //等级奖励 and 全网分红
         $level_users = IdxUser::where('level', '>=', 1)->field('user_id', 'level')->select();
@@ -80,6 +87,9 @@ class Fund extends Base{
         $level = 1;
         while($level <= 6){
             $会员总数 = count($level_users);
+            if($会员总数 == 0){
+                break;
+            }
             $总奖励 = self::$cache_level[$level - 1]['奖励_终'] * 0.01 * $money;
             $单人奖金 = $总奖励 / $会员总数;
             # 给所有人发奖
@@ -237,14 +247,16 @@ class Fund extends Base{
         }
         //获取合格人数
         foreach($users as &$user){
-            if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
-                $users_data[$user->user_id]['zjh'] = 1;
-                if($user->top_id != 0){
-                    $top_user = IdxUser::find($user->top_id);
-                    $users_data[$user->top_id]['zh'] += 1;
-                    $users_data[$user->top_id]['th'] += 1;
-                    if($top_user->top_id != 0){
-                        $users_data[$top_user->top_id]['th'] += 1;
+            if($user->usercount->today_date == date("Y-m-d", time())){
+                if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
+                    $users_data[$user->user_id]['zjh'] = 1;
+                    if($user->top_id != 0){
+                        $top_user = IdxUser::find($user->top_id);
+                        $users_data[$user->top_id]['zh'] += 1;
+                        $users_data[$user->top_id]['th'] += 1;
+                        if($top_user->top_id != 0){
+                            $users_data[$top_user->top_id]['th'] += 1;
+                        }
                     }
                 }
             }
@@ -265,23 +277,24 @@ class Fund extends Base{
                 }
             }
         }
-        return true;
+        return $users_data;
     }
 
     public static function 矿机生产($user_id){
         $user_fund = IdxUserFund::find($user_id);
+        $user_count = IdxUserCount::find($user_id);
         $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
         // $today_tt_price = Cache::get('today_tt_price');
         // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
-            while($矿机->insert_date != date("Y-m-d", time())){
+            if($矿机->insert_date != date("Y-m-d", time()) && $user_count->今日局数 >= Cache::get('settings')['任务局数']){
                 //给钱
                 $user_fund->TTP += $矿机->price;
                 //更新矿机
-                $矿机->insert_date = date("Y-m-d", strtotime($矿机->insert_date) + (24 * 60 * 60));
+                $矿机->insert_date = date("Y-m-d", time());
                 LogUserFund::create_data($user_id, $矿机->price, 'TT', '矿机生产', '矿机生产');
                 $矿机->当前周期 += 1;
-                if($矿机->当前周期 >= self::$cache_settings['收益周期']){
+                if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                     break;
