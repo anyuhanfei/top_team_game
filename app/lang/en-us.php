@@ -303,4 +303,6 @@ return [
     '暂未开放...'=> 'Temporarily not opened...',
     '价格'=> ' price',
     '正在开发中...'=> 'being developed...',
+    '达标'=> 'Standards',
+    '不达标'=> 'not up to standard'
 ];

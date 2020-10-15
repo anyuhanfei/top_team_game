@@ -6,6 +6,7 @@ use think\facade\Request;
 use think\facade\Session;
 use think\facade\Cookie;
 use think\facade\Lang;
+use think\facade\Cache;
 
 use app\index\controller\Index;
 
@@ -171,11 +172,13 @@ class Me extends Index{
         $team = [];
         foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $this->user_id)->order('register_time desc')->select() as $v){
             $v->level = 1;
+            $v->isg = $v->usercount->今日局数 > Cache::get('settings')['任务局数'] ? Lang::get('达标') : Lang::get('不达标');
             $team[] = $v;
             $team_number += 1;
             $team_number_level_one += 1;
             foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $v->user_id)->order('register_time desc')->select() as $vv){
                 $vv->level = 2;
+                $v->isg = $vv->usercount->今日局数 > Cache::get('settings')['任务局数'] ? Lang::get('达标') : Lang::get('不达标');
                 $team[] = $vv;
                 $team_number += 1;
                 $team_number_level_two += 1;

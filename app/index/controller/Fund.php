@@ -16,6 +16,7 @@ use app\admin\model\GameInning;
 use app\admin\model\GameQueue;
 use app\admin\model\IdxTtPrice;
 use app\admin\model\IdxUserMill;
+use app\admin\model\SysLevel;
 
 
 class Fund extends Base{
@@ -283,16 +284,18 @@ class Fund extends Base{
     public static function 矿机生产($user_id){
         $user_fund = IdxUserFund::find($user_id);
         $user_count = IdxUserCount::find($user_id);
+        $user = IdxUser::find($user_id);
         $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
         // $today_tt_price = Cache::get('today_tt_price');
         // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
             if($矿机->insert_date != date("Y-m-d", time()) && $user_count->今日局数 >= Cache::get('settings')['任务局数']){
                 //给钱
-                $user_fund->TTP += $矿机->price;
+                $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
+                $user_fund->TTP += $price;
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", time());
-                LogUserFund::create_data($user_id, $矿机->price, 'TT', '矿机生产', '矿机生产');
+                LogUserFund::create_data($user_id, $price, 'TT', '矿机生产', '矿机生产');
                 $矿机->当前周期 += 1;
                 if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
                     $矿机->status = 1;

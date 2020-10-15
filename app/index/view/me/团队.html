@@ -71,19 +71,23 @@
 			<div class="getRecordList mui-content-padded">
 				<div id="get1" class="mui-control-content mui-active">
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('账号')}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('注册时间')}
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
+							{:lang('是否达标')}
 						</div>
 					</div>
 					{volist name="team" id="vo"}
 					{if condition="$vo.level == 1"}
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.user_id}
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.user_id}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.isg}</div>
 					</div>
 					{/if}
 					{/volist}
@@ -95,19 +99,23 @@
 				</div>
 				<div id="get2" class="mui-control-content">
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('账号')}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('注册时间')}
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
+							{:lang('是否达标')}
 						</div>
 					</div>
 					{volist name="team" id="vo"}
 					{if condition="$vo.level == 2"}
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.user_id}
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.user_id}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.isg}</div>
 					</div>
 					{/if}
 					{/volist}
