@@ -255,4 +255,18 @@ class Me extends Index{
         View::assign('wx_img', SysAd::where('sign', '微信二维码')->value('image'));
         return View::fetch();
     }
+
+    public function 生成助记词(){
+        $new_助记词 = read_word();
+        while(IdxUser::where('助记词', $new_助记词)->find()){
+            $new_助记词 = read_word();
+        }
+        $this->user->助记词 = $new_助记词;
+        $res = $this->user->save();
+        if($res){
+            return return_data(1, $new_助记词, Lang::get('操作成功'), '重新生成助记词');
+        }else{
+            return return_data(2, '', '操作失败');
+        }
+    }
 }

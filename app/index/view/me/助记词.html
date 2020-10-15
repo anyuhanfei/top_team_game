@@ -26,6 +26,7 @@
 	<header class="mui-bar mui-bar-nav head_color">
 		<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
 		<h1 class="mui-title">{:lang('助记词')}</h1>
+		<a href="###" class="mui-pull-right white_color" id="重新生成">{:lang('重新生成')}</a>
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
@@ -37,7 +38,19 @@
 	<script src="/static/index/js/jquery.min.js"></script>
 	<script src="/static/index/js/public.js"></script>
 	<script type="text/javascript">
-		
+		$("#重新生成").click(function(){
+			$.ajax({
+				url: "/index/me/生成助记词",
+				type: "post",
+				success: function(data){
+					data = JSON.parse(data)
+					mui.toast(data.msg)
+					if(data.code == 1){
+						$("#USDT").text(data.data)
+					}
+				}
+			})
+		})
 	</script>
 </body>
 </html>

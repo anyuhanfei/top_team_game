@@ -62,6 +62,7 @@ Route::get('/me/修改昵称', 'index/me/修改昵称');
 Route::post('/me/修改昵称提交', 'index/me/修改昵称提交');
 Route::get('/me/语言切换', 'index/me/语言切换');
 Route::post('/me/语言切换提交', 'index/me/语言切换提交');
+Route::post('/me/生成助记词', 'index/me/生成助记词');
 
 Route::get('/me/资产', 'index/mefund/资产');
 Route::get('/me/coin/:coin_type', 'index/mefund/coin');
