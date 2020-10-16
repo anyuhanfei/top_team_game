@@ -54,7 +54,6 @@ class Mefund extends Index{
     }
 
     public function 兑换提交(){
-        return return_data(2, '', Lang::get('暂未开放...'));
         $number = Request::instance()->param('number', 0);
         $level_password = Request::instance()->param('level_password', '');
         $validate = new \app\index\validate\兑换;

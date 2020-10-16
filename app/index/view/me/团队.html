@@ -15,7 +15,7 @@
 		.extend_bg{
 			background: url(/static/index/img/分红.png);
 			background-size: 100% 100%;
-			padding: 10% 0;
+			padding: 10% 0 0 0;
 		}
 		.flexbox_nowrap_between{
 			padding: 10px;
@@ -52,9 +52,17 @@
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
-			<div class="extend_bg border_bot_green">
+			<div class="extend_bg">
 				<p class="mui-text-center">{$user->usercount->team_number}</p>
 				<div class="mui-text-center">{:lang('团队总人数')}</div>
+			</div>
+			<div class="getRecordTit mui-segmented-control trading_floor border" style="border-bottom: 0px;">
+				<a href="###" class="mui-control-item">{$h_team_number_level_one}</a>
+				<a href="###" class="mui-control-item">{$h_team_number_level_two}</a>
+			</div>
+			<div class="getRecordTit mui-segmented-control trading_floor border" style="margin-top: 0px;">
+				<a href="###" class="mui-control-item">{:lang('今日直推合格人数')}</a>
+				<a href="###" class="mui-control-item">{:lang('今日间推合格人数')}</a>
 			</div>
 			<a href="/index/me/邀请" class="flexbox_nowrap flexbox_nowrap_between">
 				<div class="flexbox_nowrap flexbox_nowrap_start">
@@ -71,19 +79,23 @@
 			<div class="getRecordList mui-content-padded">
 				<div id="get1" class="mui-control-content mui-active">
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('账号')}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('注册时间')}
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
+							{:lang('是否达标')}
 						</div>
 					</div>
 					{volist name="team" id="vo"}
 					{if condition="$vo.level == 1"}
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.user_id}
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.user_id}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.isg}</div>
 					</div>
 					{/if}
 					{/volist}
@@ -95,19 +107,23 @@
 				</div>
 				<div id="get2" class="mui-control-content">
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('账号')}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
 							{:lang('注册时间')}
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">
+							{:lang('是否达标')}
 						</div>
 					</div>
 					{volist name="team" id="vo"}
 					{if condition="$vo.level == 2"}
 					<div class="border_bot_green mui-row">
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.user_id}
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.user_id}
 						</div>
-						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.register_time}</div>
+						<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 32%;">{$vo.isg}</div>
 					</div>
 					{/if}
 					{/volist}

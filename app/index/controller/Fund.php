@@ -16,6 +16,7 @@ use app\admin\model\GameInning;
 use app\admin\model\GameQueue;
 use app\admin\model\IdxTtPrice;
 use app\admin\model\IdxUserMill;
+use app\admin\model\SysLevel;
 
 
 class Fund extends Base{
@@ -33,9 +34,10 @@ class Fund extends Base{
      * 一天执行一次
      */
     public static function 发放奖励(){
+        $users_data = self::升级();
         self::结算();
         //计算今日所有奖金
-        $data = SysData::find();
+        $data = SysData::find(1);
         $money = $data->推广玩家收益;
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
@@ -49,25 +51,34 @@ class Fund extends Base{
             $vip_fund->save();
             LogUserFund::create_data($vip->user_id, $节点可得金额, 'USDT', '奖金', '创世节点奖励');
         }
-        //直推链接奖励
-        $user_count = IdxUserCount::where('有效直推人数', '>', 0)->where('today_date', date("Y-m-d", time()))->where('今日局数', self::$cache_settings['每日最大局数'])->select();
-        $直推链接总奖励 = self::$cache_settings['直推玩家奖励PCT'] * 0.01 * $money;
-        $直推链接可得金额 = $直推链接总奖励 / count($user_count);
-        foreach($user_count as $v){
-            $user_fund = IdxUserFund::find($v->user_id);
-            $user_fund->USDT += $直推链接可得金额;
-            $user_fund->save();
-            LogUserFund::create_data($v->user_id, $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
+        //直推链接奖励 and 间接链接奖励
+        $z_num = 0;
+        $j_num = 0;
+        foreach($users_data as $user_data){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
+                $z_num += 1;
+            }
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+                $j_num += 1;
+            }
         }
-        //间接链接奖励
-        $user_count = IdxUserCount::where('有效间推人数', '>', 0)->where('today_date', date("Y-m-d", time()))->where('今日局数', self::$cache_settings['每日最大局数'])->select();
+        $直推链接总奖励 = self::$cache_settings['直推玩家奖励PCT'] * 0.01 * $money;
+        $直推链接可得金额 = $直推链接总奖励 / ($z_num == 0 ? 1 : $z_num);
         $间推链接总奖励 = self::$cache_settings['间推玩家奖励PCT'] * 0.01 * $money;
-        $间推链接可得金额 = $间推链接总奖励 / count($user_count);
-        foreach($user_count as $v){
-            $user_fund = IdxUserFund::find($v->user_id);
-            $user_fund->USDT += $间推链接可得金额;
-            $user_fund->save();
-            LogUserFund::create_data($v->user_id, $间推链接可得金额, 'USDT', '奖金', '间推链接奖励');
+        $间推链接可得金额 = $间推链接总奖励 / ($j_num == 0 ? 1 : $j_num);
+        foreach($users_data as $user_data){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
+                $user_fund = IdxUserFund::find($user_data['user_id']);
+                $user_fund->USDT += $直推链接可得金额;
+                $user_fund->save();
+                LogUserFund::create_data($user_data['user_id'], $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
+            }
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+                $user_fund = IdxUserFund::find($user_data['user_id']);
+                $user_fund->USDT += $间推链接可得金额;
+                $user_fund->save();
+                LogUserFund::create_data($user_data['user_id'], $间推链接可得金额, 'USDT', '奖金', '间推链接奖励');
+            }
         }
         //等级奖励 and 全网分红
         $level_users = IdxUser::where('level', '>=', 1)->field('user_id', 'level')->select();
@@ -77,6 +88,9 @@ class Fund extends Base{
         $level = 1;
         while($level <= 6){
             $会员总数 = count($level_users);
+            if($会员总数 == 0){
+                break;
+            }
             $总奖励 = self::$cache_level[$level - 1]['奖励_终'] * 0.01 * $money;
             $单人奖金 = $总奖励 / $会员总数;
             # 给所有人发奖
@@ -119,17 +133,17 @@ class Fund extends Base{
      * 每分钟执行一次
      */
     public static function 自动参与(){
-        sleep(random_int(1, 30));
+        sleep(random_int(1, 3));
         $质押s = GameAuto::where('质押日期', date("Y-m-d", time()))->select();
         foreach($质押s as $质押){
             if($质押->可玩局数 > $质押->已玩局数){
-                if(random_int(1, 10) >= 5){
-                    continue;
-                }
-                if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
-                    continue;
-                }
-                GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> 1]);
+                // if(random_int(1, 10) >= 5){
+                //     continue;
+                // }
+                // if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
+                //     continue;
+                // }
+                GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> $质押->id]);
                 $质押->已玩局数 += 1;
                 $质押->save();
             }
@@ -140,11 +154,11 @@ class Fund extends Base{
      * 每分钟执行一次
      */
     public static function 游戏(){
-        $sleep_time = 30;
+        $sleep_time = 3;
         self::$cache_settings['游戏房间玩家数量'] = self::$cache_settings['游戏房间玩家数量'] > 10 ? 10 : self::$cache_settings['游戏房间玩家数量'];
-        if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
-            return;
-        }
+        // if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
+        //     return;
+        // }
         while(true){
             $queue = GameQueue::where('is_pop', 0)->order('id asc')->limit(self::$cache_settings['游戏房间玩家数量'])->select();
             if(count($queue) != self::$cache_settings['游戏房间玩家数量']){
@@ -180,8 +194,8 @@ class Fund extends Base{
                 $is_auto_field = 'is_auto_' . $number_array[$nowin];
                 //中奖奖励
                 $v->$is_win_field = 1;
-                if($v->$is_auto_field == 1){ //是自动, 仅添加记录
-                    $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
+                if($v->$is_auto_field != 0){ //是自动, 仅添加记录
+                    $auto = GameAuto::find($v->$is_auto_field);
                     $auto->中奖局数 += 1;
                     $auto->save();
                 }else{ //直接发钱
@@ -198,13 +212,15 @@ class Fund extends Base{
                 $is_win_field = 'is_win_' . $number_array[$i];
                 if($v->$is_win_field == 0){// 未中奖
                     $v->$is_win_field = 2;
-                    if($v->$is_auto_field == 1){ //是自动, 仅添加记录
-                       $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->$player_id_field)->find();
+                    if($v->$is_auto_field != 0){ //是自动, 仅添加记录
+                       $auto = GameAuto::find($v->$is_auto_field);
                        $auto->未中奖局数 += 1;
                        $auto->save();
                     }else{ //直接发矿机
+                        $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
                         IdxUserMill::create([
                             'user_id'=> $v->$player_id_field,
+                            'price'=> $add_tt,
                             'insert_date'=> date("Y-m-d", time()),
                             'insert_time'=> date("Y-m-d H:i:s", time())
                         ]);
@@ -221,35 +237,67 @@ class Fund extends Base{
         }
     }
 
-    public static function 升级($user_id){
-        $user = IdxUser::find($user_id);
-        self::$cache_level = Cache::get('level');
-        foreach(self::$cache_level as $level){
-            if($level->level_id <= $user->level){
-                continue;
-            }
-            if($user->usercount->down_team_number >= $level->直推人数 && $user->usercount->team_number >= $level->团队人数){
-                $user->level = $level->level_id;
-                $user->save();
+    public static function 升级(){
+        //清空等级
+        IdxUser::where('is_admin_up_level', 0)->update(['level'=> 0]);
+        //获取全部会员
+        $users = IdxUser::select();
+        $users_data = [];
+        foreach($users as $user){
+            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'zjh'=> 0, 'zh'=> 0, 'th'=> 0, 'level'=> 0];
+        }
+        //获取合格人数
+        foreach($users as &$user){
+            if($user->usercount->today_date == date("Y-m-d", time())){
+                if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
+                    $users_data[$user->user_id]['zjh'] = 1;
+                    if($user->top_id != 0){
+                        $top_user = IdxUser::find($user->top_id);
+                        $users_data[$user->top_id]['zh'] += 1;
+                        $users_data[$user->top_id]['th'] += 1;
+                        if($top_user->top_id != 0){
+                            $users_data[$top_user->top_id]['th'] += 1;
+                        }
+                    }
+                }
             }
         }
-        return true;
+        //判断条件
+        self::$cache_level = Cache::get('level');
+        foreach($users_data as $user_data){
+            foreach(self::$cache_level as $level){
+                if($user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数']){
+                    $user_data['level'] = $level['level_id'];
+                }
+            }
+            if($user_data['level'] != 0){
+                $user = IdxUser::find();
+                if($user->is_admin_up_level == 0){
+                    $user->level = $user_data['level'];
+                    $user->save();
+                }
+            }
+        }
+        return $users_data;
     }
 
     public static function 矿机生产($user_id){
         $user_fund = IdxUserFund::find($user_id);
-        $矿机s = IdxUserMill::where('status', 0)->select();
-        $today_tt_price = Cache::get('today_tt_price');
-        $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
+        $user_count = IdxUserCount::find($user_id);
+        $user = IdxUser::find($user_id);
+        $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
+        // $today_tt_price = Cache::get('today_tt_price');
+        // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
-            while($矿机->insert_date != date("Y-m-d", time())){
+            if($矿机->insert_date != date("Y-m-d", time()) && $user_count->今日局数 >= Cache::get('settings')['任务局数']){
                 //给钱
-                $user_fund->TTP += $add_tt;
+                $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
+                $user_fund->TTP += $price;
                 //更新矿机
-                $矿机->insert_date = date("Y-m-d", strtotime($矿机->insert_date) + (24 * 60 * 60));
-                LogUserFund::create_data($user_id, $add_tt, 'TT', '矿机生产', '矿机生产');
+                $矿机->insert_date = date("Y-m-d", time());
+                LogUserFund::create_data($user_id, $price, 'TT', '矿机生产', '矿机生产');
                 $矿机->当前周期 += 1;
-                if($矿机->当前周期 >= self::$cache_settings['收益周期']){
+                if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                     break;
@@ -266,8 +314,8 @@ class Fund extends Base{
         foreach($queue as $v){
             $v->is_pop = 1;
             $v->save();
-            if($v->is_auto == 1){ //是自动
-                $auto = GameAuto::where('质押日期', date("Y-m-d", time()))->where('user_id', $v->user_id)->find();
+            if($v->is_auto != 0){ //是自动
+                $auto = GameAuto::find($v->is_auto);
                 $auto->已玩局数 -= 1;
                 $auto->save();
             }else{ //非自动, 直接返钱
@@ -280,11 +328,14 @@ class Fund extends Base{
         // 质押结算
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            $money = self::$游戏质押规格[$auto->可玩局数];
+            $money = self::$游戏质押规格[$auto->type];
             $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             for($i = 0; $i < $auto->未中奖局数; $i++){
+                $money -= 20;
+                $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
                 IdxUserMill::create([
                     'user_id'=> $auto->user_id,
+                    'price'=> $add_tt,
                     'insert_date'=> date("Y-m-d", time()),
                     'insert_time'=> date("Y-m-d H:i:s", time())
                 ]);
@@ -292,7 +343,9 @@ class Fund extends Base{
             $user_fund = IdxUserFund::find($auto->user_id);
             $user_fund->USDT += $money;
             $user_fund->save();
-            LogUserFund::create_data($v->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+            LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+            $auto->status = 1;
+            $auto->save();
         }
     }
 }
