@@ -309,5 +309,7 @@ return [
     '今日间推合格人数'=> 'The number of qualified persons is estimated today',
     '重新生成'=> 'rebuild',
     '门票区余额不足，请在交易区购买TTP，在我的资产中转入门票'=> 'Insufficient balance in the ticket area, Please buy TTP in the trade area, Transfer my assets into tickets',
-    ''
+    '参加一局'=> 'Take part in a game',
+    '参加二十局'=> 'Take part in twenty rounds',
+    '参加五十局'=> 'Take part in fifty rounds',
 ];
