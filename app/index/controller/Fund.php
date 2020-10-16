@@ -235,6 +235,30 @@ class Fund extends Base{
             $sys_data->累计推广玩家收益 += 9 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             $sys_data->save();
         }
+
+        $autos = GameAuto::where('status', 0)->select();
+        foreach($autos as $auto){
+            if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 == ($auto->中奖局数 + $auto->未中奖局数)){
+                $money = $auto->质押USDT;
+                $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+                for($i = 0; $i < $auto->未中奖局数; $i++){
+                    $money -= 20;
+                    $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
+                    IdxUserMill::create([
+                        'user_id'=> $auto->user_id,
+                        'price'=> $add_tt,
+                        'insert_date'=> date("Y-m-d", time()),
+                        'insert_time'=> date("Y-m-d H:i:s", time())
+                    ]);
+                }
+                $user_fund = IdxUserFund::find($auto->user_id);
+                $user_fund->USDT += $money;
+                $user_fund->save();
+                LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+                $auto->status = 1;
+                $auto->save();
+            }
+        }
     }
 
     public static function 升级(){
@@ -328,7 +352,7 @@ class Fund extends Base{
         // 质押结算
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            $money = self::$游戏质押规格[$auto->type];
+            $money = $auto->质押USDT;
             $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             for($i = 0; $i < $auto->未中奖局数; $i++){
                 $money -= 20;
