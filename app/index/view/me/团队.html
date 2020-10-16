@@ -15,7 +15,7 @@
 		.extend_bg{
 			background: url(/static/index/img/分红.png);
 			background-size: 100% 100%;
-			padding: 10% 0;
+			padding: 10% 0 0 0;
 		}
 		.flexbox_nowrap_between{
 			padding: 10px;
@@ -52,9 +52,17 @@
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
-			<div class="extend_bg border_bot_green">
+			<div class="extend_bg">
 				<p class="mui-text-center">{$user->usercount->team_number}</p>
 				<div class="mui-text-center">{:lang('团队总人数')}</div>
+			</div>
+			<div class="getRecordTit mui-segmented-control trading_floor border" style="border-bottom: 0px;">
+				<a href="###" class="mui-control-item">{$h_team_number_level_one}</a>
+				<a href="###" class="mui-control-item">{$h_team_number_level_two}</a>
+			</div>
+			<div class="getRecordTit mui-segmented-control trading_floor border" style="margin-top: 0px;">
+				<a href="###" class="mui-control-item">{:lang('今日直推合格人数')}</a>
+				<a href="###" class="mui-control-item">{:lang('今日间推合格人数')}</a>
 			</div>
 			<a href="/index/me/邀请" class="flexbox_nowrap flexbox_nowrap_between">
 				<div class="flexbox_nowrap flexbox_nowrap_start">

@@ -169,16 +169,28 @@ class Me extends Index{
         $team_number = 0;
         $team_number_level_one = 0;
         $team_number_level_two = 0;
+        $h_team_number_level_one = 0;
+        $h_team_number_level_two = 0;
         $team = [];
         foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $this->user_id)->order('register_time desc')->select() as $v){
             $v->level = 1;
-            $v->isg = $v->usercount->今日局数 > Cache::get('settings')['任务局数'] ? Lang::get('达标') : Lang::get('不达标');
+            if($v->usercount->今日局数 > Cache::get('settings')['任务局数']){
+                $v->isg = Lang::get('达标');
+                $h_team_number_level_one += 1;
+            }else{
+                $v->isg = Lang::get('不达标');
+            }
             $team[] = $v;
             $team_number += 1;
             $team_number_level_one += 1;
             foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $v->user_id)->order('register_time desc')->select() as $vv){
                 $vv->level = 2;
-                $v->isg = $vv->usercount->今日局数 > Cache::get('settings')['任务局数'] ? Lang::get('达标') : Lang::get('不达标');
+                if($vv->usercount->今日局数 > Cache::get('settings')['任务局数']){
+                    $vv->isg = Lang::get('达标');
+                    $h_team_number_level_two += 1;
+                }else{
+                    $vv->isg = Lang::get('不达标');
+                }
                 $team[] = $vv;
                 $team_number += 1;
                 $team_number_level_two += 1;
@@ -188,6 +200,8 @@ class Me extends Index{
         View::assign('team_number', $team_number);
         View::assign('team_number_level_one', $team_number_level_one);
         View::assign('team_number_level_two', $team_number_level_two);
+        View::assign('h_team_number_level_one', $h_team_number_level_one);
+        View::assign('h_team_number_level_two', $h_team_number_level_two);
         return View::fetch();
     }
 
