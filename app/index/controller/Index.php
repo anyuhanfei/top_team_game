@@ -96,13 +96,13 @@ class Index extends Base{
 
     public function 购买门票(){
         $level_password = Request::instance()->param('level_password', '');
-        $price = Cache::get('settings')['门票价格'] * Cache::get('today_tt_price');
+        $price = round(Cache::get('settings')['门票价格'] / Cache::get('today_tt_price'), 2);
         if($level_password != $this->user->level_password){
             return return_data(2, '', Lang::get('二级密码输入错误'));
         }
         $user_fund = IdxUserFund::find($this->user_id);
         if($user_fund->门票 < $price){
-            return return_data(2, '', Lang::get('门票余额不足'));
+            return return_data(2, '', Lang::get('门票区余额不足，请在交易区购买TTP，在我的资产中转入门票'));
         }
         Db::startTrans();
         $user_fund->门票 -= $price;
@@ -143,7 +143,7 @@ class Index extends Base{
         View::assign('usercount', $user_count);
         View::assign('rw', Cache::get('settings')['任务局数']);
         View::assign('day', Cache::get('settings')['门票有效期']);
-        View::assign('price', Cache::get('settings')['门票价格'] * Cache::get('today_tt_price'));
+        View::assign('price', round(Cache::get('settings')['门票价格'] / Cache::get('today_tt_price')), 2);
         return View::fetch();
     }
 
@@ -244,27 +244,25 @@ class Index extends Base{
 
     public function 游戏记录(){
         $list = GameInning::where('player_id_one|player_id_two|player_id_three|player_id_four|player_id_five|player_id_six|player_id_seven|player_id_eight|player_id_nine|player_id_ten', $this->user_id)->order('insert_time desc')->select();
-        foreach($list as &$v){
+        $log = [];
+        foreach($list as $v){
             if($v->end_time != NULL){
                 foreach (['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'] as $num) {
                     $key = 'player_id_' . $num;
                     if($v->$key == $this->user_id){
                         $key = 'is_win_' . $num;
                         if($v->$key == 1){
-                            $v->color = 'orange_color';
-                            $v->status = Lang::get('中奖');
+                            $log[] = ['color'=> 'orange_color', 'status'=> Lang::get('中奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
                         }else{
-                            $v->color = 'red_color';
-                            $v->status = Lang::get('未中奖');
+                            $log[] = ['color'=> 'red_color', 'status'=> Lang::get('未中奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
                         }
                     }
                 }
             }else{
-                $v->color = 'green_color';
-                $v->status = Lang::get('未开奖');
+                $log[] = ['color'=> 'green_color', 'status'=> Lang::get('未开奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
             }
         }
-        View::assign('list', $list);
+        View::assign('list', $log);
         return View::fetch();
     }
 

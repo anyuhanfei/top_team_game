@@ -97,19 +97,19 @@
 						<div class="flexbox_check">
 						<label for="aa">
 							<input id="aa" name="pledge" value="20" type="radio">
-							<div class="radio_box">20USDT</div>
+							<div class="radio_box" style="height: 50px;">20USDT<br/>参加一局</div>
 						</label>
 						</div>
 						<div class="flexbox_check">
 						<label for="bbb">
 							<input id="bbb" name="pledge" value="100" type="radio">
-							<div class="radio_box">100USDT</div>
+							<div class="radio_box" style="height: 50px;">100USDT<br/>参加二十局</div>
 						</label>
 						</div>
 						<div class="flexbox_check">
 						<label for="c">
 							<input id="c" name="pledge" value="200" type="radio">
-							<div class="radio_box">200USDT</div>
+							<div class="radio_box" style="height: 50px;">200USDT<br/>参加五十局</div>
 						</label>
 						</div>
 					</div>
@@ -127,7 +127,7 @@
 				<h4>{:lang("购买门票")} <span>({:lang("有效期")}{$day}{:lang("天")})</span>{:lang("需支付")} </h4>
 			</div>
 			<div class="message_reply_content">
-				<h4 class="green_color mui-text-center">{$price} TTP</h4>
+				<h4 class="green_color mui-text-center">{$price} {:lang("门票")}</h4>
 				<div class="input_box public_box">
 						<input type="password" id="level_password" placeholder="{:lang('请输入二级密码')}">
 					<div class="flexbox_nowrap flexbox_nowrap_between">

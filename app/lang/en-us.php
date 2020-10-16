@@ -305,6 +305,9 @@ return [
     '正在开发中...'=> 'being developed...',
     '达标'=> 'Standards',
     '不达标'=> 'not up to standard',
-    '今日直推合格人数'=> '',
-    '今日间推合格人数'=> '',
+    '今日直推合格人数'=> 'The qualified persons will be counted directly today',
+    '今日间推合格人数'=> 'The number of qualified persons is estimated today',
+    '重新生成'=> 'rebuild',
+    '门票区余额不足，请在交易区购买TTP，在我的资产中转入门票'=> 'Insufficient balance in the ticket area, Please buy TTP in the trade area, Transfer my assets into tickets',
+    ''
 ];
