@@ -312,4 +312,5 @@ return [
     '参加一局'=> 'Take part in a game',
     '参加二十局'=> 'Take part in twenty rounds',
     '参加五十局'=> 'Take part in fifty rounds',
+    '创世节点'=> 'Node creation',
 ];

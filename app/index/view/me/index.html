@@ -66,7 +66,7 @@
 							<div class="mui-text-center">{$user->level_name}</div>
 						</div>
 						<div class="my_info">
-							<div class="white_color my_name">UID:{$user->user_id}</div>
+							<div class="white_color my_name">UID:{$user->user_id} &nbsp;&nbsp;&nbsp;&nbsp;{if condition="$user->vip == 1"}{:lang('创世节点')}{/if}</div>
 							<div class="white_color my_phone">{:lang('昵称')}:{$user->nickname}</div>
 						</div>
 					</div>
