@@ -188,7 +188,7 @@ class User extends Validate{
     }
 
     protected function checkType($value, $rule, $data){
-        if($value == 'detail' || $value == 'password' || $value == 'level_password'){
+        if($value == 'detail' || $value == 'password' || $value == 'level_password' || $value == 'level'){
             return true;
         }
         return "非法操作";

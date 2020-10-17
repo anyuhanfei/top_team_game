@@ -38,9 +38,13 @@ class Fund extends Base{
         self::结算();
         //计算今日所有奖金
         $data = SysData::find(1);
+        $data->昨日推广分红 = 0;
+        $data->昨日团队分红 = 0;
+        $data->昨日创世节点分红 = 0;
         $money = $data->推广玩家收益;
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
+        $data->昨日创世节点分红 = $创世节点_money;
         $创世节点总数 = self::$cache_settings['创世节点最大数量'];
         $节点可得金额 = $创世节点_money / $创世节点总数;
 
@@ -66,6 +70,7 @@ class Fund extends Base{
         $直推链接可得金额 = $直推链接总奖励 / ($z_num == 0 ? 1 : $z_num);
         $间推链接总奖励 = self::$cache_settings['间推玩家奖励PCT'] * 0.01 * $money;
         $间推链接可得金额 = $间推链接总奖励 / ($j_num == 0 ? 1 : $j_num);
+        $data->昨日推广分红 = $直推链接总奖励 + $间推链接总奖励;
         foreach($users_data as $user_data){
             if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
                 $user_fund = IdxUserFund::find($user_data['user_id']);
@@ -92,6 +97,7 @@ class Fund extends Base{
                 break;
             }
             $总奖励 = self::$cache_level[$level - 1]['奖励_终'] * 0.01 * $money;
+            $data->昨日创世节点分红 += $总奖励;
             $单人奖金 = $总奖励 / $会员总数;
             # 给所有人发奖
             foreach($level_users as $v){

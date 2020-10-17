@@ -304,7 +304,7 @@ class Cms extends Admin{
         $article = ($category_id != '') ? $article->where('category_id', $category_id) : $article;
         $article = ($tag_id != '') ? $article->where('tag_ids', 'like', '%,' . $tag_id . ',%') : $article;
         $article = ($author != '') ? $article->where('author', 'like', '%' . $author . '%') : $article;
-        $list = $article->order('article_id desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $article->order('article_id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         foreach($list as &$l){
             $l['tag_ids'] = CmsTag::where('tag_id', 'in', $l['tag_ids'])->column('tag_name');
             $l['tag_ids'] = implode(',', $l['tag_ids']);

@@ -16,7 +16,7 @@ class LogUserFund extends Model{
     }
 
     public static function fund_type_text(){
-        return ['提现', '提现手续费'];
+        return ['提现', '提现手续费', '交易', '兑换', '参与游戏', '后台充值', '归集', '挂单', '游戏中奖', '游戏中奖支付矿工费', '矿机生产', '自动质押', '质押USDT结算', '购买门票', '转入门票', '转账', '交易撤销', '入金'];
     }
 
     public static function create_data($user_id, $number, $coin_type, $fund_type, $content, $remark = '', $insert_time = ''){

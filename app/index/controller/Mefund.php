@@ -17,6 +17,7 @@ use app\admin\model\IdxUserMill;
 use app\admin\model\UserCharge;
 use app\admin\model\IdxUser;
 use app\admin\model\IdxUserCount;
+use app\admin\model\SysData;
 
 class Mefund extends Index{
     public function __construct(){
@@ -45,6 +46,9 @@ class Mefund extends Index{
         View::assign('log', $log);
         View::assign('tg', $推广收益);
         View::assign('td', $团队收益);
+        View::assign('a', SysData::where('id', 1)->value('昨日推广分红'));
+        View::assign('b', SysData::where('id', 1)->value('昨日团队分红'));
+        View::assign('c', SysData::where('id', 1)->value('昨日创世节点分红'));
         return View::fetch();
     }
 

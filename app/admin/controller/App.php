@@ -27,7 +27,7 @@ class App extends Admin{
         $user_id = Request::instance()->param('user_id', '');
         $obj = new GameAuto();
         $obj = ($user_id != '') ? $obj->where('user_id', $user_id) : $obj;
-        $list = $obj->order('id desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $obj->order('id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         View::assign('list', $list);
         View::assign('user_id', $user_id);
         return View::fetch();
@@ -38,7 +38,7 @@ class App extends Admin{
         $obj = new GameInning();
         $field = "player_id_one|player_id_two|player_id_three|player_id_four|player_id_five|player_id_six|player_id_seven|player_id_eight|player_id_nine|player_id_ten";
         $obj = ($user_id != '') ? $obj->where($field, $user_id) : $obj;
-        $list = $obj->order('id desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $obj->order('id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         View::assign('list', $list);
         View::assign('user_id', $user_id);
         return View::fetch();
@@ -50,7 +50,7 @@ class App extends Admin{
         $obj = new IdxDeal();
         $obj = ($sell_user_id != '') ? $obj->where('sell_user_id', $sell_user_id) : $obj;
         $obj = ($buy_user_id != '') ? $obj->where('buy_user_id', $buy_user_id) : $obj;
-        $list = $obj->order('insert_time desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $obj->order('insert_time desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         View::assign('list', $list);
         View::assign('sell_user_id', $sell_user_id);
         View::assign('buy_user_id', $buy_user_id);
@@ -160,7 +160,7 @@ class App extends Admin{
         $user_id = Request::instance()->param('user_id', '');
         $obj = new IdxUserMill();
         $obj = ($user_id != '') ? $obj->where('user_id', $user_id) : $obj;
-        $list = $obj->order('mill_id desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $obj->order('mill_id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         View::assign('list', $list);
         View::assign('user_id', $user_id);
         return View::fetch();

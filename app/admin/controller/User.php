@@ -41,7 +41,7 @@ class User extends Admin{
         $user = ($level_id != '') ? $user->where('level', $level_id) : $user;
         $user = ($vip !== '') ? $user->where('vip', $vip) : $user;
         $user = ($nickname != '') ? $user->where('nickname', 'like', '%' . $nickname . '%') : $user;
-        $list = $user->order('register_time desc')->paginate($this->page_number, false,['query'=>request()->param()]);
+        $list = $user->order('register_time desc')->paginate(['list_rows'=> 50, 'query'=>Request()->param()]);
         $this->many_assign(['list'=> $list, 'user_id'=> $user_id, 'nickname'=> $nickname, 'top_user_id'=> $top_user_id, 'level_id'=> $level_id, 'vip'=> $vip]);
         $level = SysLevel::select();
         View::assign('level', $level);
@@ -168,6 +168,7 @@ class User extends Admin{
         }
         View::assign('detail', $user);
         View::assign('has_data', $has_data);
+        View::assign('level', SysLevel::select());
         return View::fetch();
     }
 
@@ -204,10 +205,18 @@ class User extends Admin{
                 return return_data(2, '', $validate->getError());
             }
             $user->level_password = $level_password;
+        }elseif($type == 'level'){
+            $level = Request::instance()->param('level');
+            $user->level = $level;
+            if($level == 0){
+                $user->is_admin_up_level = 0;
+            }else{
+                $user->is_admin_up_level = 1;
+            }
         }
         $res = $user->save();
         if($res){
-            $update_type = array('detail'=> '信息编辑', 'password'=> '密码修改', 'level_password'=> '二级密码修改');
+            $update_type = array('detail'=> '信息编辑', 'password'=> '密码修改', 'level_password'=> '二级密码修改', 'level'=> '等级设置');
             return return_data(1, '', '修改成功', '会员信息--'.$update_type[$type].'：'.$user->$control_user_identity);
         }else{
             return return_data(2, '', '修改失败或未修改信息');

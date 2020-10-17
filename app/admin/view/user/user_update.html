@@ -26,9 +26,14 @@
                                     <button class="tab_btn btn btn-warning">修改密码</button>
                                 </a>
                             </li>
-                            <li>
+                            <li style="padding-right: 10px;">
                                 <a href="#lpassword" role="tab" data-toggle="tab">
                                     <button class="tab_btn btn btn-warning">修改二级密码</button>
+                                </a>
+                            </li>
+                            <li style="padding-right: 10px;">
+                                <a href="#level" role="tab" data-toggle="tab">
+                                    <button class="tab_btn btn btn-warning">设置等级</button>
                                 </a>
                             </li>
                         </ul>
@@ -69,6 +74,23 @@
                                     </div>
                                     <div class="card-action" style="display: flex; justify-content: center;">
                                         <button class="btn btn-success" style="margin-right: 10px;" id="lpassword_submit">提交</button>
+                                        <button class="btn btn-danger cancel">返回</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane " id="level">
+                                <div class="card-body" style="padding: 15px 200px 10px;">
+                                    <div class="form-group">
+                                        <label for="category_name">设置等级*</label>
+                                        <select class="form-control form-control-sm" id="level_id">
+                                            <option value="0" {if condition="$detail.level == 0"}selected{/if}>普通会员</option>
+                                            {volist name="level" id="vo"}
+                                            <option value="{$vo.level_id}" {if condition="$detail.level == $vo.level_id"}selected{/if}>{$vo.level_name}</option>
+                                            {/volist}
+                                        </select>
+                                    </div>
+                                    <div class="card-action" style="display: flex; justify-content: center;">
+                                        <button class="btn btn-success" style="margin-right: 10px;" id="level_submit">提交</button>
                                         <button class="btn btn-danger cancel">返回</button>
                                     </div>
                                 </div>
@@ -121,6 +143,12 @@ $("#lpassword_submit").click(function(){
     var fd = new FormData();
     fd.append('level_password', $("#level_password").val());
     update_submit('level_password', fd);
+})
+
+$("#level_submit").click(function(){
+    var fd = new FormData();
+    fd.append('level', $("#level_id").val());
+    update_submit('level', fd);
 })
 
 function update_submit(stype, fd){
