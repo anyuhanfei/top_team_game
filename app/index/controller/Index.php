@@ -138,6 +138,10 @@ class Index extends Base{
             $level_局数 = $this->user->level_id == 0 ? 0 : SysLevel::where('level_id', $this->user->level_id)->value('增加局数');
             $user_count->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
             $user_count->今日局数 = 0;
+            $user_count->今日我合格 = 0;
+            $user_count->今日直推合格 = 0;
+            $user_count->今日间推合格 = 0;
+            $user_count->今日团队合格 = 0;
             $user_count->save();
         }
         View::assign('usercount', $user_count);
@@ -187,6 +191,7 @@ class Index extends Base{
             $user_count->今日局数 += 1;
             $user_count->save();
             Session::set('game_time', time());
+            Fund::是否合格($this->user_id);
             Db::commit();
             return return_data(1, '', Lang::get('参与成功, 请稍后查询游戏结果'), '手动参与游戏');
         }else{
@@ -234,6 +239,7 @@ class Index extends Base{
         if($res_one && $res_two){
             $user_count->今日局数 += $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
             $user_count->save();
+            Fund::是否合格($this->user_id);
             Db::commit();
             return return_data(1, '', Lang::get('质押成功'), '自动参与游戏');
         }else{

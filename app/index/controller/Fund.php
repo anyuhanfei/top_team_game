@@ -58,7 +58,7 @@ class Fund extends Base{
             if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
                 $z_num += 1;
             }
-            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['jh'] >= 1){
                 $j_num += 1;
             }
         }
@@ -73,7 +73,7 @@ class Fund extends Base{
                 $user_fund->save();
                 LogUserFund::create_data($user_data['user_id'], $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
             }
-            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['th'] >= 1){
+            if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['jh'] >= 1){
                 $user_fund = IdxUserFund::find($user_data['user_id']);
                 $user_fund->USDT += $间推链接可得金额;
                 $user_fund->save();
@@ -268,22 +268,26 @@ class Fund extends Base{
         $users = IdxUser::select();
         $users_data = [];
         foreach($users as $user){
-            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'zjh'=> 0, 'zh'=> 0, 'th'=> 0, 'level'=> 0];
+            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'zjh'=> 0, 'zh'=> 0, 'jh'=> 0, 'th'=> 0, 'level'=> 0];
         }
         //获取合格人数
         foreach($users as &$user){
             if($user->usercount->today_date == date("Y-m-d", time())){
-                if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
-                    $users_data[$user->user_id]['zjh'] = 1;
-                    if($user->top_id != 0){
-                        $top_user = IdxUser::find($user->top_id);
-                        $users_data[$user->top_id]['zh'] += 1;
-                        $users_data[$user->top_id]['th'] += 1;
-                        if($top_user->top_id != 0){
-                            $users_data[$top_user->top_id]['th'] += 1;
-                        }
-                    }
-                }
+                $users_data[$user->user_id]['zjh'] = $user->usercount->今日我合格;
+                $users_data[$user->user_id]['zh'] = $user->usercount->今日直推合格;
+                $users_data[$user->user_id]['jh'] = $user->usercount->今日间推合格;
+                $users_data[$user->user_id]['th'] = $user->usercount->今日团队合格;
+                // if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
+                //     $users_data[$user->user_id]['zjh'] = 1;
+                //     if($user->top_id != 0){
+                //         $top_user = IdxUser::find($user->top_id);
+                //         $users_data[$user->top_id]['zh'] += 1;
+                //         $users_data[$user->top_id]['th'] += 1;
+                //         if($top_user->top_id != 0){
+                //             $users_data[$top_user->top_id]['th'] += 1;
+                //         }
+                //     }
+                // }
             }
         }
         //判断条件
@@ -370,6 +374,29 @@ class Fund extends Base{
             LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
             $auto->status = 1;
             $auto->save();
+        }
+    }
+
+    public static function 是否合格($user_id){
+        $user_count = IdxUserCount::find($user_id);
+        if($user_count->今日局数 >= Cache::get('settings')['任务局数']){
+            $user_count->今日我合格 = 1;
+            $user_count->save();
+            $top_id = IdxUser::where('user_id', $user_id)->value('top_id');
+            $i = 0;
+            while($top_id != 0){
+                $top_count = IdxUserCount::find($top_id);
+                if($i == 0){
+                    $top_count->今日直推合格 += 1;
+                }
+                if($i == 1){
+                    $top_count->今日间推合格 += 1;
+                }
+                $top_count->今日团队合格 += 1;
+                $top_count->save();
+                $i++;
+                $top_id = IdxUser::where('user_id', $top_id)->value('top_id');
+            }
         }
     }
 }
