@@ -72,7 +72,10 @@
 					<input type="text" id="invite_code" value="{$code}" {if condition="$code != ''"}readonly{/if} placeholder="{:lang('请输入邀请码')}">
 				</div>
 				<a href="javascript:;" class="a_btn a_big_btn">{:lang('注册')}</a>
-				
+				<div class="flexbox_nowrap flexbox_nowrap_between public_padding">
+					<a href="{$android}">{:lang("安卓下载")}</a>
+					<a href="{$ios}">{:lang("苹果下载")}</a>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -28,7 +28,10 @@ class Login extends Base{
             return return_data(2, '', Lang::get($validate->getError()));
         }
         $user = IdxUser::find($id);
+        $user->token = create_captcha(20, 'lowercase+uppercase+figure');
+        $user->save();
         Session::set('user_id', $user->user_id);
+        Session::set('token', $user->token);
         return return_data(1, '', Lang::get('登录成功'));
     }
 
@@ -54,6 +57,8 @@ class Login extends Base{
         View::assign('z', read_word());
         View::assign('code', Request::instance()->param('code'));
         View::assign('invest', SysSetting::where('sign', '注册推荐码')->value('value'));
+        View::assign('android', SysSetting::where('sign', '安卓APP下载地址')->value('value'));
+        View::assign('ios', SysSetting::where('sign', '苹果APP下载地址')->value('value'));
         return View::fetch();
     }
 
