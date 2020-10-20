@@ -206,9 +206,9 @@ class Fund extends Base{
                     $auto->save();
                 }else{ //直接发钱
                     $user_fund = IdxUserFund::find($v->$player_id_field);
-                    $user_fund->USDT += self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费'];
+                    $user_fund->USDT += self::$cache_settings['下注金额'] + self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费'];
                     $user_fund->save();
-                    LogUserFund::create_data($v->$player_id_field, self::$cache_settings['中奖打赏金额'], 'USDT', '游戏中奖', '游戏中奖');
+                    LogUserFund::create_data($v->$player_id_field, self::$cache_settings['下注金额'] + self::$cache_settings['中奖打赏金额'], 'USDT', '游戏中奖', '游戏中奖');
                     LogUserFund::create_data($v->$player_id_field, '-' . self::$cache_settings['中奖支付矿工费'], 'USDT', '游戏中奖支付矿工费', '游戏中奖支付矿工费');
                 }
             }

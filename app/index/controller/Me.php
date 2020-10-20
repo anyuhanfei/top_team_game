@@ -231,6 +231,10 @@ class Me extends Index{
     public function 切换账号(){
         $user_id = Request::instance()->param('user_id', -1);
         if($user_id == $this->user->pan_user_id){ //主账号
+            $user = IdxUser::find($user_id);
+            $user->token = create_captcha(20, 'lowercase+uppercase+figure');
+            $user->save();
+            Session::set('token', $user->token);
             Session::set('user_id', $user_id);
             return return_data(1, '', Lang::get('切换成功'));
         }
@@ -246,7 +250,9 @@ class Me extends Index{
             $user->password = $this->user->password;
             $user->level_password = $this->user->level_password;
             $user->password_salt = $this->user->password_salt;
+            $user->token = create_captcha(20, 'lowercase+uppercase+figure');
             $user->save();
+            Session::set('token', $user->token);
             return return_data(1, '', Lang::get('切换成功'));
         }
         return return_data(2, '', Lang::get('非法操作'));

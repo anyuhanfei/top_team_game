@@ -38,6 +38,8 @@
                             </div>
                             <a style="margin-left: 20px;" type="fee" class="btn btn-default" id="fee">一键分发矿工费</a>
                             <a style="margin-left: 20px;" type="cc" class="btn btn-default" id="cc">一键归集</a>
+                            <a style="margin-left: 20px;" type="fee_all" class="btn btn-default" id="fee_all">全部分发矿工费</a>
+                            <a style="margin-left: 20px;" type="cc_all" class="btn btn-default" id="cc_all">一键归集</a>
                         </form>
                         <table class="table mt-3">
                             <thead>
@@ -111,6 +113,24 @@
         })
     })
 
+    $("#fee_all").click(function(){
+        var stock_code = $("#stock_code").val();
+        $.ajax({
+            url: "/admin/user/fund/fee/submit",
+            type: "post",
+            data: {user_ids: 'all', stock_code: stock_code},
+            success: function(data){
+                data = JSON.parse(data)
+                layer.msg(data.msg);
+                if(data.status == 1){
+                	setTimeout(() => {
+                        location.href.go(0)
+                    }, 1500);
+                }
+            }
+        })
+    })
+
     $("#cc").click(function(){
         var user_ids = '';
         $('input[name="user_id"]:checked').each(function(){
@@ -121,6 +141,24 @@
             url: "/admin/user/fund/cc/submit",
             type: "post",
             data: {user_ids: user_ids, stock_code: stock_code},
+            success: function(data){
+                data = JSON.parse(data)
+                layer.msg(data.msg);
+                if(data.status == 1){
+                    setTimeout(() => {
+                        location.href.go(0)
+                    }, 1500);
+                }
+            }
+        })
+    })
+
+    $("#cc_all").click(function(){
+        var stock_code = $("#stock_code").val();
+        $.ajax({
+            url: "/admin/user/fund/cc/submit",
+            type: "post",
+            data: {user_ids: 'all', stock_code: stock_code},
             success: function(data){
                 data = JSON.parse(data)
                 layer.msg(data.msg);
