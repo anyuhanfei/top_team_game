@@ -178,7 +178,7 @@ class Me extends Index{
                 $v->isg = Lang::get('达标');
                 $h_team_number_level_one += 1;
             }else{
-                $v->isg = '';
+                $v->isg = Lang::get('不达标');
             }
             $team[] = $v;
             $team_number += 1;
@@ -189,7 +189,7 @@ class Me extends Index{
                     $vv->isg = Lang::get('达标');
                     $h_team_number_level_two += 1;
                 }else{
-                    $vv->isg = '';
+                    $vv->isg = Lang::get('不达标');
                 }
                 $team[] = $vv;
                 $team_number += 1;
