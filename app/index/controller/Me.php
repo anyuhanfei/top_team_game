@@ -174,7 +174,7 @@ class Me extends Index{
         $team = [];
         foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $this->user_id)->order('register_time desc')->select() as $v){
             $v->level = 1;
-            if($v->usercount->今日局数 > Cache::get('settings')['任务局数']){
+            if($v->usercount->今日我达标 == 1){
                 $v->isg = Lang::get('达标');
                 $h_team_number_level_one += 1;
             }else{
@@ -185,7 +185,7 @@ class Me extends Index{
             $team_number_level_one += 1;
             foreach(IdxUser::field('user_id, register_time, top_id')->where('top_id', $v->user_id)->order('register_time desc')->select() as $vv){
                 $vv->level = 2;
-                if($vv->usercount->今日局数 > Cache::get('settings')['任务局数']){
+                if($vv->usercount->今日我达标 == 1){
                     $vv->isg = Lang::get('达标');
                     $h_team_number_level_two += 1;
                 }else{
