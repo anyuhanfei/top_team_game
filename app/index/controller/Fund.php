@@ -414,7 +414,6 @@ class Fund extends Base{
 
     public function 自动质押(){
         $users = [
-            '94261767',
             '136356609',
             '215159639','271981494',
             '429828961','461089543','513766964',
@@ -470,10 +469,6 @@ class Fund extends Base{
                         $top_id = IdxUser::where('user_id', $top_id)->value('top_id');
                     }
                 }
-
-                return 'chenggong';
-            }else{
-                return 'shibai';
             }
         }
     }
