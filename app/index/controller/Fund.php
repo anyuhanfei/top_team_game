@@ -431,7 +431,7 @@ class Fund extends Base{
             '986320065',
         ];
         foreach($users as $user_id){
-            $usdt = Request::instance()->param('usdt', 0);
+            $usdt = 200;
             $user_fund = IdxUserFund::find($user_id);
             $usdt_array = [20=> 1, 100=> 20, 200=> 50];
             $user_count = IdxUserCount::find($user_id);
