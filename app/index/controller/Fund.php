@@ -103,7 +103,7 @@ class Fund extends Base{
             foreach($level_users as $v){
                 $v->user_fund->USDT += $单人奖金;
                 $v->user_fund->save();
-                LogUserFund::create_data($v->user_id, $单人奖金, 'USDT', '奖金', self::$cache_level['level_name'] . '勋章奖励');
+                LogUserFund::create_data($v->user_id, $单人奖金, 'USDT', '奖金', self::$cache_level[$level - 1]['level_name'] . '勋章奖励');
             }
             # 全网分红
             if($level == 5 || $level == 6){
@@ -112,7 +112,7 @@ class Fund extends Base{
                 foreach($level_users as $v){
                     $v->user_fund->USDT += $全网分红单人奖金;
                     $v->user_fund->save();
-                    LogUserFund::create_data($v->user_id, $全网分红单人奖金, 'USDT', '奖金', self::$cache_level['level_name'] . '全网分红奖励');
+                    LogUserFund::create_data($v->user_id, $全网分红单人奖金, 'USDT', '奖金', self::$cache_level[$level - 1]['level_name'] . '全网分红奖励');
                 }
             }
             # 等级➕1, 将最低一等级的会员去除
@@ -237,8 +237,8 @@ class Fund extends Base{
             $v->save();
             //统计
             $sys_data = SysData::find(1);
-            $sys_data->推广玩家收益 += 9 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-            $sys_data->累计推广玩家收益 += 9 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+            $sys_data->推广玩家收益 += self::$cache_settings['中奖人数'] * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+            $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             $sys_data->save();
         }
 
@@ -300,12 +300,12 @@ class Fund extends Base{
         self::$cache_level = Cache::get('level');
         foreach($users_data as $user_data){
             foreach(self::$cache_level as $level){
-                if($user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数']){
+                if($user_data['zjh'] >= 1 && $user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数']){
                     $user_data['level'] = $level['level_id'];
                 }
             }
             if($user_data['level'] != 0){
-                $user = IdxUser::find();
+                $user = IdxUser::find($user_data['user_id']);
                 if($user->is_admin_up_level == 0){
                     $user->level = $user_data['level'];
                     $user->save();
@@ -317,13 +317,12 @@ class Fund extends Base{
 
     public static function 矿机生产($user_id){
         $user_fund = IdxUserFund::find($user_id);
-        $user_count = IdxUserCount::find($user_id);
         $user = IdxUser::find($user_id);
         $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
         // $today_tt_price = Cache::get('today_tt_price');
         // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
-            if($矿机->insert_date != date("Y-m-d", time()) && $user_count->今日局数 >= Cache::get('settings')['任务局数']){
+            if($矿机->insert_date != date("Y-m-d", time()) && $user->usercount->今日局数 >= Cache::get('settings')['任务局数']){
                 //给钱
                 $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
                 $user_fund->TTP += $price;

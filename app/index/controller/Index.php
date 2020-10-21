@@ -49,6 +49,10 @@ class Index extends Base{
                     $usercount->save();
                 }
             }
+            //清理统计
+            if($this->user->usercount->today_date != date("Y-m-d", time())){
+                self::清理统计($this->user_id, $this->user);
+            }
         } catch (\Throwable $th) {
 
         }
@@ -130,12 +134,11 @@ class Index extends Base{
         }
     }
 
-    public function 游戏(){
-        //统计
-        $user_count = IdxUserCount::find($this->user_id);
+    public static function 清理统计($user_id, $user){
+        $user_count = IdxUserCount::find($user_id);
         if($user_count->today_date != date("Y-m-d", time())){
             $user_count->today_date = date("Y-m-d", time());
-            $level_局数 = $this->user->level_id == 0 ? 0 : SysLevel::where('level_id', $this->user->level_id)->value('增加局数');
+            $level_局数 = $user->level_id == 0 ? 0 : SysLevel::where('level_id', $user->level_id)->value('增加局数');
             $user_count->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
             $user_count->今日局数 = 0;
             $user_count->今日我合格 = 0;
@@ -144,6 +147,11 @@ class Index extends Base{
             $user_count->今日团队合格 = 0;
             $user_count->save();
         }
+    }
+
+    public function 游戏(){
+        //统计
+        $user_count = IdxUserCount::find($this->user_id);
         View::assign('usercount', $user_count);
         View::assign('rw', Cache::get('settings')['任务局数']);
         View::assign('day', Cache::get('settings')['门票有效期']);
