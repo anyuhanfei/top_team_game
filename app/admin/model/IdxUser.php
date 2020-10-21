@@ -145,15 +145,16 @@ class IdxUser extends Model{
         if($data['level'] == 0){
             return Cookie::get('think_lang') == 'zh-cn' ? "普通用户" : "normal user";
         }
-        if($data['level'] >= 5){
-            $levels = SysLevel::where('level_id', '<=', $data['level'])->select();
-            $level_name = '';
-            foreach($levels as $level){
-                $level_name .= (Cookie::get('think_lang') == 'zh-cn' ? $level->level_name : $level->level_name_us) . ' ';
-            }
-        }else{
-            $level_name = Cookie::get('think_lang') == 'zh-cn' ? SysLevel::where('level_id', $data['level'])->value('level_name') : SysLevel::where('level_id', $data['level'])->value('level_name_us');
-        }
+        // if($data['level'] >= 5){
+        //     $levels = SysLevel::where('level_id', '<=', $data['level'])->select();
+        //     $level_name = '';
+        //     foreach($levels as $level){
+        //         $level_name .= (Cookie::get('think_lang') == 'zh-cn' ? $level->level_name : $level->level_name_us) . ' ';
+        //     }
+        // }else{
+        //     $level_name = Cookie::get('think_lang') == 'zh-cn' ? SysLevel::where('level_id', $data['level'])->value('level_name') : SysLevel::where('level_id', $data['level'])->value('level_name_us');
+        // }
+        $level_name = Cookie::get('think_lang') == 'zh-cn' ? SysLevel::where('level_id', $data['level'])->value('level_name') : SysLevel::where('level_id', $data['level'])->value('level_name_us');
         return $level_name;
     }
 

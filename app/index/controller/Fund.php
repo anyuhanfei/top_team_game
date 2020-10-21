@@ -45,15 +45,16 @@ class Fund extends Base{
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
         $data->昨日创世节点分红 = $创世节点_money;
-        $创世节点总数 = self::$cache_settings['创世节点最大数量'];
-        $节点可得金额 = $创世节点_money / $创世节点总数;
 
         $vips = IdxUser::where('vip', 1)->field('user_id, vip')->select();
-        foreach($vips as $vip){
-            $vip_fund = IdxUserFund::find($vip->user_id);
-            $vip_fund->USDT += $节点可得金额;
-            $vip_fund->save();
-            LogUserFund::create_data($vip->user_id, $节点可得金额, 'USDT', '奖金', '创世节点奖励');
+        if(count($vips) > 0){
+            $节点可得金额 = round($创世节点_money / count($vips), 2);
+            foreach($vips as $vip){
+                $vip_fund = IdxUserFund::find($vip->user_id);
+                $vip_fund->USDT += $节点可得金额;
+                $vip_fund->save();
+                LogUserFund::create_data($vip->user_id, $节点可得金额, 'USDT', '创世节点奖励', '创世节点奖励');
+            }
         }
         //直推链接奖励 and 间接链接奖励
         $z_num = 0;
@@ -67,63 +68,74 @@ class Fund extends Base{
             }
         }
         $直推链接总奖励 = self::$cache_settings['直推玩家奖励PCT'] * 0.01 * $money;
-        $直推链接可得金额 = $直推链接总奖励 / ($z_num == 0 ? 1 : $z_num);
+        $直推链接可得金额 = round($直推链接总奖励 / ($z_num == 0 ? 1 : $z_num), 2);
         $间推链接总奖励 = self::$cache_settings['间推玩家奖励PCT'] * 0.01 * $money;
-        $间推链接可得金额 = $间推链接总奖励 / ($j_num == 0 ? 1 : $j_num);
+        $间推链接可得金额 = round($间推链接总奖励 / ($j_num == 0 ? 1 : $j_num), 2);
         $data->昨日推广分红 = $直推链接总奖励 + $间推链接总奖励;
         foreach($users_data as $user_data){
             if($user_data['zjh'] == 1 && $user_data['zh'] >= 1){
                 $user_fund = IdxUserFund::find($user_data['user_id']);
                 $user_fund->USDT += $直推链接可得金额;
                 $user_fund->save();
-                LogUserFund::create_data($user_data['user_id'], $直推链接可得金额, 'USDT', '奖金', '直推链接奖励');
+                LogUserFund::create_data($user_data['user_id'], $直推链接可得金额, 'USDT', '直推链接奖励', '直推链接奖励');
             }
             if($user_data['zjh'] == 1 && $user_data['zh'] >= 1 && $user_data['jh'] >= 1){
                 $user_fund = IdxUserFund::find($user_data['user_id']);
                 $user_fund->USDT += $间推链接可得金额;
                 $user_fund->save();
-                LogUserFund::create_data($user_data['user_id'], $间推链接可得金额, 'USDT', '奖金', '间推链接奖励');
+                LogUserFund::create_data($user_data['user_id'], $间推链接可得金额, 'USDT', '间推链接奖励', '间推链接奖励');
             }
         }
         //等级奖励 and 全网分红
-        $level_users = IdxUser::where('level', '>=', 1)->field('user_id', 'level')->select();
+        $level_users = IdxUser::where('level', '>=', 1)->select();
         foreach($level_users as &$v){
             $v->user_fund = IdxUserFund::find($v->user_id);
         }
         $level = 1;
         while($level <= 6){
-            $会员总数 = count($level_users);
+            $会员总数 = 0;
+            foreach($level_users as $v){
+                if($v->level >= $level){
+                    $会员总数 += 1;
+                }
+            }
+            // $会员总数 = count($level_users);
             if($会员总数 == 0){
                 break;
             }
             $总奖励 = self::$cache_level[$level - 1]['奖励_终'] * 0.01 * $money;
-            $data->昨日创世节点分红 += $总奖励;
-            $单人奖金 = $总奖励 / $会员总数;
+            $data->昨日团队分红 += $总奖励;
+            $单人奖金 = round($总奖励 / $会员总数, 2);
             # 给所有人发奖
             foreach($level_users as $v){
-                $v->user_fund->USDT += $单人奖金;
-                $v->user_fund->save();
-                LogUserFund::create_data($v->user_id, $单人奖金, 'USDT', '奖金', self::$cache_level[$level - 1]['level_name'] . '勋章奖励');
+                if($v->level >= $level){
+                    $v->user_fund->USDT += $单人奖金;
+                    $v->user_fund->save();
+                    LogUserFund::create_data($v->user_id, $单人奖金, 'USDT', self::$cache_level[$level - 1]['level_name'] . '勋章奖励', self::$cache_level[$level - 1]['level_name'] . '勋章奖励');
+                }
             }
             # 全网分红
             if($level == 5 || $level == 6){
                 $全网分红奖励 = $level == 5 ? (self::$cache_settings['钻石玩家奖励'] * 0.01 * $money) : (self::$cache_settings['王者玩家奖励'] * 0.01 * $money);
-                $全网分红单人奖金 = $全网分红奖励 / $会员总数;
+                $data->昨日团队分红 += $全网分红奖励;
+                $全网分红单人奖金 = round($全网分红奖励 / $会员总数, 2);
                 foreach($level_users as $v){
-                    $v->user_fund->USDT += $全网分红单人奖金;
-                    $v->user_fund->save();
-                    LogUserFund::create_data($v->user_id, $全网分红单人奖金, 'USDT', '奖金', self::$cache_level[$level - 1]['level_name'] . '全网分红奖励');
+                    if($v->level >= $level){
+                        $v->user_fund->USDT += $全网分红单人奖金;
+                        $v->user_fund->save();
+                        LogUserFund::create_data($v->user_id, $全网分红单人奖金, 'USDT', self::$cache_level[$level - 1]['level_name'] . '全网分红勋章奖励', self::$cache_level[$level - 1]['level_name'] . '全网分红勋章奖励');
+                    }
                 }
             }
             # 等级➕1, 将最低一等级的会员去除
             $level++;
-            $temp = [];
-            foreach($level_users as $v){
-                if($v->level >= $level){
-                    $temp[] = $v;
-                }
-            }
-            $level_users = $temp;
+            // $temp = [];
+            // foreach($level_users as $v){
+            //     if($v->level >= $level){
+            //         $temp[] = $v;
+            //     }
+            // }
+            // $level_users = $temp;
         }
         //车房基金
         $车房基金 = self::$cache_settings['车房基金'] * 0.01 * $money;
@@ -223,13 +235,7 @@ class Fund extends Base{
                        $auto->未中奖局数 += 1;
                        $auto->save();
                     }else{ //直接发矿机
-                        $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
-                        IdxUserMill::create([
-                            'user_id'=> $v->$player_id_field,
-                            'price'=> $add_tt,
-                            'insert_date'=> date("Y-m-d", time()),
-                            'insert_time'=> date("Y-m-d H:i:s", time())
-                        ]);
+                        self::矿机生成($v->$player_id_field);
                     }
                 }
             }
@@ -237,8 +243,8 @@ class Fund extends Base{
             $v->save();
             //统计
             $sys_data = SysData::find(1);
-            $sys_data->推广玩家收益 += self::$cache_settings['中奖人数'] * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-            $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+            $sys_data->推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
+            $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
             $sys_data->save();
         }
 
@@ -249,13 +255,7 @@ class Fund extends Base{
                 $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
                 for($i = 0; $i < $auto->未中奖局数; $i++){
                     $money -= 20;
-                    $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
-                    IdxUserMill::create([
-                        'user_id'=> $auto->user_id,
-                        'price'=> $add_tt,
-                        'insert_date'=> date("Y-m-d", time()),
-                        'insert_time'=> date("Y-m-d H:i:s", time())
-                    ]);
+                    self::矿机生成($auto->user_id);
                 }
                 $user_fund = IdxUserFund::find($auto->user_id);
                 $user_fund->USDT += $money;
@@ -365,13 +365,7 @@ class Fund extends Base{
             $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
             for($i = 0; $i < $auto->未中奖局数; $i++){
                 $money -= 20;
-                $add_tt = (self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值']) / Cache::get('today_tt_price');
-                IdxUserMill::create([
-                    'user_id'=> $auto->user_id,
-                    'price'=> $add_tt,
-                    'insert_date'=> date("Y-m-d", time()),
-                    'insert_time'=> date("Y-m-d H:i:s", time())
-                ]);
+                self::矿机生成($auto->user_id);
             }
             $user_fund = IdxUserFund::find($auto->user_id);
             $user_fund->USDT += $money;
@@ -403,5 +397,17 @@ class Fund extends Base{
                 $top_id = IdxUser::where('user_id', $top_id)->value('top_id');
             }
         }
+    }
+
+    public static function 矿机生成($user_id){
+        $all_tt = self::$cache_settings['矿机价值'] / Cache::get('today_tt_price');
+        $add_tt = $all_tt / self::$cache_settings['收益周期'];
+        IdxUserMill::create([
+            'user_id'=> $user_id,
+            'all_price'=> $all_tt,
+            'price'=> $add_tt,
+            'insert_date'=> date("Y-m-d", time()),
+            'insert_time'=> date("Y-m-d H:i:s", time())
+        ]);
     }
 }

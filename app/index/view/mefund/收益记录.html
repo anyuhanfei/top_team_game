@@ -40,13 +40,17 @@
 				</div>
 			</div>
 			<div class="mui-row public_space_box">
-				<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center public_space">
+				<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center public_space" style="width: 33%;">
 					<p>{$tg}</p>
 					<p class="clean_margin">{:lang('推广总收益')}</p>
 				</div>
-				<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center">
+				<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center public_space" style="width: 33%;">
 					<p>{$td}</p>
 					<p class="clean_margin">{:lang('团队总收益')}</p>
+				</div>
+				<div class="mui-col-sm-6 mui-col-xs-6 mui-text-center" style="width: 33%;">
+					<p>{$cs}</p>
+					<p class="clean_margin">{:lang('创世节点总收益')}</p>
 				</div>
 			</div>
 			{volist name="log" id="vo"}

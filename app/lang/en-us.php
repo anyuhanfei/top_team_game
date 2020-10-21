@@ -313,4 +313,8 @@ return [
     '参加二十局'=> 'Take part in twenty rounds',
     '参加五十局'=> 'Take part in fifty rounds',
     '创世节点'=> 'Node creation',
+    '创世节点奖励'=> 'Creation node reward',
+    '直推链接奖励'=> 'Direct link rewards',
+    '间推链接奖励'=> 'Push links between rewards',
+    '创世节点总收益'=> 'Total revenue at creation node'
 ];

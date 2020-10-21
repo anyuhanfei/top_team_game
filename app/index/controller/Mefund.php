@@ -40,12 +40,14 @@ class Mefund extends Index{
     }
 
     public function 收益记录(){
-        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['奖金', '推广奖励'])->order('id desc')->select();
-        $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '奖金')->sum('number');
-        $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '推广奖励')->sum('number');
+        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select();
+        $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
+        $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
+        $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
         View::assign('log', $log);
         View::assign('tg', $推广收益);
         View::assign('td', $团队收益);
+        View::assign('cs', $创世节点收益);
         View::assign('a', SysData::where('id', 1)->value('昨日推广分红'));
         View::assign('b', SysData::where('id', 1)->value('昨日团队分红'));
         View::assign('c', SysData::where('id', 1)->value('昨日创世节点分红'));
