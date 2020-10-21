@@ -199,8 +199,8 @@ class Index extends Base{
             $user_count->今日局数 += 1;
             $user_count->save();
             Session::set('game_time', time());
-            Fund::是否合格($this->user_id);
             Db::commit();
+            Fund::是否合格($this->user_id);
             return return_data(1, '', Lang::get('参与成功, 请稍后查询游戏结果'), '手动参与游戏');
         }else{
             Db::rollback();
@@ -247,8 +247,8 @@ class Index extends Base{
         if($res_one && $res_two){
             $user_count->今日局数 += $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
             $user_count->save();
-            Fund::是否合格($this->user_id);
             Db::commit();
+            Fund::是否合格($this->user_id);
             return return_data(1, '', Lang::get('质押成功'), '自动参与游戏');
         }else{
             Db::rollback();
