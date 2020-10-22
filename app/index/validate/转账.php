@@ -47,7 +47,7 @@ class 转账 extends Base{
                     return true;
                 }
             }else{
-                if($to_user->pan_user_id == $from_user->pan_user_id){
+                if($to_user->user_id == $from_user->pan_user_id){
                     return true;
                 }
             }
