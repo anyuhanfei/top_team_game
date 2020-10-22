@@ -325,14 +325,17 @@ class Fund extends Base{
             if($矿机->insert_date != date("Y-m-d", time()) && $user->usercount->今日局数 >= Cache::get('settings')['任务局数']){
                 //给钱
                 $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
+                $price = $矿机->all_price < $price ? $矿机->all_price : $price;
                 $user_fund->TTP += $price;
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", time());
+                $矿机->all_price -= $price;
                 LogUserFund::create_data($user_id, $price, 'TT', '矿机生产', '矿机生产');
                 $矿机->当前周期 += 1;
                 if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
+                    $矿机->save();
                     break;
                 }
             }

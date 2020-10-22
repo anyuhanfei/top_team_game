@@ -60,14 +60,14 @@
 						<div class="green_color">{:lang('TTP矿机')}</div>
 						<div class="flexbox_nowrap flexbox_nowrap_between">
 							<div>{:lang('价值')}:{$vo->价值}USDT</div>
-							<div>{:lang('收益')}/{:lang('天')}:{$vo->收益天}TTP</div>
+							<div>{:lang('收益')}/{:lang('天')}:{$vo->price}TTP</div>
 						</div>
 						<div class="flexbox_nowrap flexbox_nowrap_between">
-							<div>{:lang('预计收益')}:{$vo->预计收益}TTP</div>
+							<div>{:lang('预计收益')}:{$vo->price * $vo->收益周期}TTP</div>
 							<div>{:lang('运行周期')}:{$vo->收益周期}{:lang('天')}</div>
 						</div>
-						<div>{:lang('运行时间')}:{$vo->已运行时间}H</div>
 						<div class="flexbox_nowrap flexbox_nowrap_between">
+							<div>{:lang('运行时间')}:{$vo->已运行时间}H</div>
 							<div>{:lang('获得时间')}:{$vo->insert_time}</div>
 						</div>
 					</div>
