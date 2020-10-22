@@ -138,7 +138,7 @@ class Index extends Base{
         $user_count = IdxUserCount::find($user_id);
         if($user_count->today_date != date("Y-m-d", time())){
             $user_count->today_date = date("Y-m-d", time());
-            $level_局数 = $user->level_id == 0 ? 0 : SysLevel::where('level_id', $user->level_id)->value('增加局数');
+            $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
             $user_count->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
             $user_count->今日局数 = 0;
             $user_count->今日我合格 = 0;
