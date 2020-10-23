@@ -316,32 +316,39 @@ class Fund extends Base{
     }
 
     public static function 矿机生产($user_id){
-        $user_fund = IdxUserFund::find($user_id);
+        //矿机  一天一次
+        $user_count = IdxUserCount::find($user_id);
         $user = IdxUser::find($user_id);
+        $user_fund = IdxUserFund::find($user_id);
         $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
-        // $today_tt_price = Cache::get('today_tt_price');
-        // $add_tt = self::$cache_settings['每日收益PCT'] * 0.01 * self::$cache_settings['矿机价值'] * $today_tt_price;
         foreach($矿机s as $矿机){
-            if($矿机->insert_date != date("Y-m-d", time()) && $user->usercount->今日局数 >= Cache::get('settings')['任务局数']){
-                //给钱
+            if($user_count->今日我合格 == 1 && $矿机->insert_date != date("Y-m-d", time())){
                 $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
                 $price = $矿机->all_price < $price ? $矿机->all_price : $price;
                 $user_fund->TTP += $price;
+                $user_fund->save();
+                if($price > 0){
+                    LogUserFund::create_data($矿机->user_id, $price, 'TTP', '矿机生产', '矿机生产');
+                }
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", time());
                 $矿机->all_price -= $price;
-                LogUserFund::create_data($user_id, $price, 'TT', '矿机生产', '矿机生产');
+                if($矿机->all_price <= 0){
+                    $矿机->status = 1;
+                    $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
+                }
                 $矿机->当前周期 += 1;
                 if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
-                    $矿机->save();
-                    break;
                 }
+                if(strtotime(date('Y-m-d', strtotime($矿机->insert_time))) + (Cache::get('settings')['收益周期'] * 24 * 60 * 60) < strtotime(date("Y-m-d", time()))){
+                    $矿机->status = 1;
+                    $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
+                }
+                $矿机->save();
             }
-            $矿机->save();
         }
-        $user_fund->save();
     }
 
     public static function 结算(){
