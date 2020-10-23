@@ -201,7 +201,6 @@ class Index extends Base{
             Session::set('game_time', time());
             Db::commit();
             Fund::是否合格($this->user_id);
-            Fund::矿机生产($this->user_id);
             return return_data(1, '', Lang::get('参与成功, 请稍后查询游戏结果'), '手动参与游戏');
         }else{
             Db::rollback();
@@ -250,7 +249,6 @@ class Index extends Base{
             $user_count->save();
             Db::commit();
             Fund::是否合格($this->user_id);
-            Fund::矿机生产($this->user_id);
             return return_data(1, '', Lang::get('质押成功'), '自动参与游戏');
         }else{
             Db::rollback();
