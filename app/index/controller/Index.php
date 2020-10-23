@@ -134,18 +134,21 @@ class Index extends Base{
         }
     }
 
-    public static function 清理统计($user_id, $user){
-        $user_count = IdxUserCount::find($user_id);
-        if($user_count->today_date != date("Y-m-d", time())){
-            $user_count->today_date = date("Y-m-d", time());
-            $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
-            $user_count->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
-            $user_count->今日局数 = 0;
-            $user_count->今日我合格 = 0;
-            $user_count->今日直推合格 = 0;
-            $user_count->今日间推合格 = 0;
-            $user_count->今日团队合格 = 0;
-            $user_count->save();
+    public static function 清理统计(){
+        $users_count = IdxUserCount::select();
+        foreach($users_count as $v){
+            if($v->today_date != date("Y-m-d", time())){
+                $v->today_date = date("Y-m-d", time());
+                $user = IdxUser::find($v->user_id);
+                $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
+                $v->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
+                $v->今日局数 = 0;
+                $v->今日我合格 = 0;
+                $v->今日直推合格 = 0;
+                $v->今日间推合格 = 0;
+                $v->今日团队合格 = 0;
+                $v->save();
+            }
         }
     }
 
