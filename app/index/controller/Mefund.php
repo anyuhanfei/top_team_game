@@ -232,7 +232,7 @@ class Mefund extends Index{
             $mill->收益天 = $cache_settings['矿机价值'] * $cache_settings['每日收益PCT'] * 0.01;
             $mill->收益周期 = $cache_settings['收益周期'];
             $mill->预计收益 = $cache_settings['矿机价值'] * $cache_settings['每日收益PCT'] * 0.01 * $cache_settings['收益周期'];
-            $mill->已运行时间 = intval((time() - strtotime($mill->insert_time)) / 60);
+            // $mill->已运行时间 = intval((time() - strtotime($mill->insert_time)) / 60);
         }
         View::assign('mills', $mills);
         View::assign('mill_earnings', $mill_earnings);
