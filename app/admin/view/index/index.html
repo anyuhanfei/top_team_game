@@ -1,9 +1,30 @@
 {extend name="base" /}
 
 {block name="content"}
-
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table mt-3">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 20%;">今日TTP转入门票数</td>
+                                    <td>{$today_m}</td>
+                                    <td style="width: 20%;">累计TTP转入门票数</td>
+                                    <td>{$acc_m}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {/block}
 
 {block name="custom_js"}
-{/block}
 
+{/block}

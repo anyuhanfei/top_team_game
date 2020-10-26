@@ -111,12 +111,12 @@ class Deal extends Index{
             $user_fund->TTP += $deal->TT;
             $user_fund->USDT -= $deal->USDT + $deal->USDT_fee;
             $res_one = $user_fund->save();
-            $to_user_fund->TTP -= $deal->TT;
+            $to_user_fund->USDT += $deal->USDT;
             $res_two = $to_user_fund->save();
             LogUserFund::create_data($this->user_id, $deal->TT, 'TTP', '交易', '交易匹配');
             LogUserFund::create_data($this->user_id, '-' . $deal->USDT, 'USDT', '交易', '交易匹配');
             LogUserFund::create_data($this->user_id, '-' . $deal->USDT_fee, 'USDT', '交易', '交易匹配, 扣除手续费');
-            LogUserFund::create_data($to_user_fund->user_id, '-' . $deal->TT, 'TTP', '交易', '交易匹配');
+            LogUserFund::create_data($to_user_fund->user_id, $deal->USDT, 'USDT', '交易', '交易匹配');
             $deal->buy_user_id = $this->user_id;
         }
         $deal->status = 1;
