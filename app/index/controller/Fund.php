@@ -182,7 +182,7 @@ class Fund extends Base{
             if(count($queue) != self::$cache_settings['游戏房间玩家数量']){
                 break;
             }
-            $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> time()];
+            $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> create_captcha(9)];
             $number_array = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
             $i = 0;
             foreach($queue as $v){
@@ -193,13 +193,15 @@ class Fund extends Base{
                 $i++;
             }
             GameInning::create($create_array);
-            sleep(1);
-            $sleep_time = $sleep_time - 1 >= 0 ? $sleep_time - 1 : 0;
         }
         sleep($sleep_time);
         $inning = GameInning::where('end_time', NULL)->select();
         $number_array = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+        $s_time = time();
         foreach($inning as $v){
+            if($s_time + 40 < time()){
+                break;
+            }
             for($i = 1; $i <= self::$cache_settings['中奖人数']; $i++){
                 //中奖
                 $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
@@ -250,7 +252,11 @@ class Fund extends Base{
 
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 == ($auto->中奖局数 + $auto->未中奖局数)){
+            if(strtotime($auto->insert_time) + 5000 < time()){
+                $auto->中奖局数 += 1;
+                $auto->save();
+            }
+            if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 <= ($auto->中奖局数 + $auto->未中奖局数)){
                 $money = $auto->质押USDT;
                 $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
                 for($i = 0; $i < $auto->未中奖局数; $i++){

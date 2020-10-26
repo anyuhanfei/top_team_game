@@ -474,9 +474,11 @@ class App extends Admin{
         $start_time = Request::instance()->param('start_time', '');
         $end_time = Request::instance()->param('end_time', '');
         $log = new UserCharge;
-        $user = IdxUser::field('user_id, phone')->where('phone', $user_identity)->find();
-        if($user){
-            $log = $log->where('user_id', $user->user_id);
+        if($user_identity != ''){
+            $user = IdxUser::field('user_id, phone')->where('phone', $user_identity)->find();
+            if($user){
+                $log = $log->where('user_id', $user->user_id);
+            }
         }
         $log = ($stock_code != '') ? $log->where('code', $stock_code) : $log;
         $log = $this->where_time($log, $start_time, $end_time);
