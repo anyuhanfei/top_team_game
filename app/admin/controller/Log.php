@@ -88,7 +88,7 @@ class Log extends Admin{
         $end_time = Request::instance()->param('end_time', '');
         $log = new LogUserFund;
         $log = $this->where_time($log, $start_time, $end_time);
-        $log = ($user_identity != '') ? $log->where('user_identity', $user_identity) : $log;
+        $log = ($user_identity != '') ? $log->where('user_id', $user_identity) : $log;
         $log = ($coin_type != '') ? $log->where('coin_type', $coin_type) : $log;
         $log = ($fund_type != '') ? $log->where('fund_type', $fund_type) : $log;
         $list = $log->order('insert_time desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);

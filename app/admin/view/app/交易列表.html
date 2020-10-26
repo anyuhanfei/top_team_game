@@ -61,3 +61,13 @@
     </div>
 </div>
 {/block}
+
+{block name="custom_js"}
+<script>
+    $("#from_close").click(function(){
+        $("#sell_user_id").val('');
+        $("#buy_user_id").val('');
+        $("#search_submit").click();
+    })
+</script>
+{/block}

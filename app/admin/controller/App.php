@@ -38,7 +38,7 @@ class App extends Admin{
         $obj = new GameInning();
         $field = "player_id_one|player_id_two|player_id_three|player_id_four|player_id_five|player_id_six|player_id_seven|player_id_eight|player_id_nine|player_id_ten";
         $obj = ($user_id != '') ? $obj->where($field, $user_id) : $obj;
-        $list = $obj->order('id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
+        $list = $obj->order('insert_time desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         View::assign('list', $list);
         View::assign('user_id', $user_id);
         return View::fetch();
