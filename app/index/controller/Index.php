@@ -20,6 +20,7 @@ use app\admin\model\IdxUserFund;
 use app\admin\model\GameQueue;
 use app\admin\model\GameAuto;
 use app\admin\model\GameInning;
+use app\admin\model\SysSetting;
 
 use app\index\controller\Base;
 use app\index\controller\Fund;
@@ -42,7 +43,7 @@ class Index extends Base{
             }
             //检查自己的门票
             if($this->user->usercount->has_门票 == 1){
-                if(strtotime($this->user->usercount->门票购买_time) + (Cache::get('settings')['门票有效期'] * 86400) < time()){
+                if(strtotime($this->user->usercount->门票购买_time) + (SysSetting::where('sign', '门票有效期')->value('value') * 86400) < time()){
                     $usercount = IdxUserCount::find($this->user_id);
                     $usercount->has_门票 = 0;
                     $usercount->门票购买_time = "0000-00-00 00:00:00";
@@ -141,7 +142,7 @@ class Index extends Base{
                 $v->today_date = date("Y-m-d", time());
                 $user = IdxUser::find($v->user_id);
                 $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
-                $v->今日最大局数 = Cache::get('settings')['每日最大局数'] + $level_局数;
+                $v->今日最大局数 = SysSetting::where('sign', '每日最大局数')->value('value') + $level_局数;
                 $v->今日局数 = 0;
                 $v->今日我合格 = 0;
                 $v->今日直推合格 = 0;
