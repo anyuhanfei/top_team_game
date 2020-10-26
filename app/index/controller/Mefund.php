@@ -257,7 +257,7 @@ class Mefund extends Index{
 
     public function 归集(){
         $id = Request::instance()->param('id', 0);
-        if($id != 0){
+        if($id == 0){
             Db::startTrans();
             $user_fund = IdxUserFund::find($this->user_id);
             $pan_users = IdxUser::where('pan_user_id', $this->user_id)->select();
