@@ -26,7 +26,7 @@ class Base{
             foreach($settings as $v){
                 $settings_array[$v['sign']] = $v['value'];
             }
-            Cache::set('settings', $settings_array, 30);
+            Cache::set('settings', $settings_array, 600);
             sleep(0.3);
         }
         // 等级设置
@@ -39,7 +39,7 @@ class Base{
                     $level[$i]['奖励_终'] = $level[$i]['奖励'] - $level[$i - 1]['奖励'];
                 }
             }
-            Cache::set('level', $level, 30);
+            Cache::set('level', $level, 600);
             sleep(0.3);
         }
         // 今日价格

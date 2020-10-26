@@ -17,6 +17,7 @@ use app\admin\model\GameQueue;
 use app\admin\model\IdxTtPrice;
 use app\admin\model\IdxUserMill;
 use app\admin\model\SysLevel;
+use app\admin\model\SysSetting;
 
 
 class Fund extends Base{
@@ -344,11 +345,11 @@ class Fund extends Base{
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
                 $矿机->当前周期 += 1;
-                if($矿机->当前周期 >= Cache::get('settings')['收益周期']){
+                if($矿机->当前周期 >= SysSetting::where('sign', '收益周期')->value('value')){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
-                if(strtotime(date('Y-m-d', strtotime($矿机->insert_time))) + (Cache::get('settings')['收益周期'] * 24 * 60 * 60) < strtotime(date("Y-m-d", time()))){
+                if(strtotime(date('Y-m-d', strtotime($矿机->insert_time))) + (SysSetting::where('sign', '收益周期')->value('value') * 24 * 60 * 60) < strtotime(date("Y-m-d", time()))){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
@@ -394,7 +395,7 @@ class Fund extends Base{
 
     public static function 是否合格($user_id){
         $user_count = IdxUserCount::find($user_id);
-        if($user_count->今日局数 >= Cache::get('settings')['任务局数']){
+        if($user_count->今日局数 >= SysSetting::where('sign', '任务局数')->value('value')){
             $user_count->今日我合格 = 1;
             $user_count->save();
             $top_id = IdxUser::where('user_id', $user_id)->value('top_id');
@@ -416,8 +417,8 @@ class Fund extends Base{
     }
 
     public static function 矿机生成($user_id){
-        $all_tt = self::$cache_settings['矿机价值'] / Cache::get('today_tt_price');
-        $add_tt = $all_tt / self::$cache_settings['收益周期'];
+        $all_tt = SysSetting::where('sign', '矿机价值')->value('value') / Cache::get('today_tt_price');
+        $add_tt = $all_tt / SysSetting::where('sign', '收益周期')->value('value');
         IdxUserMill::create([
             'user_id'=> $user_id,
             'all_price'=> $all_tt,
@@ -425,67 +426,5 @@ class Fund extends Base{
             'insert_date'=> date("Y-m-d", time()),
             'insert_time'=> date("Y-m-d H:i:s", time())
         ]);
-    }
-
-
-    public function 自动质押(){
-        $users = [
-            '136356609',
-            '215159639','271981494',
-            '429828961','461089543','513766964',
-            '563865877','566641391','640858669','685608542','709282370','761941896','805246645',
-            '820123587',
-            '860396547',
-            '905083463',
-            '951378392',
-            '956180341',
-            '971508593',
-            '972246708',
-            '972583946',
-            '978349257',
-            '986320065',
-        ];
-        foreach($users as $user_id){
-            $usdt = 200;
-            $user_fund = IdxUserFund::find($user_id);
-            $usdt_array = [20=> 1, 100=> 20, 200=> 50];
-            $user_count = IdxUserCount::find($user_id);
-            $res_one = GameAuto::create([
-                'user_id'=> $user_id,
-                'type'=> $usdt_array[$usdt],
-                '质押USDT'=> $usdt,
-                '可玩局数'=> $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt],
-                '质押日期'=> date("Y-m-d", time()),
-                'insert_time'=> date("Y-m-d H:i:s", time())
-            ]);
-            $user_fund->USDT -= $usdt;
-            $res_two = $user_fund->save();
-            LogUserFund::create_data($user_id, '-' . $usdt, 'USDT', '自动质押', '自动质押');
-            if($res_one && $res_two){
-                $user_count->今日局数 += $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
-                $user_count->save();
-
-                $user_count = IdxUserCount::find($user_id);
-                if($user_count->今日局数 >= Cache::get('settings')['任务局数']){
-                    $user_count->今日我合格 = 1;
-                    $user_count->save();
-                    $top_id = IdxUser::where('user_id', $user_id)->value('top_id');
-                    $i = 0;
-                    while($top_id != 0){
-                        $top_count = IdxUserCount::find($top_id);
-                        if($i == 0){
-                            $top_count->今日直推合格 += 1;
-                        }
-                        if($i == 1){
-                            $top_count->今日间推合格 += 1;
-                        }
-                        $top_count->今日团队合格 += 1;
-                        $top_count->save();
-                        $i++;
-                        $top_id = IdxUser::where('user_id', $top_id)->value('top_id');
-                    }
-                }
-            }
-        }
     }
 }
