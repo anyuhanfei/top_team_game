@@ -510,35 +510,42 @@ class App extends Admin{
             $withdraw->save();
             return return_data(1, '', '操作成功', 'json');
         }else{
-            // 通过
-            $withdraw_address_key = SysSetting::where('sign', 'withdraw_address_key')->value('value');
-            $withdraw_address = SysSetting::where('sign', 'withdraw_address')->value('value');
-            $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
-            $url = "http://". $kuake_ip ."/wallet/send?code=".$withdraw->code."&balance=".$withdraw->balance."&from=".$withdraw_address."&privateKey=".$withdraw_address_key."&to=".$withdraw->to_addr.'&type=1';
-            $opts = array(
-                'http'=>array(
-                'method'=>"POST",
-                )
-            );
-            $context = stream_context_create($opts);
-            $res = json_decode(file_get_contents($url, false, $context));
-            if($res->code == 200){
-                $withdraw = UserCharge::where('swift_no', $swift_no)->find();
-                $withdraw->inspect_time = date("Y-m-d H:i:s", time());
-                $withdraw->inspect_status = 5;
-                $withdraw->hash = $res->data;
-                $withdraw->save();
-                return return_data(1, '', '操作成功, 再次进入提现列表时进行最终状态的获取', 'json');
-            }else{
-                // $withdraw = UserCharge::where('swift_no', $swift_no)->find();
-                // $withdraw->inspect_time = date("Y-m-d H:i:s", time());
-                // $withdraw->inspect_status = 2;
-                // $withdraw->save();
-                // $user_fund = IdxUserFund::find($withdraw->user_id);
-                // $user_fund->money += $withdraw->number + $withdraw->fee;
-                // $user_fund->save();
-                return return_data(2, '', '操作失败', 'json');
-            }
+            $withdraw = UserCharge::where('swift_no', $swift_no)->find();
+            $withdraw->inspect_time = date("Y-m-d H:i:s", time());
+            $withdraw->inspect_status = 1;
+            $withdraw->hash = '';
+            $withdraw->save();
+            return return_data(1, '', '操作成功, 请手动拨款', 'json');
+
+            // // 通过
+            // $withdraw_address_key = SysSetting::where('sign', 'withdraw_address_key')->value('value');
+            // $withdraw_address = SysSetting::where('sign', 'withdraw_address')->value('value');
+            // $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+            // $url = "http://". $kuake_ip ."/wallet/send?code=".$withdraw->code."&balance=".$withdraw->balance."&from=".$withdraw_address."&privateKey=".$withdraw_address_key."&to=".$withdraw->to_addr.'&type=1';
+            // $opts = array(
+            //     'http'=>array(
+            //     'method'=>"POST",
+            //     )
+            // );
+            // $context = stream_context_create($opts);
+            // $res = json_decode(file_get_contents($url, false, $context));
+            // if($res->code == 200){
+            //     $withdraw = UserCharge::where('swift_no', $swift_no)->find();
+            //     $withdraw->inspect_time = date("Y-m-d H:i:s", time());
+            //     $withdraw->inspect_status = 5;
+            //     $withdraw->hash = $res->data;
+            //     $withdraw->save();
+            //     return return_data(1, '', '操作成功, 再次进入提现列表时进行最终状态的获取', 'json');
+            // }else{
+            //     // $withdraw = UserCharge::where('swift_no', $swift_no)->find();
+            //     // $withdraw->inspect_time = date("Y-m-d H:i:s", time());
+            //     // $withdraw->inspect_status = 2;
+            //     // $withdraw->save();
+            //     // $user_fund = IdxUserFund::find($withdraw->user_id);
+            //     // $user_fund->money += $withdraw->number + $withdraw->fee;
+            //     // $user_fund->save();
+            //     return return_data(2, '', '操作失败', 'json');
+            // }
         }
     }
 }
