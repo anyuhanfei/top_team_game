@@ -76,7 +76,7 @@ class Deal extends Index{
 
     public function 交易(){
         $deal_id = Request::instance()->param('deal_id', '');
-        $deal = IdxDeal::find($deal_id);
+        $deal = IdxDeal::where('status', 0)->where('deal_id', $deal_id)->find();
         if(!$deal){
             return return_data(2, '', Lang::get('非法操作'));
         }
