@@ -330,7 +330,7 @@ class User extends Admin{
         $res = $user_fund->save();
         if($res){
             $fund_type_array = array_flip($this->user_fund_type);
-            LogUserFund::create_data($id, '-' . $add_number, $fund_type, '后台充值', '后台充值');
+            LogUserFund::create_data($id, $add_number, $fund_type, '后台充值', '后台充值');
             return return_data(1, '', '充值成功', '会员充值：给'.$user->$control_user_identity.'充值'.$add_number.$fund_type_array[$fund_type]);
         }else{
             return return_data(3, '', '充值失败,请联系管理员');
