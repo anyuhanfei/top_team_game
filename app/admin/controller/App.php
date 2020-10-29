@@ -474,12 +474,7 @@ class App extends Admin{
         $start_time = Request::instance()->param('start_time', '');
         $end_time = Request::instance()->param('end_time', '');
         $log = new UserCharge;
-        if($user_identity != ''){
-            $user = IdxUser::field('user_id, phone')->where('phone', $user_identity)->find();
-            if($user){
-                $log = $log->where('user_id', $user->user_id);
-            }
-        }
+        $log = ($user_identity != '') ? $log->where('user_id', $user_identity) : $log;
         $log = ($stock_code != '') ? $log->where('code', $stock_code) : $log;
         $log = $this->where_time($log, $start_time, $end_time);
         $list = $log->where('charge_type', 2)->where('is_deleted', 0)->order('inspect_status asc')->order('id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
