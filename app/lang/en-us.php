@@ -316,5 +316,6 @@ return [
     '创世节点奖励'=> 'Creation node reward',
     '直推链接奖励'=> 'Direct link rewards',
     '间推链接奖励'=> 'Push links between rewards',
-    '创世节点总收益'=> 'Total revenue at creation node'
+    '创世节点总收益'=> 'Total revenue at creation node',
+    '请选择提现方式'=> 'Please select the withdrawal method'
 ];
