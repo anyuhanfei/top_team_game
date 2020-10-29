@@ -200,9 +200,6 @@ class Fund extends Base{
         $number_array = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
         $s_time = time();
         foreach($inning as $v){
-            if($s_time + 40 < time()){
-                break;
-            }
             for($i = 1; $i <= self::$cache_settings['中奖人数']; $i++){
                 //中奖
                 $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
