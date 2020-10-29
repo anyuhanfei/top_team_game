@@ -393,6 +393,9 @@ class Fund extends Base{
     public static function 是否合格($user_id){
         $user_count = IdxUserCount::find($user_id);
         if($user_count->今日局数 >= SysSetting::where('sign', '任务局数')->value('value')){
+            if($user_count->今日我合格 == 1){
+                return;
+            }
             $user_count->今日我合格 = 1;
             $user_count->save();
             $top_id = IdxUser::where('user_id', $user_id)->value('top_id');
