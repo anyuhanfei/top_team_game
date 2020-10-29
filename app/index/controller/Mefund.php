@@ -100,12 +100,35 @@ class Mefund extends Index{
                 $this->user->save();
             }
         }
+        if($this->user->taddress == ''){
+            $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+            $url = "http://". $kuake_ip ."/tron/createAddress?userId=" . $this->user_id;
+            $opts = array(
+                'http'=>array(
+                  'method'=>"GET",
+                  "header"=> "Content-Type:application/x-www-form-urlencoded"
+                )
+            );
+            $context = stream_context_create($opts);
+            $res = json_decode(file_get_contents($url, false, $context));
+            if($res->code == 200){
+                $this->user->taddress = $res->data;
+                $this->user->taddress_qrcode = png_erwei($this->user->taddress, $this->user->taddress);
+                $this->user->save();
+            }
+        }
         if($this->user->address_qrcode == ''){
             $this->user->address_qrcode = png_erwei($this->user->address, $this->user->address);
             $this->user->save();
         }
+        if($this->user->taddress_qrcode == ''){
+            $this->user->taddress_qrcode = png_erwei($this->user->taddress, $this->user->taddress);
+            $this->user->save();
+        }
         View::assign('address', $this->user->address);
         View::assign('address_qrcode', $this->user->address_qrcode);
+        View::assign('taddress', $this->user->taddress);
+        View::assign('taddress_qrcode', $this->user->taddress_qrcode);
         return View::fetch();
     }
 

@@ -26,39 +26,66 @@
 <body>
 	<header class="mui-bar mui-bar-nav head_color">
 		<a href="javascript:;" class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
-		<h1 class="mui-title">{:lang('充币')}(ERC20)</h1>
+		<h1 class="mui-title">{:lang('充币')}</h1>
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll">
-			<div class="public_box">
-				<div class="public_box_bg">
-					<img src="{$address_qrcode}" class="img_style">
-					<!-- <div class="public_box public_box_bg"> -->
-						<!-- <textarea name=""  rows="5" maxlength="50" value="" style="font-size: 15px;">啊啊啊啊</textarea> -->
-					<input type="text" value="{$address}" readonly id="taokouling">
-					<!-- </div> -->
+			<div class="getRecordTit mui-segmented-control mui-segmented-control1">
+				<a href="#get1" class="mui-control-item mui-active">ERC20</a>
+				<a href="#get2" class="mui-control-item">TRC20</a>
+			</div>
+			<div class="getRecordList mui-content-padded">
+				<div id="get1" class="mui-control-content mui-active">
+					<div class="public_box">
+						<div class="public_box_bg">
+							<img src="{$address_qrcode}" class="img_style">
+							<input type="text" value="{$address}" readonly id="taokouling1">
+						</div>
+						<a href="javascript:;" id="copyCode1" class="a_btn a_big_btn copy1" data-clipboard-target="#taokouling1" data-clipboard-action="copy">{:lang('复制私钥')}</a>
+					</div>
 				</div>
-				<a href="javascript:;" id="copyCode" class="a_btn a_big_btn" data-clipboard-target="#taokouling" data-clipboard-action="copy">{:lang('复制私钥')}</a>
+				<div id="get2" class="mui-control-content">
+					<div class="public_box">
+						<div class="public_box_bg">
+							<img src="{$taddress_qrcode}" class="img_style">
+							<input type="text" value="{$taddress}" readonly id="taokouling2">
+						</div>
+						<a href="javascript:;" id="copyCode2" class="a_btn a_big_btn copy2" data-clipboard-target="#taokouling2" data-clipboard-action="copy">{:lang('复制私钥')}</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
+
 	<script src="/static/index/js/jquery.min.js"></script>
 	<script src="/static/index/js/public.js"></script>
 	<!-- 复制插件 -->
 	<script src="/static/index/js/code.js"></script>
 	<script type="text/javascript">
 		// 复制
-		var clipboard = new Clipboard('.a_btn');
+		var clipboard = new Clipboard('.copy1');
 		    clipboard.on('success', function(e){
 		        console.log(e);
 				// console.info('Action:', e.action);
 				// console.info('Text:', e.text);
 				// console.info('Trigger:', e.trigger);
 				mui.toast("{:lang('复制成功')}");
-		        document.getElementById('taokouling').blur();
+		        document.getElementById('taokouling1').blur();
 		    });
 		    clipboard.on('error', function(e){
+				mui.toast("{:lang('复制失败，请长按复制')}");
+			});
+
+		var clipboard1 = new Clipboard('.copy2');
+		    clipboard1.on('success', function(e){
+		        console.log(e);
+				// console.info('Action:', e.action);
+				// console.info('Text:', e.text);
+				// console.info('Trigger:', e.trigger);
+				mui.toast("{:lang('复制成功')}");
+		        document.getElementById('taokouling2').blur();
+		    });
+		    clipboard1.on('error', function(e){
 				mui.toast("{:lang('复制失败，请长按复制')}");
 		    });
 	</script>
