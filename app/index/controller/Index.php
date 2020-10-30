@@ -234,14 +234,30 @@ class Index extends Base{
         if($user_count->今日最大局数 <= $user_count->今日局数){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
-        $res_one = GameAuto::create([
-            'user_id'=> $this->user_id,
-            'type'=> $usdt_array[$usdt],
-            '质押USDT'=> $usdt,
-            '可玩局数'=> $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt],
-            '质押日期'=> date("Y-m-d", time()),
-            'insert_time'=> date("Y-m-d H:i:s", time())
-        ]);
+        $可玩局数 = $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
+        if($可玩局数 % 10 == 0){
+            $res_one = GameAuto::create([
+                'user_id'=> $this->user_id,
+                'type'=> $usdt_array[$usdt],
+                '质押USDT'=> $usdt,
+                '可玩局数'=> $可玩局数,
+                '已玩局数'=> $可玩局数,
+                '中奖局数'=> $可玩局数 - ($可玩局数 / 10),
+                '未中奖局数'=> $可玩局数 / 10,
+                '质押日期'=> date("Y-m-d", time()),
+                'insert_time'=> date("Y-m-d H:i:s", time())
+            ]);
+        }else{
+            $res_one = GameAuto::create([
+                'user_id'=> $this->user_id,
+                'type'=> $usdt_array[$usdt],
+                '质押USDT'=> $usdt,
+                '可玩局数'=> $可玩局数,
+                '质押日期'=> date("Y-m-d", time()),
+                'insert_time'=> date("Y-m-d H:i:s", time())
+            ]);
+        }
+        
         $user_fund->USDT -= $usdt;
         $res_two = $user_fund->save();
         LogUserFund::create_data($this->user_id, '-' . $usdt, 'USDT', '自动质押', '自动质押');

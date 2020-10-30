@@ -247,26 +247,59 @@ class Fund extends Base{
             $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
             $sys_data->save();
         }
-
+        
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            if(strtotime($auto->insert_time) + 5000 < time()){
-                $auto->中奖局数 += 1;
-                $auto->save();
-            }
-            if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 <= ($auto->中奖局数 + $auto->未中奖局数)){
-                $money = $auto->质押USDT;
-                $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-                for($i = 0; $i < $auto->未中奖局数; $i++){
-                    $money -= 20;
-                    self::矿机生成($auto->user_id);
+            if($auto->可玩局数 % 10 == 0){
+                if(strtotime($auto->insert_time) + 30 < time()){
+                    //开几局游戏
+                    $c = 1;
+                    while($c <= $auto->可玩局数 / 10){
+                        $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> create_captcha(9)];
+                        $number_array = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+                        $i = 0;
+                        while($i < 10){
+                            $create_array['player_id_' . $number_array[$i]] = $auto->user_id;
+                            $create_array['is_auto_' . $number_array[$i]] = $auto->id;
+                            $create_array['is_win_' . $number_array[$i]] = $i == 1 ? 2 : 1;
+                            $i++;
+                        }
+                        GameInning::create($create_array);
+                        $c++;
+                    }
+                    //发奖
+                    $money = $auto->质押USDT;
+                    $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+                    for($i = 0; $i < $auto->未中奖局数; $i++){
+                        $money -= 20;
+                        self::矿机生成($auto->user_id);
+                    }
+                    $user_fund = IdxUserFund::find($auto->user_id);
+                    $user_fund->USDT += $money;
+                    $user_fund->save();
+                    LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+                    $auto->status = 1;
+                    $auto->save();
                 }
-                $user_fund = IdxUserFund::find($auto->user_id);
-                $user_fund->USDT += $money;
-                $user_fund->save();
-                LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
-                $auto->status = 1;
-                $auto->save();
+            }else{
+                if(strtotime($auto->insert_time) + 5000 < time()){
+                    $auto->中奖局数 += 1;
+                    $auto->save();
+                }
+                if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 <= ($auto->中奖局数 + $auto->未中奖局数)){
+                    $money = $auto->质押USDT;
+                    $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+                    for($i = 0; $i < $auto->未中奖局数; $i++){
+                        $money -= 20;
+                        self::矿机生成($auto->user_id);
+                    }
+                    $user_fund = IdxUserFund::find($auto->user_id);
+                    $user_fund->USDT += $money;
+                    $user_fund->save();
+                    LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+                    $auto->status = 1;
+                    $auto->save();
+                }
             }
         }
     }
