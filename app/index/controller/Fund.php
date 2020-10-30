@@ -247,7 +247,6 @@ class Fund extends Base{
             $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
             $sys_data->save();
         }
-        
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
             if($auto->可玩局数 % 10 == 0){
@@ -255,7 +254,7 @@ class Fund extends Base{
                     //开几局游戏
                     $c = 1;
                     while($c <= $auto->可玩局数 / 10){
-                        $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> create_captcha(9)];
+                        $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'end_time'=> date("Y-m-d H:i:s", time()), 'id'=> create_captcha(9)];
                         $number_array = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
                         $i = 0;
                         while($i < 10){
