@@ -156,7 +156,7 @@ class Mefund extends Index{
         $res_one = $user_fund->save();
         $swift_no = 'sn' . date("YmdHis", time()) . rand(1000, 9999) . substr($this->user->phone, 7, 4);
         if($type == 'USDT' && $lian_type == 'TRC20'){
-            $withdraw_address = Cache::get('settings')['withdraw_address'];
+            $withdraw_address = Cache::get('settings')['t_withdraw_address'];
             $res_two = UserCharge::create([
                 'swift_no'=> $swift_no,
                 'user_id'=> $this->user_id,
@@ -165,8 +165,9 @@ class Mefund extends Index{
                 'charge_type'=> 2,
                 'poundage'=> $fee,
                 'create_time'=> date("Y-m-d H:i:s", time()),
-                'to_addr'=> $address,
-                'from_addr'=> $withdraw_address
+                'coin_type'=> 3,
+                'to_addr'=> $this->user->TUSDT,
+                'from_address'=> $withdraw_address
             ]);
         }else{
             $withdraw_address = Cache::get('settings')['withdraw_address'];
@@ -179,7 +180,7 @@ class Mefund extends Index{
                 'poundage'=> $fee,
                 'create_time'=> date("Y-m-d H:i:s", time()),
                 'to_addr'=> $address,
-                'from_addr'=> $withdraw_address
+                'from_address'=> $withdraw_address
             ]);
         }
         
