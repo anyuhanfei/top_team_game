@@ -250,7 +250,7 @@ class Fund extends Base{
 
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            if(strtotime($auto->insert_time) + 5000 < time()){
+            if(strtotime($auto->insert_time) + 7200 < time()){
                 $auto->中奖局数 += 1;
                 $auto->save();
             }
