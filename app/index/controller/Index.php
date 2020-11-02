@@ -182,8 +182,8 @@ class Index extends Base{
         if($user_count->今日最大局数 < ($user_count->今日局数 + 1)){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
-        if(time() - Session::get('game_time') < 10){
-            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为10秒'));
+        if(time() - Session::get('game_time') < 30){
+            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为30秒'));
         }
         if($user_fund->number <= 0){
             $user_fund->USDT -= $cache_settings['下注金额'];
@@ -267,10 +267,10 @@ class Index extends Base{
         }else{
             return return_data(2, '', Lang::get('质押失败'));
         }
-    } 
+    }
 
     public function 游戏记录(){
-        $autos = GameAuto::where('user_id', $this->user_id)->where('status', 1)->order('id desc')->limit(100)->select();
+        $autos = GameAuto::where('user_id', $this->user_id)->where('status', 1)->where('质押日期', date("Y-m-d", time()))->order('id desc')->select();
         $log = [];
         foreach($autos as $auto){
             if($auto->status == 1){

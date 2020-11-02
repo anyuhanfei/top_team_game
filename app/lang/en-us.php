@@ -31,7 +31,7 @@ return [
     '未参与成功游戏'=> 'Not participating in a successful game',
     '质押USDT结算'=> 'Pledge USDT for settlement',
     '今日可玩局数已完成'=> 'The number of games available for today has been completed',
-    '手动参与游戏的间隔时间为10秒'=> 'The interval between manual participation in the game is 10s',
+    '手动参与游戏的间隔时间为30秒'=> 'The interval between manual participation in the game is 30s',
     '参与成功, 请稍后查询游戏结果'=> 'Successful participation, please check the game results later',
     '参与失败'=> 'Participate in failure',
     '今日已质押, 无法多次质押'=> 'It has been pledged today and cannot be pledged multiple times',

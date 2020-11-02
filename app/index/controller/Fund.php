@@ -45,7 +45,8 @@ class Fund extends Base{
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
         $data->昨日创世节点分红 = $创世节点_money;
-
+        //计算昨日团队分红
+        $data->昨日团队分红 = $money * 0.4;
         $vips = IdxUser::where('vip', 1)->field('user_id, vip')->select();
         if(count($vips) > 0){
             $节点可得金额 = round($创世节点_money / count($vips), 2);
@@ -104,7 +105,6 @@ class Fund extends Base{
                 break;
             }
             $总奖励 = self::$cache_level[$level - 1]['奖励_终'] * 0.01 * $money;
-            $data->昨日团队分红 += $总奖励;
             $单人奖金 = round($总奖励 / $会员总数, 2);
             # 给所有人发奖
             foreach($level_users as $v){
@@ -117,7 +117,6 @@ class Fund extends Base{
             # 全网分红
             if($level == 5 || $level == 6){
                 $全网分红奖励 = $level == 5 ? (self::$cache_settings['钻石玩家奖励'] * 0.01 * $money) : (self::$cache_settings['王者玩家奖励'] * 0.01 * $money);
-                $data->昨日团队分红 += $全网分红奖励;
                 $全网分红单人奖金 = round($全网分红奖励 / $会员总数, 2);
                 foreach($level_users as $v){
                     if($v->level >= $level){
