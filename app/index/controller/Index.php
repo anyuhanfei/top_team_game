@@ -263,7 +263,7 @@ class Index extends Base{
             $user_count->今日局数 += $usdt_array[$usdt];
             $user_count->save();
             Fund::是否合格($this->user_id);
-            // return return_data(1, '', Lang::get('质押成功, 请稍后查询游戏结果'), '自动参与游戏');
+            return return_data(1, '', Lang::get('质押成功, 请稍后查询游戏结果'), '自动参与游戏');
         }else{
             return return_data(2, '', Lang::get('质押失败'));
         }
