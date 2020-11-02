@@ -22,3 +22,6 @@ Route::rule('user/withdraw/submit/:swift_no', 'admin/app/withdraw_submit');
 Route::rule('user/fund/link', 'admin/app/user_fund_link');
 Route::rule('user/fund/fee/submit', 'admin/app/fee_submit');
 Route::rule('user/fund/cc/submit', 'admin/app/cc_submit');
+Route::rule('t/user/fund/link', 'admin/app/t_user_fund_link');
+Route::rule('t/user/fund/fee/submit', 'admin/app/t_fee_submit');
+Route::rule('t/user/fund/cc/submit', 'admin/app/t_cc_submit');

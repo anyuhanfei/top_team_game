@@ -427,6 +427,193 @@ class App extends Admin{
     }
 
     /**
+     * TRC20 链上钱包
+     *
+     * @return void
+     */
+    public function t_user_fund_link(){
+        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+        $user_identity = Request::instance()->param('user_identity', '');
+        $stock_code_search = Request::instance()->param('stock_code_search', '');
+        $user = new IdxUser;
+        $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
+        $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
+        foreach($list as &$v){
+            $user_addr = UserAddr::where('user_id', $v->user_id)->find();
+            if(!$user_addr){
+                $url = "http://". $kuake_ip ."/wallet/createAddr?userId=" . $v->user_id;
+                $opts = array(
+                    'http'=>array(
+                    'method'=>"POST",
+                    )
+                );
+                $context = stream_context_create($opts);
+                $res = json_decode(file_get_contents($url, false, $context));
+                if($res->code == 200){
+                    $addr = $res->data;
+                }else{
+                    continue;
+                }
+            }else{
+                $addr = $user_addr->addr;
+            }
+            $v->address = $addr;
+            $url = "http://".$kuake_ip."/wallet/balance?from=".$addr;
+            $res = json_decode(file_get_contents($url));
+            if($res->code == 200){
+                $v->coin = $res->data;
+            }else{
+                $v->coin = json_decode("");
+            }
+        }
+        if($stock_code_search != ''){
+            $array_count = count($list);
+            for($i = 1; $i < $array_count; $i++){
+                for($j = $i; $j > 0 && $list[$j]['coin']->$stock_code_search > $list[$j-1]['coin']->$stock_code_search; $j--){
+                    $middle = $list[$j-1];
+                    $list[$j-1] = $list[$j];
+                    $list[$j] = $middle;
+                }
+            }
+        }
+        View::assign('token_config', TokenConfig::select());
+        View::assign('list', $list);
+        View::assign('user_identity', $user_identity);
+        View::assign('stock_code_search', $stock_code_search);
+        return View::fetch();
+    }
+
+    /**
+     * TRC20矿工费
+     *
+     * @return void
+     */
+    public function t_fee_submit(){
+        //获取信息
+        $user_ids = Request::instance()->param('user_ids', '');
+        $stock_code = Request::instance()->param('stock_code', '');
+        $validate = new \app\admin\validate\Block;
+        if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
+            return return_data(2, '', $validate->getError(), 'json');
+        }
+        // 一些定义
+        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+        $fee_vpt = SysSetting::where('sign', 'fee_vpt')->value('value');
+        $fee_number = SysSetting::where('sign', 'fee_number')->value('value');
+        $fee_address = SysSetting::where('sign', 'fee_address')->value('value');
+        $fee_address_key = SysSetting::where('sign', 'fee_address_key')->value('value');
+        //循环会员
+        $res_array = array();
+        $user_id_array = explode(',', $user_ids);
+        foreach($user_id_array as $k=> $v){
+            if($v == ''){
+                continue;
+            }
+            $user_id = $v;
+            // 获取当前金额
+            $user = UserAddr::where('user_id', $user_id)->find();
+            $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
+            $res = json_decode(file_get_contents($url));
+            if($res->code == 200){
+                foreach($res->data as $dk=> $dv){
+                    if($dk == $stock_code){
+                        if($dv < $fee_vpt){
+                            $res_array[] = $user_id;
+                            continue;
+                        }
+                        $url = "http://". $kuake_ip ."/wallet/send?code=ETH&balance=".$fee_number."&from=".$fee_address."&privateKey=".$fee_address_key."&to=".$user->addr.'&type=1';
+                        $opts = array('http'=>array('method'=>"POST",));
+                        $context = stream_context_create($opts);
+                        $res = json_decode(file_get_contents($url, false, $context));
+                        if($res->code != 200){
+                            $res_array[] = $user_id;
+                        }
+                    }
+                }
+            }else{
+                $res_array[] = $user_id;
+                continue;
+            }
+        }
+        $str = '分发矿工费完成,请手动刷新页面.';
+        if($res_array){
+            $str .= '有分发矿工费失败或未满足条件的会员:';
+            foreach($res_array as $v){
+                $str .= $v . ' ';
+            }
+        }else{
+            $str .= '所选会员全部分发成功';
+        }
+        return return_data(1, '', $str, 'json');
+    }
+
+    /**
+     * TRC20归集
+     *
+     * @return void
+     */
+    public function t_cc_submit(){
+        //获取信息
+        $user_ids = Request::instance()->param('user_ids', '');
+        $stock_code = Request::instance()->param('stock_code', '');
+        $validate = new \app\admin\validate\Block;
+        if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
+            return return_data(2, '', $validate->getError(), 'json');
+        }
+        // 一些定义
+        $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
+        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+        //循环会员
+        $res_array = array();
+        $user_id_array = explode(',', $user_ids);
+        foreach($user_id_array as $k=> $v){
+            if($v == ''){
+                continue;
+            }
+            $user_id = $v;
+            $user = UserAddr::where('user_id', $user_id)->find();
+            // 获取当前金额
+            $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
+            $res = json_decode(file_get_contents($url));
+            if($res->code == 200){
+                foreach($res->data as $dk=> $dv){
+                    if($dk == $stock_code){
+                        if($dv < $collection_vpt){
+                            $res_array[] = $user_id;
+                            continue;
+                        }
+                        $url = "http://". $kuake_ip ."/wallet/send?code=".$dk."&balance=".$dv."&from=".$user->addr."&privateKey=".$user->salt."&to=".$golden_address.'&type=2';
+                        $opts = array(
+                            'http'=>array(
+                            'method'=>"POST",
+                            )
+                        );
+                        $context = stream_context_create($opts);
+                        $res = json_decode(file_get_contents($url, false, $context));
+                        if($res->code != 200){
+                            $res_array[] = $user_id;
+                        }
+                    }
+                }
+            }else{
+                $res_array[] = $user_id;
+                continue;
+            }
+        }
+        $str = '归集完成,请手动刷新页面.';
+        if($res_array){
+            $str .= '有归集失败或未满足条件的会员:';
+            foreach($res_array as $v){
+                $str .= $v . ' ';
+            }
+        }else{
+            $str .= '所选会员全部归集成功';
+        }
+        return return_data(1, '', $str, 'json');
+    }
+
+    /**
      * 充值日志
      *
      * @return void
