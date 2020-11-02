@@ -267,7 +267,7 @@ class Index extends Base{
         }else{
             return return_data(2, '', Lang::get('质押失败'));
         }
-    }
+    } 
 
     public function 游戏记录(){
         $autos = GameAuto::where('user_id', $this->user_id)->where('status', 1)->order('id desc')->limit(100)->select();
