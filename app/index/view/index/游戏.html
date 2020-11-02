@@ -34,7 +34,7 @@
 			background-color: #000;
 		}
 		.message_reply{
-			height: 195px;
+			height: 205px;
 		}
 		.game_show{
 			display: none;
@@ -128,7 +128,8 @@
 			</div>
 			<div class="message_reply_content">
 				<h4 class="green_color mui-text-center">{$price} {:lang("门票")}</h4>
-				<div class="input_box public_box">
+				<div class="mui-text-right">{:lang('门票余额')}: {$user->userfund->门票}</div>
+				<div class="input_box public_box" style="margin: 0;">
 						<input type="password" id="level_password" placeholder="{:lang('请输入二级密码')}">
 					<div class="flexbox_nowrap flexbox_nowrap_between">
 						<a href="javascript:;" class="a_btn close">{:lang("取消")}</a>
