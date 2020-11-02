@@ -96,8 +96,8 @@
 					<div class="flexbox_nowrap">
 						<div class="flexbox_check">
 						<label for="aa">
-							<input id="aa" name="pledge" value="20" type="radio">
-							<div class="radio_box" style="height: 50px;">20USDT<br/>{:lang("参加一局")}</div>
+							<input id="aa" name="pledge" value="50" type="radio">
+							<div class="radio_box" style="height: 50px;">20USDT<br/>{:lang("参加十局")}</div>
 						</label>
 						</div>
 						<div class="flexbox_check">
@@ -205,7 +205,13 @@
 				data: {usdt: usdt},
 				success: function(data){
 					data = JSON.parse(data)
-					mui.toast(data.msg)
+					if(data.code == 1){
+						mui.alert(data.msg, '', '{:lang("确认")}', function(){
+							location.href = '/index/游戏';
+						})
+					}else{
+						mui.toast(data.msg)
+					}
 				}
 			})
 		})
@@ -216,7 +222,13 @@
 				type: "post",
 				success: function(data){
 					data = JSON.parse(data)
-					mui.toast(data.msg)
+					if(data.code == 1){
+						mui.alert(data.msg, '', '{:lang("确认")}', function(){
+							location.href = '/index/游戏';
+						})
+					}else{
+						mui.toast(data.msg)
+					}
 				}
 			})
 		})

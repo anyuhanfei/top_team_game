@@ -179,18 +179,12 @@ class Index extends Base{
             }
         }
         $user_count = IdxUserCount::find($this->user_id);
-        if($user_count->今日最大局数 <= $user_count->今日局数){
-            return return_data(2, '', Lang::get('今日可玩局数已完成'));
+        if($user_count->今日最大局数 < ($user_count->今日局数 + 1)){
+            return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
-        // if(GameQueue::where('user_id', $this->user_id)->where('is_pop', 0)->find()){
-        //     return return_data(2, '', Lang::get('正在游戏中, 请等待'));
-        // }
         if(time() - Session::get('game_time') < 10){
             return return_data(2, '', Lang::get('手动参与游戏的间隔时间为10秒'));
         }
-        $res_one = GameQueue::create([
-            'user_id'=> $this->user_id
-        ]);
         if($user_fund->number <= 0){
             $user_fund->USDT -= $cache_settings['下注金额'];
             LogUserFund::create_data($this->user_id, '-' . $cache_settings['下注金额'], 'USDT', '参与游戏', '参与游戏');
@@ -199,6 +193,22 @@ class Index extends Base{
             LogUserFund::create_data($this->user_id, '-1', '免费次数', '参与游戏', '参与游戏');
         }
         $res_two = $user_fund->save();
+        $user_count->局数 += 1;
+        $未中奖局数 = $user_count->局数 >= 10 ? 1 : 0;
+        $中奖局数 = 1 - $未中奖局数;
+        $user_count->局数 = $user_count->局数 >= 10 ? $user_count->局数 - 10 : $user_count->局数;
+        $res_one = GameAuto::create([
+            'user_id'=> $this->user_id,
+            'type'=> 1,
+            '质押USDT'=> 20,
+            '可玩局数'=> 1,
+            '已玩局数'=> 1,
+            '中奖局数'=> $中奖局数,
+            '未中奖局数'=> $未中奖局数,
+            '质押日期'=> date("Y-m-d", time()),
+            'insert_time'=> date("Y-m-d H:i:s", time())
+        ]);
+
         if($res_one && $res_two){
             $user_count->今日局数 += 1;
             $user_count->save();
@@ -219,60 +229,62 @@ class Index extends Base{
             return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
         }
         $usdt = Request::instance()->param('usdt', 0);
-        if($usdt != 20 && $usdt != 100 && $usdt != 200){
+        if($usdt != 20 && $usdt != 50 && $usdt != 100 && $usdt != 200){
             return return_data(2, '', Lang::get('非法操作'));
         }
         $user_fund = IdxUserFund::find($this->user_id);
         if($user_fund->USDT < $usdt){
             return return_data(2, '', Lang::get('USDT余额不足'));
         }
-        $usdt_array = [20=> 1, 100=> 20, 200=> 50];
-        // if(GameAuto::where('user_id', $this->user_id)->where('质押日期', date("Y-m-d", time()))->find()){
-        //     return return_data(2, '', Lang::get('今日已质押, 无法多次质押'));
-        // }
+        $usdt_array = [20=> 1, 50=>10, 100=> 20, 200=> 50];
         $user_count = IdxUserCount::find($this->user_id);
-        if($user_count->今日最大局数 <= $user_count->今日局数){
+        if($user_count->今日最大局数 <= ($user_count->今日局数 + $usdt_array[$usdt])){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
+        $user_fund->USDT -= $usdt;
+        $res_two = $user_fund->save();
+
+        $未中奖局数 = $usdt_array[$usdt] / 10;
+        $中奖局数 = $usdt_array[$usdt] - $未中奖局数;
         $res_one = GameAuto::create([
             'user_id'=> $this->user_id,
             'type'=> $usdt_array[$usdt],
             '质押USDT'=> $usdt,
-            '可玩局数'=> $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt],
+            '可玩局数'=> $usdt_array[$usdt],
+            '已玩局数'=> $usdt_array[$usdt],
+            '中奖局数'=> $中奖局数,
+            '未中奖局数'=> $未中奖局数,
             '质押日期'=> date("Y-m-d", time()),
             'insert_time'=> date("Y-m-d H:i:s", time())
         ]);
-        $user_fund->USDT -= $usdt;
-        $res_two = $user_fund->save();
+
         LogUserFund::create_data($this->user_id, '-' . $usdt, 'USDT', '自动质押', '自动质押');
         if($res_one && $res_two){
-            $user_count->今日局数 += $user_count->今日最大局数 < $user_count->今日局数 + $usdt_array[$usdt] ? $user_count->今日最大局数 - $user_count->今日局数 : $usdt_array[$usdt];
+            $user_count->今日局数 += $usdt_array[$usdt];
             $user_count->save();
             Fund::是否合格($this->user_id);
-            return return_data(1, '', Lang::get('质押成功'), '自动参与游戏');
+            // return return_data(1, '', Lang::get('质押成功, 请稍后查询游戏结果'), '自动参与游戏');
         }else{
             return return_data(2, '', Lang::get('质押失败'));
         }
     }
 
     public function 游戏记录(){
-        $list = GameInning::where('player_id_one|player_id_two|player_id_three|player_id_four|player_id_five|player_id_six|player_id_seven|player_id_eight|player_id_nine|player_id_ten', $this->user_id)->order('insert_time desc')->select();
+        $autos = GameAuto::where('user_id', $this->user_id)->where('status', 1)->order('id desc')->limit(100)->select();
         $log = [];
-        foreach($list as $v){
-            if($v->end_time != NULL){
-                foreach (['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'] as $num) {
-                    $key = 'player_id_' . $num;
-                    if($v->$key == $this->user_id){
-                        $key = 'is_win_' . $num;
-                        if($v->$key == 1){
-                            $log[] = ['color'=> 'orange_color', 'status'=> Lang::get('中奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
-                        }else{
-                            $log[] = ['color'=> 'red_color', 'status'=> Lang::get('未中奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
-                        }
+        foreach($autos as $auto){
+            if($auto->status == 1){
+                $i = 0;
+                while($i < $auto->可玩局数){
+                    $insert_time = date("Y-m-d H:i:s", strtotime($auto->insert_time) + ($i * 60));
+                    $id = strval($auto->id) . strval(strtotime($auto->insert_time) + ($i * 60));
+                    if($i < $auto->中奖局数){
+                        $log[] = ['color'=> 'orange_color', 'status'=> Lang::get('中奖'), 'id'=> $id, 'insert_time'=> $insert_time];
+                    }else{
+                        $log[] = ['color'=> 'red_color', 'status'=> Lang::get('未中奖'), 'id'=> $id, 'insert_time'=> $insert_time];
                     }
+                    $i++;
                 }
-            }else{
-                $log[] = ['color'=> 'green_color', 'status'=> Lang::get('未开奖'), 'id'=> $v->id, 'insert_time'=> $v->insert_time];
             }
         }
         View::assign('list', $log);

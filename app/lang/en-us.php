@@ -316,5 +316,7 @@ return [
     '创世节点奖励'=> 'Creation node reward',
     '直推链接奖励'=> 'Direct link rewards',
     '间推链接奖励'=> 'Push links between rewards',
-    '创世节点总收益'=> 'Total revenue at creation node'
+    '创世节点总收益'=> 'Total revenue at creation node',
+    '质押成功, 请稍后查询游戏结果'=> 'Pledge successfully, please check the game result later',
+    '参加十局'=> 'Participate in 10 innings',
 ];

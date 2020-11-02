@@ -36,13 +36,12 @@ class Fund extends Base{
      */
     public static function 发放奖励(){
         $users_data = self::升级();
-        self::结算();
         //计算今日所有奖金
         $data = SysData::find(1);
         $data->昨日推广分红 = 0;
         $data->昨日团队分红 = 0;
         $data->昨日创世节点分红 = 0;
-        $money = $data->推广玩家收益;
+        $money = GameAuto::where('质押日期', date("Y-m-d", time()))->sum('可玩局数') * 0.38;
         //创世节点分发奖金
         $创世节点_money = self::$cache_settings['创世节点分红PCT'] * 0.01 * $money;
         $data->昨日创世节点分红 = $创世节点_money;
@@ -151,121 +150,25 @@ class Fund extends Base{
     /**
      * 每分钟执行一次
      */
-    public static function 自动参与(){
-        sleep(random_int(1, 3));
-        $质押s = GameAuto::where('质押日期', date("Y-m-d", time()))->select();
-        foreach($质押s as $质押){
-            if($质押->可玩局数 > $质押->已玩局数){
-                // if(random_int(1, 10) >= 5){
-                //     continue;
-                // }
-                // if(GameQueue::where('user_id', $质押->user_id)->where('is_pop', 0)->find()){
-                //     continue;
-                // }
-                GameQueue::create(['user_id'=> $质押->user_id, 'is_auto'=> $质押->id]);
-                $质押->已玩局数 += 1;
-                $质押->save();
-            }
-        }
-    }
-
-    /**
-     * 每分钟执行一次
-     */
     public static function 游戏(){
-        $sleep_time = 3;
-        self::$cache_settings['游戏房间玩家数量'] = self::$cache_settings['游戏房间玩家数量'] > 10 ? 10 : self::$cache_settings['游戏房间玩家数量'];
-        // if(self::$cache_settings['每日游戏开始时间'] > date("H:i", time()) || self::$cache_settings['每日游戏结束时间'] < date("H:i", time())){
-        //     return;
-        // }
-        while(true){
-            $queue = GameQueue::where('is_pop', 0)->order('id asc')->limit(self::$cache_settings['游戏房间玩家数量'])->select();
-            if(count($queue) != self::$cache_settings['游戏房间玩家数量']){
-                break;
-            }
-            $create_array = ['insert_time'=> date("Y-m-d H:i:s", time()), 'id'=> create_captcha(9)];
-            $number_array = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-            $i = 0;
-            foreach($queue as $v){
-                $v->is_pop = 1;
-                $v->save();
-                $create_array['player_id_' . $number_array[$i]] = $v->user_id;
-                $create_array['is_auto_' . $number_array[$i]] = $v->is_auto;
-                $i++;
-            }
-            GameInning::create($create_array);
-        }
-        sleep($sleep_time);
-        $inning = GameInning::where('end_time', NULL)->select();
-        $number_array = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+        // 所以设置在这里查
         $s_time = time();
-        foreach($inning as $v){
-            for($i = 1; $i <= self::$cache_settings['中奖人数']; $i++){
-                //中奖
-                $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
-                $is_win_field = 'is_win_' . $number_array[$nowin];
-                while($v->$is_win_field != 0){  //说明这个人已经有结果了, 换一个没结果的
-                    $nowin = random_int(1, self::$cache_settings['游戏房间玩家数量']);
-                    $is_win_field = 'is_win_' . $number_array[$nowin];
-                }
-                $player_id_field = 'player_id_' . $number_array[$nowin];
-                $is_auto_field = 'is_auto_' . $number_array[$nowin];
-                //中奖奖励
-                $v->$is_win_field = 1;
-                if($v->$is_auto_field != 0){ //是自动, 仅添加记录
-                    $auto = GameAuto::find($v->$is_auto_field);
-                    $auto->中奖局数 += 1;
-                    $auto->save();
-                }else{ //直接发钱
-                    $user_fund = IdxUserFund::find($v->$player_id_field);
-                    $user_fund->USDT += self::$cache_settings['下注金额'] + self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费'];
-                    $user_fund->save();
-                    LogUserFund::create_data($v->$player_id_field, self::$cache_settings['下注金额'] + self::$cache_settings['中奖打赏金额'], 'USDT', '游戏中奖', '游戏中奖');
-                    LogUserFund::create_data($v->$player_id_field, '-' . self::$cache_settings['中奖支付矿工费'], 'USDT', '游戏中奖支付矿工费', '游戏中奖支付矿工费');
-                }
-            }
-            for($i = 1; $i <= self::$cache_settings['游戏房间玩家数量']; $i++){
-                $player_id_field = 'player_id_' . $number_array[$i];
-                $is_auto_field = 'is_auto_' . $number_array[$i];
-                $is_win_field = 'is_win_' . $number_array[$i];
-                if($v->$is_win_field == 0){// 未中奖
-                    $v->$is_win_field = 2;
-                    if($v->$is_auto_field != 0){ //是自动, 仅添加记录
-                       $auto = GameAuto::find($v->$is_auto_field);
-                       $auto->未中奖局数 += 1;
-                       $auto->save();
-                    }else{ //直接发矿机
-                        self::矿机生成($v->$player_id_field);
-                    }
-                }
-            }
-            $v->end_time = date("Y-m-d H:i:s", time());
-            $v->save();
-            //统计
-            $sys_data = SysData::find(1);
-            $sys_data->推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
-            $sys_data->累计推广玩家收益 += self::$cache_settings['中奖人数'] * self::$cache_settings['中奖支付矿工费'] + self::$cache_settings['中奖打赏金额'];
-            $sys_data->save();
-        }
-
         $autos = GameAuto::where('status', 0)->select();
         foreach($autos as $auto){
-            if(strtotime($auto->insert_time) + 7200 < time()){
-                $auto->中奖局数 += 1;
-                $auto->save();
-            }
-            if($auto->可玩局数 == $auto->已玩局数 && $auto->已玩局数 <= ($auto->中奖局数 + $auto->未中奖局数)){
+            // if($s_time + 600 < time()){
+            //     break;
+            // }
+            if(strtotime($auto->insert_time) + (60 * $auto->可玩局数) <= time()){
                 $money = $auto->质押USDT;
                 $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-                for($i = 0; $i < $auto->未中奖局数; $i++){
-                    $money -= 20;
-                    self::矿机生成($auto->user_id);
-                }
+                $money -= 20 * $auto->未中奖局数;
+                self::矿机生成($auto->user_id, $auto->未中奖局数);
                 $user_fund = IdxUserFund::find($auto->user_id);
                 $user_fund->USDT += $money;
                 $user_fund->save();
                 LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
                 $auto->status = 1;
+                $auto->end_time = date("Y-m-d H:i:s", time());
                 $auto->save();
             }
         }
@@ -324,7 +227,7 @@ class Fund extends Base{
         $user_count = IdxUserCount::find($user_id);
         $user = IdxUser::find($user_id);
         $user_fund = IdxUserFund::find($user_id);
-        $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_id)->select();
+        $矿机s = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->where('user_id', $user_id)->select();
         foreach($矿机s as $矿机){
             if($user_count->今日我合格 == 1 && $矿机->insert_date != date("Y-m-d", time())){
                 $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
@@ -355,40 +258,6 @@ class Fund extends Base{
         }
     }
 
-    public static function 结算(){
-        // 排队未游戏 返还
-        $queue = GameQueue::where('is_pop', 0)->select();
-        foreach($queue as $v){
-            $v->is_pop = 1;
-            $v->save();
-            if($v->is_auto != 0){ //是自动
-                $auto = GameAuto::find($v->is_auto);
-                $auto->已玩局数 -= 1;
-                $auto->save();
-            }else{ //非自动, 直接返钱
-                $user_fund = IdxUserFund::find($v->user_id);
-                $user_fund->USDT += self::$cache_settings['下注金额'];
-                $user_fund->save();
-                LogUserFund::create_data($v->user_id, self::$cache_settings['下注金额'], 'USDT', '未参与成功游戏', '未参与成功游戏');
-            }
-        }
-        // 质押结算
-        $autos = GameAuto::where('status', 0)->select();
-        foreach($autos as $auto){
-            $money = $auto->质押USDT;
-            $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-            for($i = 0; $i < $auto->未中奖局数; $i++){
-                $money -= 20;
-                self::矿机生成($auto->user_id);
-            }
-            $user_fund = IdxUserFund::find($auto->user_id);
-            $user_fund->USDT += $money;
-            $user_fund->save();
-            LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
-            $auto->status = 1;
-            $auto->save();
-        }
-    }
 
     public static function 是否合格($user_id){
         $user_count = IdxUserCount::find($user_id);
@@ -416,15 +285,20 @@ class Fund extends Base{
         }
     }
 
-    public static function 矿机生成($user_id){
+    public static function 矿机生成($user_id, $number){
         $all_tt = SysSetting::where('sign', '矿机价值')->value('value') / Cache::get('today_tt_price');
         $add_tt = $all_tt / SysSetting::where('sign', '收益周期')->value('value');
-        IdxUserMill::create([
-            'user_id'=> $user_id,
-            'all_price'=> $all_tt,
-            'price'=> $add_tt,
-            'insert_date'=> date("Y-m-d", time()),
-            'insert_time'=> date("Y-m-d H:i:s", time())
-        ]);
+        $mill = new IdxUserMill;
+        $list = [];
+        while(count($list) < $number){
+            $list[] = [
+                'user_id'=> $user_id,
+                'all_price'=> $all_tt,
+                'price'=> $add_tt,
+                'insert_date'=> date("Y-m-d", time()),
+                'insert_time'=> date("Y-m-d H:i:s", time())
+            ];
+        }
+        $mill->saveAll($list);
     }
 }
