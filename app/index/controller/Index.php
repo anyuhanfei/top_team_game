@@ -160,7 +160,7 @@ class Index extends Base{
         View::assign('usercount', $user_count);
         View::assign('rw', Cache::get('settings')['任务局数']);
         View::assign('day', Cache::get('settings')['门票有效期']);
-        View::assign('price', round(Cache::get('settings')['门票价格'] / Cache::get('today_tt_price')), 2);
+        View::assign('price', round(Cache::get('settings')['门票价格'] / Cache::get('today_tt_price'), 2));
         return View::fetch();
     }
 

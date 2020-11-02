@@ -319,4 +319,5 @@ return [
     '创世节点总收益'=> 'Total revenue at creation node',
     '质押成功, 请稍后查询游戏结果'=> 'Pledge successfully, please check the game result later',
     '参加十局'=> 'Participate in 10 innings',
+    '直接参加一局'=> 'Go straight into a game',
 ];
