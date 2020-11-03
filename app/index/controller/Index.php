@@ -182,8 +182,8 @@ class Index extends Base{
         if($user_count->今日最大局数 < ($user_count->今日局数 + 1)){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
-        if(time() - Session::get('game_time') < 30){
-            return return_data(2, '', Lang::get('手动参与游戏的间隔时间为30秒'));
+        if(GameAuto::where('user_id', $this->user_id)->where('status', 0)->find()){
+            return return_data(2, '', Lang::get('当前有正在进行中的质押或手动参与, 请等待结算完毕后再次手动参与'));
         }
         if($user_fund->number <= 0){
             $user_fund->USDT -= $cache_settings['下注金额'];
@@ -229,7 +229,7 @@ class Index extends Base{
             return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
         }
         if(GameAuto::where('user_id', $this->user_id)->where('status', 0)->find()){
-            return return_data(2, '', Lang::get('当前有正在进行中的质押, 请等待结算完毕后再次质押'));
+            return return_data(2, '', Lang::get('当前有正在进行中的质押或手动参与, 请等待结算完毕后再次质押'));
         }
         $usdt = Request::instance()->param('usdt', 0);
         if($usdt != 50 && $usdt != 100 && $usdt != 200){
