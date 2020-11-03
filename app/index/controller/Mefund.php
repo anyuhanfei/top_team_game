@@ -41,9 +41,21 @@ class Mefund extends Index{
 
     public function 收益记录(){
         $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select();
-        $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
-        $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
-        $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
+        $推广收益 = 0;
+        $团队收益 = 0;
+        $创世节点收益 = 0;
+        foreach($log as $v){
+            if($v->fund_type == '直推链接奖励' || $v->fund_type == '间推链接奖励'){
+                $推广收益 += $v->number;
+            }elseif($v->fund_type == '创世节点奖励'){
+                $创世节点收益 += $v->number;
+            }else{
+                $团队收益 += $v->number;
+            }
+        }
+        // $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
+        // $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
+        // $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
         View::assign('log', $log);
         View::assign('tg', $推广收益);
         View::assign('td', $团队收益);
