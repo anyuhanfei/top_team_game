@@ -241,7 +241,7 @@ class Index extends Base{
         }
         $usdt_array = [20=> 1, 50=>10, 100=> 20, 200=> 50];
         $user_count = IdxUserCount::find($this->user_id);
-        if($user_count->今日最大局数 <= ($user_count->今日局数 + $usdt_array[$usdt])){
+        if($user_count->今日最大局数 < ($user_count->今日局数 + $usdt_array[$usdt])){
             return return_data(2, '', Lang::get('今日可玩局数不足'));
         }
         $user_fund->USDT -= $usdt;
