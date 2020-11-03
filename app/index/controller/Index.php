@@ -228,6 +228,9 @@ class Index extends Base{
         if($cache_settings['每日游戏开始时间'] > date("H:i", time()) || $cache_settings['每日游戏结束时间'] < date("H:i", time())){
             return return_data(2, '', Lang::get('游戏通道已关闭, 每日游戏时间为:') . $cache_settings['每日游戏开始时间'] . '-' . $cache_settings['每日游戏结束时间']);
         }
+        if(GameAuto::where('user_id', $this->user_id)->where('status', 0)->find()){
+            return return_data(2, '', Lang::get('当前有正在进行中的质押, 请等待结算完毕后再次质押'));
+        }
         $usdt = Request::instance()->param('usdt', 0);
         if($usdt != 50 && $usdt != 100 && $usdt != 200){
             return return_data(2, '', Lang::get('非法操作'));

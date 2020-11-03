@@ -321,4 +321,5 @@ return [
     '参加十局'=> 'Participate in 10 innings',
     '直接参加一局'=> 'Go straight into a game',
     '门票余额'=> 'Tickets for the balance',
+    '当前有正在进行中的质押, 请等待结算完毕后再次质押'=> 'There is a pledge in progress at present, please wait for another pledge after the settlement is completed',
 ];
