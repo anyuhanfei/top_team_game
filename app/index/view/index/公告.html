@@ -24,27 +24,16 @@
 <body>
 	<header class="mui-bar mui-bar-nav head_color">
 		<a href="/index/me" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
-		<h1 class="mui-title">{:lang('联系客服')}</h1>
+		<h1 class="mui-title">{:lang('公告')}</h1>
 	</header>
 	<div class="mui-content mui-scroll-wrapper content_bg">
 		<div class="mui-scroll public_padding">
 			<div class="public_box">
-				<div class="public_box_bg">
-					<div>{:lang('微信二维码')}</div>
-					<img src="{$wx_img}" class="img_style">
-				</div>
-				<div class="public_box_bg">
-					{:lang('微信号')}:{$wx}
-				</div>
-			</div>
-			<div class="public_box">
-				<div class="public_box_bg">
-					<div>{:lang('微信二维码')}</div>
-					<img src="{$wx_img_2}" class="img_style">
-				</div>
-				<div class="public_box_bg">
-					{:lang('微信号')}:{$wx_2}
-				</div>
+                {volist name="list" id="vo"}
+				<div class="public_box_bg" onclick="location.href='/index/公告详情?id={$vo.article_id}'">
+					{$vo.title}
+                </div>
+                {/volist}
 			</div>
 		</div>
 	</div>

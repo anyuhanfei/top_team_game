@@ -66,6 +66,9 @@
 							</select>
 							<div class="mui-icon mui-icon-arrowdown"></div>
 						</div>
+						<div class="mui-text-right" id="z_USDT">{:lang('USDT余额')}: {$user->userfund->USDT}</div>
+						<div class="mui-text-right" id="z_TTP" style="display: none;">{:lang('TTP余额')}: {$user->userfund->TTP}</div>
+						<div class="mui-text-right" id="z_门票" style="display: none;">{:lang('门票余额')}: {$user->userfund->门票}</div>
 						<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between">
 							<select id="z_to_user_id">
 								{volist name="accounts" id="vo"}
@@ -95,6 +98,9 @@
 							</select>
 							<div class="mui-icon mui-icon-arrowdown"></div>
 						</div>
+						<div class="mui-text-right" id="a_USDT">{:lang('USDT余额')}: {$user->userfund->USDT}</div>
+						<div class="mui-text-right" id="a_TTP" style="display: none;">{:lang('TTP余额')}: {$user->userfund->TTP}</div>
+						<div class="mui-text-right" id="a_门票" style="display: none;">{:lang('门票余额')}: {$user->userfund->门票}</div>
 						<div class="public_box_bg">
 							<input type="text" id="a_to_user_id" placeholder="{:lang('请输入对方UID')}">
 						</div>
@@ -120,6 +126,22 @@
 		})
 		$('.all_btn').click(()=>{
 			console.log($('#all_money_type').val())
+		})
+
+		$("#z_coin_type").change(function(){
+			values = $("#z_coin_type").val();
+			$("#z_USDT").attr('style', 'display: none;');
+			$("#z_TTP").attr('style', 'display: none;');
+			$("#z_门票").attr('style', 'display: none;');
+			$("#z_" + values).attr('style', '');
+		})
+
+		$("#a_coin_type").change(function(){
+			values = $("#a_coin_type").val();
+			$("#a_USDT").attr('style', 'display: none;');
+			$("#a_TTP").attr('style', 'display: none;');
+			$("#a_门票").attr('style', 'display: none;');
+			$("#a_" + values).attr('style', '');
 		})
 
 		// 点击按钮获取选中的值

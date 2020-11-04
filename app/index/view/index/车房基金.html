@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="/static/index/js/mui.min.js"></script>
+    <link href="/static/index/css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/index/css/deal.css"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>
+	<style type="text/css">
+		.extend_bg{
+			background: url(/static/index/img/分红.png);
+			background-size: 100% 100%;
+			padding: 10% 0 0 0;
+		}
+		.flexbox_nowrap_between{
+			padding: 10px;
+			background-color: rgba(0,0,0,0.6);
+		}
+		.trading_floor{
+			width: 100%;
+			border-bottom: 1px solid #3ae2c1;
+		}
+		.trading_floor .mui-control-item.mui-active::before{
+			background-color: rgba(0,0,0,0);
+		}
+		.direct{
+			position: relative;
+		}
+		.direct::after{
+			content: '';
+			width: 1px;
+			height: 20px;
+			background-color: #fff;
+			position: absolute;
+			top: 9px;
+			right: 0;
+		}
+		.mui-content-padded{
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav head_color">
+		<a href="/index/更多" class="mui-icon mui-icon-left-nav mui-pull-left white_color"></a>
+		<h1 class="mui-title">{:lang('车房基金')}</h1>
+	</header>
+	<div class="mui-content mui-scroll-wrapper content_bg">
+		<div class="mui-scroll">
+			<div class="extend_bg">
+				<p class="mui-text-center">{$all}</p>
+				<div class="mui-text-center">{:lang('累计车房基金')}</div>
+            </div>
+            <div class="extend_bg">
+				<p class="mui-text-center">{$today}</p>
+				<div class="mui-text-center">{:lang('昨日车房基金')}</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/static/index/js/jquery.min.js"></script>
+	<script src="/static/index/js/public.js"></script>
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

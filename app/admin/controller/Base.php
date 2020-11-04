@@ -4,6 +4,7 @@ namespace app\admin\controller;
 use think\facade\Env;
 use think\facade\Session;
 use think\facade\View;
+use think\facade\Request;
 
 
 class Base{
@@ -18,7 +19,13 @@ class Base{
         //管理员异常登录后的冻结时间
         $this->admin_freeze_time = Env::get('ANER_ADMIN.ADMIN_FREEZE_TIME');
         //列表分页每页数据量
-        $this->page_number = Env::get('ANER_ADMIN.PAGE_DATA_NUMBER');
+        $page_number = Request::instance()->param('page_number', 0);
+        if($page_number <= 0){
+            $this->page_number = Env::get('ANER_ADMIN.PAGE_DATA_NUMBER');
+        }else{
+            $this->page_number = $page_number;
+        }
+        View::assign('page_number', $this->page_number);
 
         /*cms*/
         //标签图片上传开关

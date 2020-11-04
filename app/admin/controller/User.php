@@ -235,6 +235,7 @@ class User extends Admin{
             return return_data(2, '', '非法操作');
         }
         $user->is_login = $user->is_login == 1 ? 0 : 1;
+        $user->token = $user->is_login == 1 ? $user->token : '';
         $res = $user->save();
         if($res){
             $control_user_identity = $this->user_identity;

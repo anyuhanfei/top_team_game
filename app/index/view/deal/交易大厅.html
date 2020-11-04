@@ -221,14 +221,12 @@
 		})
 
 		function deal(deal_id){
-			layer.confirm('是否确认交易?', {
-				btn: ['确定','取消'] //按钮
-			}, function(){
+			layer.prompt({title: '请输入二级密码', formType: 1}, function(pass, index){
 				layer.closeAll();
 				$.ajax({
 					url: "/index/deal/交易",
 					type: "post",
-					data: {deal_id: deal_id},
+					data: {deal_id: deal_id, level_password: pass},
 					success: function(data){
 						data = JSON.parse(data)
 						mui.toast(data.msg);

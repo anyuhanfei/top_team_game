@@ -40,29 +40,39 @@ class Mefund extends Index{
     }
 
     public function 收益记录(){
-        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select();
-        $推广收益 = 0;
-        $团队收益 = 0;
-        $创世节点收益 = 0;
-        foreach($log as $v){
-            if($v->fund_type == '直推链接奖励' || $v->fund_type == '间推链接奖励'){
-                $推广收益 += $v->number;
-            }elseif($v->fund_type == '创世节点奖励'){
-                $创世节点收益 += $v->number;
-            }else{
-                $团队收益 += $v->number;
+        $cache_log = Cache::get($this->user_id . 'log');
+        if($cache_log == NULL){
+            $log = LogUserFund::field('insert_time, content, number, coin_type, fund_type')->where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select()->toArray();
+            $推广收益 = 0;
+            $团队收益 = 0;
+            $创世节点收益 = 0;
+            foreach($log as $v){
+                if($v['fund_type'] == '直推链接奖励' || $v['fund_type'] == '间推链接奖励'){
+                    $推广收益 += $v['number'];
+                }elseif($v->fund_type == '创世节点奖励'){
+                    $创世节点收益 += $v['number'];
+                }else{
+                    $团队收益 += $v['number'];
+                }
             }
+            Cache::set($this->user_id . 'log', ['log'=> $log, '推广收益'=> $推广收益, '团队收益'=> $团队收益, '创世节点收益'=> $创世节点收益], 600);
+        }else{
+            $log = $cache_log['log'];
+            $推广收益 = $cache_log['推广收益'];
+            $团队收益 = $cache_log['团队收益'];
+            $创世节点收益 = $cache_log['创世节点收益'];
         }
         // $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
         // $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
         // $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
+        $z = SysData::where('id', 1)->find();
         View::assign('log', $log);
         View::assign('tg', $推广收益);
         View::assign('td', $团队收益);
         View::assign('cs', $创世节点收益);
-        View::assign('a', SysData::where('id', 1)->value('昨日推广分红'));
-        View::assign('b', SysData::where('id', 1)->value('昨日团队分红'));
-        View::assign('c', SysData::where('id', 1)->value('昨日创世节点分红'));
+        View::assign('a', $z->昨日推广分红);
+        View::assign('b', $z->昨日团队分红);
+        View::assign('c', $z->昨日创世节点分红);
         return View::fetch();
     }
 
@@ -137,6 +147,10 @@ class Mefund extends Index{
         if(!$validate->check(['type'=> $type, 'number'=> $number, 'address'=> $address, 'level_password'=> $level_password])){
             return return_data(2, '', Lang::get($validate->getError()));
         }
+        $cache_settings = Cache::get('settings');
+        if($cache_settings['提现起始'] > date("H:i", time()) || $cache_settings['提现结束'] < date("H:i", time())){
+            return return_data(2, '', Lang::get('提现通道已关闭, 每日提现时间为:') . $cache_settings['提现起始'] . '-' . $cache_settings['提现结束']);
+        }
         Db::startTrans();
         $fee = Cache::get('settings')[$type . '提现手续费'];
         $user_fund = IdxUserFund::find($this->user_id);
@@ -190,11 +204,11 @@ class Mefund extends Index{
         $res_one = $from_user_fund->save();
         $res_two = $to_user_fund->save();
         if($res_one && $res_two){
-            LogUserFund::create_data($from_user_fund->user_id, '-' . $number, $coin_type, '转账', '转账');
+            LogUserFund::create_data($from_user_fund->user_id, '-' . $number, $coin_type, '转账', '向'. $to_user_id .'转账');
             if($fee > 0){
                 LogUserFund::create_data($from_user_fund->user_id, '-' . $fee, $coin_type, '转账', '转账手续费');
             }
-            LogUserFund::create_data($to_user_fund->user_id, $number, $coin_type, '转账', '向我转账');
+            LogUserFund::create_data($to_user_fund->user_id, $number, $coin_type, '转账', $from_user_fund->user_id . '向我转账');
             Db::commit();
             return return_data(1, '', Lang::get('转账成功'), '给' . $to_user_id . '转账');
         }else{

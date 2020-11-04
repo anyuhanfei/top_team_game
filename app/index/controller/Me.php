@@ -276,6 +276,8 @@ class Me extends Index{
     public function 客服(){
         View::assign('wx', SysAd::where('sign', '微信号')->value('value'));
         View::assign('wx_img', SysAd::where('sign', '微信二维码')->value('image'));
+        View::assign('wx_img_2', SysAd::where('sign', '微信二维码(二号)')->value('image'));
+        View::assign('wx_2', SysAd::where('sign', '微信号(二号)')->value('value'));
         return View::fetch();
     }
 

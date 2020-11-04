@@ -11,6 +11,7 @@ use think\facade\Cache;
 
 use app\admin\model\IdxUser;
 use app\admin\model\AutoValue;
+use app\admin\model\CmsArticle;
 use app\admin\model\SysAd;
 use app\admin\model\IdxTtPrice;
 use app\admin\model\IdxUserCount;
@@ -21,6 +22,7 @@ use app\admin\model\GameQueue;
 use app\admin\model\GameAuto;
 use app\admin\model\GameInning;
 use app\admin\model\SysSetting;
+use app\admin\model\SysData;
 
 use app\index\controller\Base;
 use app\index\controller\Fund;
@@ -314,5 +316,23 @@ class Index extends Base{
             $accounts[] = ['id'=> $v->user_id, 'nickname'=> $v->nickname, 'is_login'=> ($v->user_id == $this->user_id ? 1 : 0)];
         }
         return $accounts;
+    }
+
+    public function 车房基金(){
+        $data = SysData::find(1);
+        View::assign('today', $data->车房基金);
+        View::assign('all', $data->昨日创世节点分红 / (0.01 * Cache::get('settings')['创世节点分红PCT']) * (0.01 * Cache::get('settings')['车房基金']));
+        return View::fetch();
+    }
+
+    public function 公告(){
+        View::assign('list', CmsArticle::where('category_id', 10)->order('article_id desc')->select());
+        return View::fetch();
+    }
+
+    public function 公告详情(){
+        $id = Request::instance()->param('id');
+        View::assign('detail', CmsArticle::where('article_id', $id)->find());
+        return View::fetch();
     }
 }

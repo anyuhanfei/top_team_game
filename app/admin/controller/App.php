@@ -166,6 +166,16 @@ class App extends Admin{
         return View::fetch();
     }
 
+    public function 门票列表(){
+        $user_id = Request::instance()->param('user_id', '');
+        $obj = new LogUserFund();
+        $obj = ($user_id != '') ? $obj->where('user_id', $user_id) : $obj;
+        $list = $obj->where('fund_type', '购买门票')->order('id desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
+        View::assign('list', $list);
+        View::assign('user_id', $user_id);
+        return View::fetch();
+    }
+
     /**
      * 提币地址列表
      *
@@ -249,7 +259,7 @@ class App extends Admin{
         $stock_code = Request::instance()->param('stock_code', '');
         $validate = new \app\admin\validate\Block;
         if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
-            return return_data(2, '', $validate->getError(), 'json');
+            return return_data(2, '', $validate->getError());
         }
         // 一些定义
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
@@ -299,7 +309,7 @@ class App extends Admin{
         }else{
             $str .= '所选会员全部分发成功';
         }
-        return return_data(1, '', $str, 'json');
+        return return_data(1, '', $str, '分发矿工费');
     }
 
     /**
@@ -313,7 +323,7 @@ class App extends Admin{
         $stock_code = Request::instance()->param('stock_code', '');
         $validate = new \app\admin\validate\Block;
         if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
-            return return_data(2, '', $validate->getError(), 'json');
+            return return_data(2, '', $validate->getError());
         }
         // 一些定义
         $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
@@ -365,7 +375,7 @@ class App extends Admin{
         }else{
             $str .= '所选会员全部归集成功';
         }
-        return return_data(1, '', $str, 'json');
+        return return_data(1, '', $str, '归集');
     }
 
     /**
@@ -376,7 +386,7 @@ class App extends Admin{
     public function qki_submit(){
         $user_ids = Request::instance()->param('user_ids', '');
         if($user_ids == ''){
-            return return_data(2, '', '请选择归集的会员', 'json');
+            return return_data(2, '', '请选择归集的会员');
         }
         $res = array();
         $user_id_array = explode(',', $user_ids);
@@ -423,7 +433,7 @@ class App extends Admin{
         }else{
             $str = '所选会员全部归集成功';
         }
-        return return_data(1, '', $str, 'json');
+        return return_data(1, '', $str, '归集');
     }
 
     /**
@@ -487,11 +497,11 @@ class App extends Admin{
     public function withdraw_submit($swift_no){
         $status = Request::instance()->param('status', -1);
         if($status != 1 && $status != 2){
-            return return_data(2, '', '非法操作', 'json');
+            return return_data(2, '', '非法操作');
         }
         $withdraw = UserCharge::where('swift_no', $swift_no)->find();
         if(!$withdraw){
-            return return_data(2, '', '非法操作', 'json');
+            return return_data(2, '', '非法操作');
         }
         if($status == 2){
             // 驳回
@@ -503,14 +513,14 @@ class App extends Admin{
             $withdraw->inspect_time = date("Y-m-d H:i:s", time());
             $withdraw->inspect_status = 2;
             $withdraw->save();
-            return return_data(1, '', '操作成功', 'json');
+            return return_data(1, '', '操作成功');
         }else{
             $withdraw = UserCharge::where('swift_no', $swift_no)->find();
             $withdraw->inspect_time = date("Y-m-d H:i:s", time());
             $withdraw->inspect_status = 1;
             $withdraw->hash = '';
             $withdraw->save();
-            return return_data(1, '', '操作成功, 请手动拨款', 'json');
+            return return_data(1, '', '操作成功, 请手动拨款', '提现审核通过');
 
             // // 通过
             // $withdraw_address_key = SysSetting::where('sign', 'withdraw_address_key')->value('value');

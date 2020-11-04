@@ -47,14 +47,15 @@
                             <thead>
                                 <tr>
                                     <th scope="col" width="7%">#</th>
-                                    <th scope="col" width="10%">昵称</th>
-                                    <th scope="col" width="8%">上级会员</th>
-                                    <th scope="col" width="8%">主账号</th>
-                                    <th scope="col" width="18%">资金</th>
+                                    <th scope="col" width="6%">昵称</th>
+                                    <th scope="col" width="7%">上级会员</th>
+                                    <th scope="col" width="7%">主账号</th>
+                                    <th scope="col" width="14%">资金</th>
+                                    <th scope="col" width="12%">今日可玩/今日已玩(局)</th>
                                     <th scope="col" width="5%">状态</th>
-                                    <th scope="col" width="8%">等级</th>
-                                    <th scope="col" width="8%"></th>
-                                    <th scope="col" width="10%">注册时间</th>
+                                    <th scope="col" width="5%">等级</th>
+                                    <th scope="col" width="5%"></th>
+                                    <th scope="col" width="8%">注册时间</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -78,6 +79,7 @@
                                             {$k}: {$vo.userfund->$v}&nbsp&nbsp&nbsp&nbsp
                                         {/foreach}
                                     </td>
+                                    <td>{$vo.usercount->今日最大局数}/{$vo.usercount->今日局数}</td>
                                     <td id="login{$vo.user_id}">{$vo.is_login_text}</td>
                                     <td>{$vo.level_name}</td>
                                     <td id="lc{$vo.user_id}">{$vo.vip_text}</td>

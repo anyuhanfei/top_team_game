@@ -11,6 +11,7 @@ Route::rule('app/等级/update/submit', 'app/等级_update_submit');
 Route::rule('app/tt价格', 'app/tt价格');
 Route::rule('app/tt价格/add/submit', 'app/tt价格_add_submit');
 Route::rule('app/矿机管理', 'app/矿机管理');
+Route::rule('app/门票列表', 'app/门票列表');
 
 Route::get('user/pan/:id', 'admin/user/user_pan');
 

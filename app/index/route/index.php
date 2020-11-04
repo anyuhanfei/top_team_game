@@ -16,6 +16,7 @@ Route::post('/语言切换', 'index/base/语言切换');
 Route::get('/', 'index/index/index');
 Route::get('/启动图', 'index/index/启动图');
 Route::get('/更多', 'index/index/更多');
+Route::get('/车房基金', 'index/index/车房基金');
 Route::get('/非法操作', 'index/base/非法操作');
 
 Route::post('/购买门票', 'index/index/购买门票');
@@ -61,6 +62,8 @@ Route::post('/me/修改密码提交', 'index/me/修改密码提交');
 Route::get('/me/团队', 'index/me/团队');
 Route::get('/me/邀请', 'index/me/邀请');
 Route::get('/me/关于我们', 'index/me/关于我们');
+Route::get('/公告', 'index/index/公告');
+Route::get('/公告详情', 'index/index/公告详情');
 Route::get('/me/TTP销毁', 'index/me/ttp销毁');
 Route::get('/me/百问百答', 'index/me/百问百答');
 Route::get('/me/设置', 'index/me/设置');
