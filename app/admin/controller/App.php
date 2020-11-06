@@ -193,8 +193,8 @@ class App extends Admin{
         $user = new IdxUser;
         $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
         $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
-        foreach($list as &$v){
-            $user_addr = UserAddr::where('user_id', $v->user_id)->find();
+        foreach($list as $k=>$v){
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 1)->find();
             if(!$user_addr){
                 $url = "http://". $kuake_ip ."/wallet/createAddr?userId=" . $v->user_id;
                 $opts = array(
@@ -217,6 +217,9 @@ class App extends Admin{
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
                 $v->coin = $res->data;
+                if($v->coin->USDT <= 0 && $v->coin->TTP <= 0 && $v->coin->TTA <= 0 && $v->coin->ETH <= 0){
+                    unset($list[$k]);
+                }
             }else{
                 $v->coin = json_decode("");
             }
@@ -317,7 +320,7 @@ class App extends Admin{
         }
         // 一些定义
         $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
-        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $golden_address = '0x912b96A05f608A227D08e42d76ed2f57C9085239';
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
         //循环会员
         $res_array = array();
@@ -382,7 +385,7 @@ class App extends Admin{
         $user_id_array = explode(',', $user_ids);
 
         $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
-        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $golden_address = '0x912b96A05f608A227D08e42d76ed2f57C9085239';
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
         foreach($user_id_array as $k=> $v){
             if($v == ''){
@@ -438,13 +441,13 @@ class App extends Admin{
         $user = new IdxUser;
         $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
         $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
-        foreach($list as &$v){
-            $user_addr = UserAddr::where('user_id', $v->user_id)->find();
+        foreach($list as $k=>$v){
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 3)->find();
             if(!$user_addr){
-                $url = "http://". $kuake_ip ."/wallet/createAddr?userId=" . $v->user_id;
+                $url = "http://". $kuake_ip ."/tron/createAddress?userId=" . $v->user_id;
                 $opts = array(
                     'http'=>array(
-                    'method'=>"POST",
+                        'method'=>"GET",
                     )
                 );
                 $context = stream_context_create($opts);
@@ -457,11 +460,14 @@ class App extends Admin{
             }else{
                 $addr = $user_addr->addr;
             }
-            $v->address = $addr;
-            $url = "http://".$kuake_ip."/wallet/balance?from=".$addr;
+            $v->taddress = $addr;
+            $url = "http://".$kuake_ip."/tron/trcBalance?address=".$addr;
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
                 $v->coin = $res->data;
+                if($v->coin <= 0){
+                    unset($list[$k]);
+                }
             }else{
                 $v->coin = json_decode("");
             }
@@ -484,70 +490,6 @@ class App extends Admin{
     }
 
     /**
-     * TRC20矿工费
-     *
-     * @return void
-     */
-    public function t_fee_submit(){
-        //获取信息
-        $user_ids = Request::instance()->param('user_ids', '');
-        $stock_code = Request::instance()->param('stock_code', '');
-        $validate = new \app\admin\validate\Block;
-        if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
-            return return_data(2, '', $validate->getError(), 'json');
-        }
-        // 一些定义
-        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
-        $fee_vpt = SysSetting::where('sign', 'fee_vpt')->value('value');
-        $fee_number = SysSetting::where('sign', 'fee_number')->value('value');
-        $fee_address = SysSetting::where('sign', 'fee_address')->value('value');
-        $fee_address_key = SysSetting::where('sign', 'fee_address_key')->value('value');
-        //循环会员
-        $res_array = array();
-        $user_id_array = explode(',', $user_ids);
-        foreach($user_id_array as $k=> $v){
-            if($v == ''){
-                continue;
-            }
-            $user_id = $v;
-            // 获取当前金额
-            $user = UserAddr::where('user_id', $user_id)->find();
-            $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
-            $res = json_decode(file_get_contents($url));
-            if($res->code == 200){
-                foreach($res->data as $dk=> $dv){
-                    if($dk == $stock_code){
-                        if($dv < $fee_vpt){
-                            $res_array[] = $user_id;
-                            continue;
-                        }
-                        $url = "http://". $kuake_ip ."/wallet/send?code=ETH&balance=".$fee_number."&from=".$fee_address."&privateKey=".$fee_address_key."&to=".$user->addr.'&type=1';
-                        $opts = array('http'=>array('method'=>"POST",));
-                        $context = stream_context_create($opts);
-                        $res = json_decode(file_get_contents($url, false, $context));
-                        if($res->code != 200){
-                            $res_array[] = $user_id;
-                        }
-                    }
-                }
-            }else{
-                $res_array[] = $user_id;
-                continue;
-            }
-        }
-        $str = '分发矿工费完成,请手动刷新页面.';
-        if($res_array){
-            $str .= '有分发矿工费失败或未满足条件的会员:';
-            foreach($res_array as $v){
-                $str .= $v . ' ';
-            }
-        }else{
-            $str .= '所选会员全部分发成功';
-        }
-        return return_data(1, '', $str, 'json');
-    }
-
-    /**
      * TRC20归集
      *
      * @return void
@@ -555,14 +497,12 @@ class App extends Admin{
     public function t_cc_submit(){
         //获取信息
         $user_ids = Request::instance()->param('user_ids', '');
-        $stock_code = Request::instance()->param('stock_code', '');
         $validate = new \app\admin\validate\Block;
-        if(!$validate->check(['user_ids'=> $user_ids, 'stock_code'=> $stock_code])){
-            return return_data(2, '', $validate->getError(), 'json');
+        if($user_ids == ''){
+            return return_data(2, '', '请选择归集会员');
         }
         // 一些定义
-        $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
-        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $golden_address = 'TLnyfuNjjBFtcyNpzsLr2FxkE5GidgYaTk';
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
         //循环会员
         $res_array = array();
@@ -572,28 +512,22 @@ class App extends Admin{
                 continue;
             }
             $user_id = $v;
-            $user = UserAddr::where('user_id', $user_id)->find();
+            $user = UserAddr::where('user_id', $user_id)->where('type', 3)->find();
             // 获取当前金额
-            $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
+            $url = "http://".$kuake_ip."/tron/trcBalance?address=".$user->addr;
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
-                foreach($res->data as $dk=> $dv){
-                    if($dk == $stock_code){
-                        if($dv < $collection_vpt){
-                            $res_array[] = $user_id;
-                            continue;
-                        }
-                        $url = "http://". $kuake_ip ."/wallet/send?code=".$dk."&balance=".$dv."&from=".$user->addr."&privateKey=".$user->salt."&to=".$golden_address.'&type=2';
-                        $opts = array(
-                            'http'=>array(
-                            'method'=>"POST",
-                            )
-                        );
-                        $context = stream_context_create($opts);
-                        $res = json_decode(file_get_contents($url, false, $context));
-                        if($res->code != 200){
-                            $res_array[] = $user_id;
-                        }
+                if($res->data > 0){
+                    $url = "http://". $kuake_ip ."/tron/sendTrc?balance=".$res->data."&from=".$user->addr."&privateKey=".$user->salt."&to=".$golden_address;
+                    $opts = array(
+                        'http'=>array(
+                        'method'=>"POST",
+                        )
+                    );
+                    $context = stream_context_create($opts);
+                    $res = json_decode(file_get_contents($url, false, $context));
+                    if($res->code != 200){
+                        $res_array[] = $user_id;
                     }
                 }
             }else{
