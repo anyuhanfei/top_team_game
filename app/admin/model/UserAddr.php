@@ -12,7 +12,7 @@ class UserAddr extends Model{
     }
 
     public function getTypeTextAttr($value, $data){
-        $res = ['', '夸克', 'ETH', 'BTC'];
+        $res = ['', 'ERC20', '', 'TRC20'];
         return $res[$data['type']];
     }
 }

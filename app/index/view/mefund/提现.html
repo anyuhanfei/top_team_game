@@ -15,6 +15,14 @@
 			border-color: #3ae2c1;
 			padding: 0;
 		}
+		select{
+			background-color: rgba(0,0,0,0);
+			margin: 0;
+		}
+		select option{
+			background-color: rgba(0,0,0,0);
+			color: #333;
+		}
 	</style>
 </head>
 <body>
@@ -28,6 +36,23 @@
 				<div class="public_box_bg">
 					<input type="text" value="{$user->$type}" readonly>
 				</div>
+				{if condition="$type == 'USDT'"}
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between">
+					<select id="lian_type">
+					  <option value="a">{:lang('请选择提现方式')}</option>
+					  <option value="ERC20">ERC20</option>
+					  <option value="TRC20">TRC20</option>
+					</select>
+					<div class="mui-icon mui-icon-arrowdown"></div>
+				</div>
+				{else /}
+				<div class="public_box_bg flexbox_nowrap flexbox_nowrap_between" style="display: none;">
+					<select id="lian_type">
+					  <option value="a">{:lang('请选择提现方式')}</option>
+					</select>
+					<div class="mui-icon mui-icon-arrowdown"></div>
+				</div>
+				{/if}
 				<div class="public_box_bg">
 					<input type="number" id="number" value="0" placeholder="{:lang('请输入数量')}" >
 				</div>
@@ -46,11 +71,12 @@
 		$(".a_big_btn").click(function(){
 			var number = $("#number").val();
 			var level_password = $("#level_password").val();
+			var lian_type = $("#lian_type").val();
 			$("#level_password").val('')
 			$.ajax({
 				url: "/index/me/提现提交",
 				type: "post",
-				data: {number: number, level_password: level_password, type: "{$type}"},
+				data: {number: number, level_password: level_password, type: "{$type}", lian_type: lian_type},
 				success: function(data){
 					data = JSON.parse(data)
 					mui.toast(data.msg)

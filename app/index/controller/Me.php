@@ -60,9 +60,11 @@ class Me extends Index{
         $usdt = Request::instance()->param('USDT', '');
         $ttp = Request::instance()->param('TTP', '');
         $tta = Request::instance()->param('TTA', '');
+        $tusdt = Request::instance()->param('TUSDT', '');
         $this->user->USDT = $usdt;
         $this->user->TTP = $ttp;
         $this->user->TTA = $tta;
+        $this->user->TUSDT = $tusdt;
         $res = $this->user->save();
         return $res ? return_data(1, '', Lang::get('修改成功'), '修改钱包地址') : return_data(2, '', Lang::get('修改失败'));
     }

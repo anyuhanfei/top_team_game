@@ -28,6 +28,11 @@ class UserCharge extends Model{
         return $res[$data['inspect_status']];
     }
 
+    public function getCoinTypeTextAttr($value, $data){
+        $res = ['', 'ERC20', '', 'TRC20'];
+        return $res[$data['coin_type']];
+    }
+
     public function user(){
         return $this->hasOne('idx_user', 'user_id', 'user_id')->field('user_id, nickname, phone');
     }

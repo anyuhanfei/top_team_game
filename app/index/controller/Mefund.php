@@ -122,12 +122,35 @@ class Mefund extends Index{
                 $this->user->save();
             }
         }
+        if($this->user->taddress == ''){
+            $kuake_ip = Env::get('ANER_ADMIN.KUAKE_IP');
+            $url = "http://". $kuake_ip ."/tron/createAddress?userId=" . $this->user_id;
+            $opts = array(
+                'http'=>array(
+                  'method'=>"GET",
+                  "header"=> "Content-Type:application/x-www-form-urlencoded"
+                )
+            );
+            $context = stream_context_create($opts);
+            $res = json_decode(file_get_contents($url, false, $context));
+            if($res->code == 200){
+                $this->user->taddress = $res->data;
+                $this->user->taddress_qrcode = png_erwei($this->user->taddress, $this->user->taddress);
+                $this->user->save();
+            }
+        }
         if($this->user->address_qrcode == ''){
             $this->user->address_qrcode = png_erwei($this->user->address, $this->user->address);
             $this->user->save();
         }
+        if($this->user->taddress_qrcode == ''){
+            $this->user->taddress_qrcode = png_erwei($this->user->taddress, $this->user->taddress);
+            $this->user->save();
+        }
         View::assign('address', $this->user->address);
         View::assign('address_qrcode', $this->user->address_qrcode);
+        View::assign('taddress', $this->user->taddress);
+        View::assign('taddress_qrcode', $this->user->taddress_qrcode);
         return View::fetch();
     }
 
@@ -141,10 +164,11 @@ class Mefund extends Index{
     public function 提现提交(){
         $type = Request::instance()->param('type', '');
         $number = Request::instance()->param('number', 0);
+        $lian_type = Request::instance()->param('lian_type', 0);
         $address = $this->user->$type;
         $level_password = Request::instance()->param('level_password', '');
         $validate = new \app\index\validate\提现;
-        if(!$validate->check(['type'=> $type, 'number'=> $number, 'address'=> $address, 'level_password'=> $level_password])){
+        if(!$validate->check(['type'=> $type, 'number'=> $number, 'address'=> $address, 'level_password'=> $level_password, 'lian_type'=> $lian_type])){
             return return_data(2, '', Lang::get($validate->getError()));
         }
         $cache_settings = Cache::get('settings');
@@ -157,18 +181,35 @@ class Mefund extends Index{
         $user_fund->$type -= $number + $fee;
         $res_one = $user_fund->save();
         $swift_no = 'sn' . date("YmdHis", time()) . rand(1000, 9999) . substr($this->user->phone, 7, 4);
-        $withdraw_address = Cache::get('settings')['withdraw_address'];
-        $res_two = UserCharge::create([
-            'swift_no'=> $swift_no,
-            'user_id'=> $this->user_id,
-            'code'=> $type,
-            'balance'=> $number,
-            'charge_type'=> 2,
-            'poundage'=> $fee,
-            'create_time'=> date("Y-m-d H:i:s", time()),
-            'to_addr'=> $address,
-            'from_addr'=> $withdraw_address
-        ]);
+        if($type == 'USDT' && $lian_type == 'TRC20'){
+            $withdraw_address = Cache::get('settings')['t_withdraw_address'];
+            $res_two = UserCharge::create([
+                'swift_no'=> $swift_no,
+                'user_id'=> $this->user_id,
+                'code'=> $type,
+                'balance'=> $number,
+                'charge_type'=> 2,
+                'poundage'=> $fee,
+                'create_time'=> date("Y-m-d H:i:s", time()),
+                'coin_type'=> 3,
+                'to_addr'=> $this->user->TUSDT,
+                'from_address'=> $withdraw_address
+            ]);
+        }else{
+            $withdraw_address = Cache::get('settings')['withdraw_address'];
+            $res_two = UserCharge::create([
+                'swift_no'=> $swift_no,
+                'user_id'=> $this->user_id,
+                'code'=> $type,
+                'balance'=> $number,
+                'charge_type'=> 2,
+                'poundage'=> $fee,
+                'create_time'=> date("Y-m-d H:i:s", time()),
+                'to_addr'=> $address,
+                'from_address'=> $withdraw_address
+            ]);
+        }
+        
         if($res_one && $res_two){
             Db::commit();
             LogUserFund::create_data($this->user_id, '-' . $number, $type, '提现', $type . '提现');

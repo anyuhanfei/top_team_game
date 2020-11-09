@@ -37,6 +37,8 @@
 				<textarea name="" id="TTA" rows="5" maxlength="75" style="font-size: 15px;">{$user.TTA}</textarea>
 				<div>{:lang('TTP地址')}(ERC20):</div>
 				<textarea name="" id="TTP" rows="5" maxlength="75" style="font-size: 15px;">{$user.TTP}</textarea>
+				<div>{:lang('USDT地址')}(TRC20):</div>
+				<textarea name="" id="TUSDT" rows="5" maxlength="75" style="font-size: 15px;">{$user.TTP}</textarea>
 			</div>
 		</div>
 	</div>
@@ -47,10 +49,11 @@
 			var USDT = $("#USDT").val();
 			var TTA = $("#TTA").val();
 			var TTP = $("#TTP").val();
+			var TUSDT = $("#TUSDT").val();
 			$.ajax({
 				url: "/index/me/钱包地址提交",
 				type: "post",
-				data: {USDT: USDT, TTA: TTA, TTP: TTP},
+				data: {USDT: USDT, TTA: TTA, TTP: TTP, TUSDT: TUSDT},
 				success: function(data){
 					data = JSON.parse(data)
 					mui.toast(data.msg)
