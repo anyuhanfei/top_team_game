@@ -7,9 +7,9 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">会员链上资产管理</div>
+                        <div class="card-title">会员链上资产管理(ERC20)</div>
                         <div class="card-sub text-warning">
-
+                            此列表每页固定查询200个会员的链上资产, 但会隐藏资产为0的会员
                         </div>
                     </div>
                     <div class="card-body">
@@ -17,14 +17,14 @@
                             <div class="form-group">
                                 <input type="text" class="form-control" name="user_identity" id="user_identity" value="{$user_identity}" placeholder="会员id" style="width: 150px;">
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <select class="form-control form-control" name="stock_code_search" id="stock_code_search">
                                     <option value="">选择币种</option>
                                     {volist name="token_config" id="vo"}
                                     <option value="{$vo.stock_code}" {if condition="$vo.stock_code == $stock_code_search"}checked{/if}>{$vo.stock_code}</option>
                                     {/volist}
                                 </select>
-                            </div>
+                            </div> -->
                             <button type="submit" class="btn btn-default" id="search_submit">搜索</button>&nbsp;&nbsp;
                             <button type="button" class="btn btn-default" id="from_close">清空</button>
 

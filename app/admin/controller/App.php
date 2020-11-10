@@ -20,6 +20,7 @@ use app\admin\model\SysSetting;
 use app\admin\model\IdxUser;
 use app\admin\model\IdxUserFund;
 use app\admin\model\LogUserFund;
+use app\admin\model\CollectLog;
 
 
 class App extends Admin{
@@ -202,9 +203,9 @@ class App extends Admin{
         $stock_code_search = Request::instance()->param('stock_code_search', '');
         $user = new IdxUser;
         $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
-        $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
+        $list = $user->order('user_id desc')->paginate(['list_rows'=> 200, 'query'=>Request()->param()]);
         foreach($list as $k=>$v){
-            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 1)->find();
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 1)->order('id desc')->find();
             if(!$user_addr){
                 $url = "http://". $kuake_ip ."/wallet/createAddr?userId=" . $v->user_id;
                 $opts = array(
@@ -279,7 +280,7 @@ class App extends Admin{
             }
             $user_id = $v;
             // 获取当前金额
-            $user = UserAddr::where('user_id', $user_id)->find();
+            $user = UserAddr::where('user_id', $user_id)->where('type', 1)->order('id desc')->find();
             $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
@@ -340,17 +341,13 @@ class App extends Admin{
                 continue;
             }
             $user_id = $v;
-            $user = UserAddr::where('user_id', $user_id)->find();
+            $user = UserAddr::where('user_id', $user_id)->where('type', 1)->order('id desc')->find();
             // 获取当前金额
             $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
             $res = json_decode(file_get_contents($url));
             if($res->code == 200){
                 foreach($res->data as $dk=> $dv){
                     if($dk == $stock_code){
-                        if($dv < $collection_vpt){
-                            $res_array[] = $user_id;
-                            continue;
-                        }
                         $url = "http://". $kuake_ip ."/wallet/send?code=".$dk."&balance=".$dv."&from=".$user->addr."&privateKey=".$user->salt."&to=".$golden_address.'&type=2';
                         $opts = array(
                             'http'=>array(
@@ -361,6 +358,17 @@ class App extends Admin{
                         $res = json_decode(file_get_contents($url, false, $context));
                         if($res->code != 200){
                             $res_array[] = $user_id;
+                        }else{
+                            CollectLog::create([
+                                'code'=> $stock_code,
+                                'from_addr'=> $user->addr,
+                                'to_addr'=> $golden_address,
+                                'create_time'=> date("Y-m-d H:i:s", time()),
+                                'gj_status'=> 0,
+                                'money'=> $dv,
+                                'from_user_id'=> $user_id,
+                                'collect_type'=> 1
+                            ]);
                         }
                     }
                 }
@@ -402,7 +410,7 @@ class App extends Admin{
                 continue;
             }
             $user_id = $v;
-            $user = UserAddr::where('user_id', $user_id)->find();
+            $user = UserAddr::where('user_id', $user_id)->where('type', 1)->order('id desc')->find();
             //查询这个会员的币
             $url = "http://".$kuake_ip."/wallet/balance?from=".$user->addr;
             $res = json_decode(file_get_contents($url));
@@ -419,6 +427,17 @@ class App extends Admin{
                         $res = json_decode(file_get_contents($url, false, $context));
                         if($res->code != 200){
                             $res[] = $user_id;
+                        }else{
+                            CollectLog::create([
+                                'code'=> 'ETH',
+                                'from_addr'=> $user->addr,
+                                'to_addr'=> $golden_address,
+                                'create_time'=> date("Y-m-d H:i:s", time()),
+                                'gj_status'=> 0,
+                                'money'=> $dv,
+                                'from_user_id'=> $user_id,
+                                'collect_type'=> 1
+                            ]);
                         }
                     }
                 }
@@ -450,9 +469,9 @@ class App extends Admin{
         $stock_code_search = Request::instance()->param('stock_code_search', '');
         $user = new IdxUser;
         $user = $user_identity == '' ? $user : $user->where('user_id', $user_identity);
-        $list = $user->order('user_id desc')->paginate(['list_rows'=> 100, 'query'=>Request()->param()]);
+        $list = $user->order('user_id desc')->paginate(['list_rows'=> 200, 'query'=>Request()->param()]);
         foreach($list as $k=>$v){
-            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 3)->find();
+            $user_addr = UserAddr::where('user_id', $v->user_id)->where('type', 3)->order('id desc')->find();
             if(!$user_addr){
                 $url = "http://". $kuake_ip ."/tron/createAddress?userId=" . $v->user_id;
                 $opts = array(
@@ -522,7 +541,7 @@ class App extends Admin{
                 continue;
             }
             $user_id = $v;
-            $user = UserAddr::where('user_id', $user_id)->where('type', 3)->find();
+            $user = UserAddr::where('user_id', $user_id)->where('type', 3)->order('id desc')->find();
             // 获取当前金额
             $url = "http://".$kuake_ip."/tron/trcBalance?address=".$user->addr;
             $res = json_decode(file_get_contents($url));
@@ -538,6 +557,17 @@ class App extends Admin{
                     $res = json_decode(file_get_contents($url, false, $context));
                     if($res->code != 200){
                         $res_array[] = $user_id;
+                    }else{
+                        CollectLog::create([
+                            'code'=> 'USDT',
+                            'from_addr'=> $user->addr,
+                            'to_addr'=> $golden_address,
+                            'create_time'=> date("Y-m-d H:i:s", time()),
+                            'gj_status'=> 0,
+                            'money'=> $res->data,
+                            'from_user_id'=> $user_id,
+                            'collect_type'=> 1
+                        ]);
                     }
                 }
             }else{
