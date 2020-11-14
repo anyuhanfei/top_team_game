@@ -41,7 +41,7 @@ class User extends Admin{
         $user = ($level_id != '') ? $user->where('level', $level_id) : $user;
         $user = ($vip !== '') ? $user->where('vip', $vip) : $user;
         $user = ($nickname != '') ? $user->where('nickname', 'like', '%' . $nickname . '%') : $user;
-        $list = $user->order('register_time desc')->paginate(['list_rows'=> 50, 'query'=>Request()->param()]);
+        $list = $user->order('register_time desc')->paginate(['list_rows'=> $this->page_number, 'query'=>Request()->param()]);
         $this->many_assign(['list'=> $list, 'user_id'=> $user_id, 'nickname'=> $nickname, 'top_user_id'=> $top_user_id, 'level_id'=> $level_id, 'vip'=> $vip]);
         $level = SysLevel::select();
         View::assign('level', $level);
@@ -102,6 +102,10 @@ class User extends Admin{
         $user_count = IdxUserCount::find($id);
         $team = array();
         $this->team_select($team, $id);
+        $a = '';
+        foreach($team as $v){
+            $a .= $v->user_id . ',';
+        }
         View::assign('user', $user);
         View::assign('user_count', $user_count);
         View::assign('has_data', $has_data);

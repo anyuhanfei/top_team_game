@@ -32,7 +32,7 @@ class Mefund extends Index{
         if($coin_type != 'USDT' && $coin_type != 'TTP' && $coin_type != 'TTA' && $coin_type != '能量石' && $coin_type != '门票'){
             return redirect('/index/非法操作');
         }
-        $log = LogUserFund::where('coin_type', $coin_type)->where('user_id', $this->user_id)->order('id desc')->select();
+        $log = LogUserFund::where('coin_type', $coin_type)->where('user_id', $this->user_id)->whereDay('insert_time')->order('id desc')->select();
         View::assign('coin_type', $coin_type);
         View::assign('coin_amount', $this->user->userfund->$coin_type);
         View::assign('log', $log);
@@ -74,11 +74,30 @@ class Mefund extends Index{
         // View::assign('b', $z->昨日团队分红);
         // View::assign('c', $z->昨日创世节点分红);
         // return View::fetch();
-        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select();
-        $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
-        $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
-        $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
-        View::assign('log', $log);
+        // $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select();
+        // $推广收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'in', ['直推链接奖励', '间推链接奖励'])->sum('number');
+        // $团队收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', 'like', '%勋章奖励')->sum('number');
+        // $创世节点收益 = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '创世节点奖励')->sum('number');
+
+        $log = LogUserFund::field('insert_time, content, number, coin_type, fund_type')->where('user_id', $this->user_id)->where('fund_type', 'like', '%奖励')->order('id desc')->select()->toArray();
+        $list = [];
+        $推广收益 = 0;
+        $团队收益 = 0;
+        $创世节点收益 = 0;
+        foreach($log as $v){
+            if(date("Y-m-d", strtotime($v['insert_time'])) == date("Y-m-d", time() - 86400)){
+                $list[] = $v;
+            }
+            if($v['fund_type'] == '直推链接奖励' || $v['fund_type'] == '间推链接奖励'){
+                $推广收益 += $v['number'];
+            }elseif($v->fund_type == '创世节点奖励'){
+                $创世节点收益 += $v['number'];
+            }else{
+                $团队收益 += $v['number'];
+            }
+        }
+        Cache::set($this->user_id . 'log', ['log'=> $log, '推广收益'=> $推广收益, '团队收益'=> $团队收益, '创世节点收益'=> $创世节点收益], 600);
+        View::assign('log', $list);
         View::assign('tg', $推广收益);
         View::assign('td', $团队收益);
         View::assign('cs', $创世节点收益);
@@ -300,8 +319,16 @@ class Mefund extends Index{
 
     public function 矿机(){
         $cache_settings = Cache::get('settings');
-        $mills = IdxUserMill::where('user_id', $this->user_id)->order('mill_id desc')->select();
-        $mill_earnings = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->sum('number');
+        $mills = IdxUserMill::where('user_id', $this->user_id)->where('status', 0)->order('mill_id desc')->select();
+        $user_count = IdxUserCount::find($this->user_id);
+        if($user_count->矿机收益 == '0' || $user_count->矿机收益计算时间 != date("Y-m-d", time())){
+            $mill_earnings = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->sum('number');
+            $user_count->矿机收益 = $mill_earnings;
+            $user_count->矿机收益计算时间 = date("Y-m-d", time());
+            $user_count->save();
+        }else{
+            $mill_earnings = $user_count->矿机收益;
+        }
         $mill_number = 0;
         foreach($mills as &$mill){
             if($mill->status == 0){
@@ -320,7 +347,7 @@ class Mefund extends Index{
     }
 
     public function 矿机记录(){
-        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->order('id desc')->select();
+        $log = LogUserFund::where('user_id', $this->user_id)->where('fund_type', '矿机生产')->whereDay('insert_time', 'yesterday')->order('id desc')->select();
         View::assign('log', $log);
         return View::fetch();
     }
