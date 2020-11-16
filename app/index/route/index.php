@@ -83,6 +83,8 @@ Route::post('/me/兑换提交', 'index/mefund/兑换提交');
 Route::get('/me/充值', 'index/mefund/充值');
 Route::get('/me/提现', 'index/mefund/提现');
 Route::post('/me/提现提交', 'index/mefund/提现提交');
+Route::get('/me/提现记录', 'index/mefund/提现记录');
+Route::post('/me/提现撤销', 'index/mefund/提现撤销');
 Route::get('/me/转账', 'index/mefund/转账');
 Route::post('/me/转账提交', 'index/mefund/转账提交');
 Route::get('/me/转入', 'index/mefund/转入');

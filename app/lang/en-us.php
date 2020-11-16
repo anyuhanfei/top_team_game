@@ -323,8 +323,12 @@ return [
     '门票余额'=> 'Tickets for the balance',
     '当前有正在进行中的质押或手动参与, 请等待结算完毕后再次手动参与'=> 'There is a pledge in progress at present, please wait for another pledge after the settlement is completed',
     '当前有正在进行中的质押或手动参与, 请等待结算完毕后再次质押'=> 'There is a pledge in progress at present, please wait for another pledge after the settlement is completed',
-    '车房基金'=> '',
-    '累计车房基金'=> '',
-    '昨日车房基金'=> '',
-    '请选择提现方式'=> 'Please select the withdrawal method'
+    '车房基金'=> 'Garage fund',
+    '累计车房基金'=> 'Accumulated car and housing fund',
+    '昨日车房基金'=> 'Yesterday garage fund',
+    '请选择提现方式'=> 'Please select the withdrawal method',
+    '需完成今日任务后才可提现'=> "You need to complete today's task before you can withdraw money",
+    '今日已进行过卖单交易'=> '',
+    '超出成交系数'=> '',
+    
 ];

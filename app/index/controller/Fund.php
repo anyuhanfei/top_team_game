@@ -147,7 +147,7 @@ class Fund extends Base{
     }
 
     /**
-     * 每分钟执行一次
+     * 游戏关闭后计算
      */
     public static function 游戏(){
         // 所以设置在这里查
@@ -189,6 +189,19 @@ class Fund extends Base{
                 $users_data[$user->user_id]['zh'] = $user->usercount->今日直推合格;
                 $users_data[$user->user_id]['jh'] = $user->usercount->今日间推合格;
                 $users_data[$user->user_id]['th'] = $user->usercount->今日团队合格;
+                $down_users = IdxUser::field('user_id, top_id')->where('top_id', $user->user_id)->select();
+                $users_data[$user->user_id]['xth'] = 0;
+                if($down_users){
+                    $max_team_number = 0;
+                    foreach($down_users as $down_user){
+                        $down_user_今日团队合格 = IdxUserCount::where('user_id', $down_user->user_id)->value('今日团队合格');
+                        if($down_user_今日团队合格 > $max_team_number){
+                            $max_team_number = $down_user_今日团队合格;
+                        }
+                        $users_data[$user->user_id]['xth'] += $down_user_今日团队合格;
+                    }
+                    $users_data[$user->user_id]['xth'] -= $max_team_number;
+                }
                 // if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
                 //     $users_data[$user->user_id]['zjh'] = 1;
                 //     if($user->top_id != 0){
@@ -206,7 +219,7 @@ class Fund extends Base{
         self::$cache_level = Cache::get('level');
         foreach($users_data as $user_data){
             foreach(self::$cache_level as $level){
-                if($user_data['zjh'] >= 1 && $user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数']){
+                if($user_data['zjh'] >= 1 && $user_data['zh'] >= $level['直推人数'] && $user_data['th'] >= $level['团队人数'] && $user_data['xth'] >= $level['小区团队人数']){
                     $user_data['level'] = $level['level_id'];
                 }
             }
@@ -221,18 +234,19 @@ class Fund extends Base{
         return $users_data;
     }
 
-    public static function 矿机生产($user_id){
-        //矿机  一天一次
-        $user_count = IdxUserCount::find($user_id);
-        $user = IdxUser::find($user_id);
-        $user_fund = IdxUserFund::find($user_id);
-        $矿机s = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->where('user_id', $user_id)->select();
-        foreach($矿机s as $矿机){
-            if($user_count->今日我合格 == 1 && $矿机->insert_date != date("Y-m-d", time())){
-                $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user->level)->value('矿机加速') * 0.01);
+    //矿机  一天一次
+    public static function 矿机生产(){
+        $users_count = IdxUserCount::where('今日我合格', 1)->select();
+        foreach($users_count as $user_count){
+            $矿机s = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->where('user_id', $user_count->user_id)->select();
+            if(!$矿机s){
+                continue;
+            }
+            $user_fund = IdxUserFund::find($user_count->user_id);
+            foreach($矿机s as $矿机){
+                $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user_count->user->level)->value('矿机加速') * 0.01);
                 $price = $矿机->all_price < $price ? $矿机->all_price : $price;
                 $user_fund->TTP += $price;
-                $user_fund->save();
                 if($price > 0){
                     LogUserFund::create_data($矿机->user_id, $price, 'TTP', '矿机生产', '矿机生产');
                 }
@@ -254,6 +268,7 @@ class Fund extends Base{
                 }
                 $矿机->save();
             }
+            $user_fund->save();
         }
     }
 

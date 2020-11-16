@@ -227,6 +227,19 @@ class User extends Admin{
         }
     }
 
+    public function 提现系数(){
+        $user_id = Request::instance()->param('user_id', 0);
+        $number = Request::instance()->param('number', 0);
+        $user = IdxUser::find($user_id);
+        $user->提现系数 = $number;
+        $res = $user->save();
+        if($res){
+            return return_data(1, '', '修改成功', '修改会员' . $user_id . '的提现系数');
+        }else{
+            return return_data(2, '', '修改失败');
+        }
+    }
+
     /**
      * 会员登录权限设置
      *

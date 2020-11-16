@@ -84,9 +84,11 @@ class App extends Admin{
         $obj->level_name_us = Request::instance()->param('level_name_us', '');
         $obj->直推人数 = Request::instance()->param('直推人数', 0);
         $obj->团队人数 = Request::instance()->param('团队人数', 0);
+        $obj->小区团队人数 = Request::instance()->param('小区团队人数', 0);
         $obj->奖励 = Request::instance()->param('奖励', 0);
-        $obj->增加局数 = Request::instance()->param('增加局数', 0);
+        // $obj->增加局数 = Request::instance()->param('增加局数', 0);
         $obj->矿机加速 = Request::instance()->param('矿机加速', 0);
+        $obj->提现系数 = Request::instance()->param('提现系数', 0);
         $res = $obj->save();
         if($res){
             return return_data(1, '', '修改成功', '修改会员等级设置');

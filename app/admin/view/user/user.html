@@ -55,6 +55,7 @@
                                     <th scope="col" width="5%">状态</th>
                                     <th scope="col" width="5%">等级</th>
                                     <th scope="col" width="5%"></th>
+                                    <th scope="col" width="5%">提现系数</th>
                                     <th scope="col" width="8%">注册时间</th>
                                     <th scope="col"></th>
                                 </tr>
@@ -83,12 +84,14 @@
                                     <td id="login{$vo.user_id}">{$vo.is_login_text}</td>
                                     <td>{$vo.level_name}</td>
                                     <td id="lc{$vo.user_id}">{$vo.vip_text}</td>
+                                    <td id="t{$vo.user_id}">{if condition="$vo->提现系数 == 0"}无{else /}{$vo->提现系数}{/if}</td>
                                     <td>{$vo.register_time}</td>
                                     <td>
                                         <button class="btn btn-success btn-xs" onclick="team('{$vo.user_id}')">团队</button>
                                         {if condition="$vo.pan_user_id == 0"}
                                         <button class="btn btn-success btn-xs" onclick="pan('{$vo.user_id}')">子账号</button>
                                         {/if}
+                                        <button class="btn btn-success btn-xs" onclick="提现系数设置('{$vo.user_id}')">提现系数设置</button>
                                         <button class="btn btn-success btn-xs" onclick="detail('{$vo.user_id}')">详情</button>
                                         <button class="btn btn-warning btn-xs" onclick="recharge('{$vo.user_id}')">充值</button>
                                         <button class="btn btn-warning btn-xs" onclick="update('{$vo.user_id}')">编辑</button>
@@ -207,6 +210,28 @@
                     $("#tr" + id).html(' ');
                 }
             }
+        })
+    }
+
+    function 提现系数设置(user_id){
+        layer.prompt({title: '请输入提现系数(不要大于100, 输入0则表示无限制)', formType: 3}, function(pass, index){
+            layer.close(index);
+            $.ajax({
+                url: "/admin/user/提现系数",
+                type: "post",
+                data: {user_id: user_id, number: pass},
+                success: function(data){
+                    data = JSON.parse(data)
+                    if(data.code == 3){
+                        custom_notify('danger', '会员', data.msg);
+                    }else if(data.code == 2){
+                        custom_notify('warning', '会员', data.msg);
+                    }else if(data.code == 1){
+                        custom_notify('success', '会员', data.msg);
+                        $("#t" + user_id).html(pass)
+                    }
+                }
+            })
         })
     }
 

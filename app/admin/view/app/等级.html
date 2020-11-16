@@ -9,7 +9,7 @@
                     <div class="card-header">
                         <div class="card-title">等级管理</div>
                         <div class="card-sub text-warning">
-
+                            增加局数废除, 提现系数为200USDT以外的百分比可提现(无等级的提现系数在系统设置中设置)
                         </div>
                     </div>
                     <div class="card-body">
@@ -21,9 +21,11 @@
                                     <th scope="col">名称(英文)</th>
                                     <th scope="col">直推人数</th>
                                     <th scope="col">团队人数</th>
+                                    <th scope="col">小区团队人数</th>
                                     <th scope="col">奖励</th>
-                                    <th scope="col">增加局数</th>
+                                    <!-- <th scope="col">增加局数</th> -->
                                     <th scope="col">矿机加速</th>
+                                    <th scope="col">提现系数</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -35,9 +37,11 @@
                                     <td>{$vo->level_name_us}</td>
                                     <td>{$vo->直推人数}</td>
                                     <td>{$vo->团队人数}</td>
-                                    <td>{$vo->奖励}</td>
-                                    <td>{$vo->增加局数}</td>
+                                    <td>{$vo->小区团队人数}</td>
+                                    <td>{$vo->奖励}%</td>
+                                    <!-- <td>{$vo->增加局数}</td> -->
                                     <td>{$vo->矿机加速}%</td>
+                                    <td>{$vo->提现系数}%</td>
                                     <td>
                                         <button class="btn btn-warning btn-xs" onclick="update('{$vo.level_id}')">修改</button>
                                     </td>

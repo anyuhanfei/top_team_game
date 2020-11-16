@@ -14,7 +14,9 @@
                             </button>
                         </div>
                         <div class="card-sub text-warning">
-                            {$user->$user_identity}的团队会员，直推人数：{$user_count.down_team_number}，团队人数：{$user_count.team_number}
+                            {$user->$user_identity}的团队会员，直推人数：{$user_count.down_team_number}，团队人数：{$user_count.team_number}<br/>
+                            昨日直推达标人数:{$user_count->昨日直推合格}, 昨日间推达标人数:{$user_count->昨日间推合格}, 昨日团队达标人数:{$user_count->昨日团队合格}, 昨日自己达标:{if condition="$user_count->昨日我合格 == 1"}是{else /}否{/if}<br/>
+                            今日直推达标人数:{$user_count->今日直推合格}, 今日间推达标人数:{$user_count->今日间推合格}, 今日团队达标人数:{$user_count->今日团队合格}, 今日自己达标:{if condition="$user_count->今日我合格 == 1"}是{else /}否{/if}
                         </div>
                     </div>
                     <div class="card-body">

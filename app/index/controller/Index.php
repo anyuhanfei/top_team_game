@@ -45,11 +45,12 @@ class Index extends Base{
             }
             //检查自己的门票
             if($this->user->usercount->has_门票 == 1){
-                if(strtotime($this->user->usercount->门票购买_time) + (SysSetting::where('sign', '门票有效期')->value('value') * 86400) < time()){
+                if((strtotime($this->user->usercount->门票购买_time) + (SysSetting::where('sign', '门票有效期')->value('value') * 86400)) < strtotime(date("Y-m-d", time() + 86400))){
                     $usercount = IdxUserCount::find($this->user_id);
                     $usercount->has_门票 = 0;
                     $usercount->门票购买_time = "0000-00-00 00:00:00";
                     $usercount->save();
+                    $this->user = IdxUser::find($this->user_id);
                 }
             }
             //清理统计
@@ -68,7 +69,7 @@ class Index extends Base{
     }
 
     public function index(){
-        Fund::矿机生产($this->user_id);
+        // Fund::矿机生产($this->user_id);
         //轮播图
         $banners = SysAd::where('sign', 'index_banner')->select();
         view::assign('banners', $banners);
@@ -143,9 +144,13 @@ class Index extends Base{
             if($v->today_date != date("Y-m-d", time())){
                 $v->today_date = date("Y-m-d", time());
                 $user = IdxUser::find($v->user_id);
-                $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
-                $v->今日最大局数 = SysSetting::where('sign', '每日最大局数')->value('value') + $level_局数;
+                // $level_局数 = $user->level == 0 ? 0 : SysLevel::where('level_id', $user->level)->value('增加局数');
+                $v->今日最大局数 = SysSetting::where('sign', '每日最大局数')->value('value');
                 $v->今日局数 = 0;
+                $v->昨日我合格 = $v->今日我合格;
+                $v->昨日直推合格 = $v->今日直推合格;
+                $v->昨日间推合格 = $v->今日间推合格;
+                $v->昨日团队合格 = $v->今日团队合格;
                 $v->今日我合格 = 0;
                 $v->今日直推合格 = 0;
                 $v->今日间推合格 = 0;
@@ -156,7 +161,7 @@ class Index extends Base{
     }
 
     public function 游戏(){
-        Fund::矿机生产($this->user_id);
+        // Fund::矿机生产($this->user_id);
         //统计
         $user_count = IdxUserCount::find($this->user_id);
         View::assign('usercount', $user_count);

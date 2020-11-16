@@ -202,9 +202,30 @@ class Mefund extends Index{
         if(!$validate->check(['type'=> $type, 'number'=> $number, 'address'=> $address, 'level_password'=> $level_password, 'lian_type'=> $lian_type])){
             return return_data(2, '', Lang::get($validate->getError()));
         }
+        if($this->user->usercount->今日我合格 != 1){
+            return return_data(2, '', Lang::get('需完成今日任务后才可提现'));
+        }
+        // if(UserCharge::where('user_id', $this->user_id)->whereDay('create_time')->count()){
+        //     return return_data(2, '', '今日您已达到可提现次数');
+        // }
         $cache_settings = Cache::get('settings');
         if($cache_settings['提现起始'] > date("H:i", time()) || $cache_settings['提现结束'] < date("H:i", time())){
             return return_data(2, '', Lang::get('提现通道已关闭, 每日提现时间为:') . $cache_settings['提现起始'] . '-' . $cache_settings['提现结束']);
+        }
+        if($type == 'USDT'){
+            if($this->user->提现系数 != 0){
+                $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * $this->user->提现系数 * 0.01;
+            }else{
+                if($this->user->level == 0){
+                    $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * $cache_settings['卖币系数'] * 0.01;
+                }else{
+                    $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * Cache::get('level')[$this->user->level]['提现系数'] * 0.01;
+                }
+            }
+            var_dump($可提金额);exit;
+            if($number > $可提金额){
+                return return_data(2, '', '可提现金额不足, 当前可提现金额为' . $可提金额);
+            }
         }
         Db::startTrans();
         $fee = Cache::get('settings')[$type . '提现手续费'];
@@ -240,7 +261,7 @@ class Mefund extends Index{
                 'from_address'=> $withdraw_address
             ]);
         }
-        
+
         if($res_one && $res_two){
             Db::commit();
             LogUserFund::create_data($this->user_id, '-' . $number, $type, '提现', $type . '提现');
@@ -250,6 +271,46 @@ class Mefund extends Index{
             Db::rollback();
             return return_data(2, '', Lang::get('提币申请失败'));
         }
+    }
+
+    public function 提现记录(){
+        $log = UserCharge::where('charge_type', 2)->where('is_deleted', 0)->where('user_id', $this->user_id)->select();
+        View::assign('log', $log);
+        return View::fetch();
+    }
+
+    public function 提现撤销(){
+        $id = Request::instance()->param('id', 0);
+        $log = UserCharge::find($id);
+        if(!$log){
+            return return_data(2, '', '非法操作');
+        }
+        if($log->user_id != $this->user_id){
+            return return_data(2, '', '非法操作');
+        }
+        if($log->inspect_status != 0){
+            return return_data(2, '', '非法操作');
+        }
+        if($log->is_deleted != 0){
+            return return_data(2, '', '非法操作');
+        }
+        Db::startTrans();
+        $log->inspect_time = date("Y-m-d H:i:s", time());
+        $log->inspect_status = 4;
+        $res_one = $log->save();
+        $code = $log->code;
+        $user_fund = IdxUserFund::find($log->user_id);
+        $user_fund->$code += $log->balance + $log->poundage;
+        $res_two = $user_fund->save();
+        if($res_one && $res_two){
+            LogUserFund::create_data($log->user_id, $log->balance + $log->poundage, $code, '提现撤销', '提现撤销');
+            Db::commit();
+            return return_data(1, '', '提现撤销成功', '提现撤销');
+        }else{
+            Db::rollback();
+            return return_data(2, '', '提现撤销失败');
+        }
+        return return_data(1, '', '操作成功');
     }
 
     public function 转账(){

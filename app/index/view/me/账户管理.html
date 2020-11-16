@@ -35,7 +35,8 @@
 		<div class="mui-scroll">
 			{volist name="accounts" id="vo"}
 			<div class="border_bot_green account_box">
-				<div class="line_left">{$vo.nickname}</div>
+				<div class="line_left" style="width: 30%;">{$vo.nickname}</div>
+				<div class="line_left" style="margin-left: 40%;">{$vo.id}</div>
 				<label for="aa" class="flexbox_nowrap flexbox_nowrap_between">
 					<input id="aa" name="account" value="{$vo.id}" type="radio" {if condition="$vo.is_login == 1"}checked{/if}>
 					<div class="radio_box"></div>

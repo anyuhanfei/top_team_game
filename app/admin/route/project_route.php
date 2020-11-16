@@ -14,6 +14,7 @@ Route::rule('app/矿机管理', 'app/矿机管理');
 Route::rule('app/门票列表', 'app/门票列表');
 
 Route::get('user/pan/:id', 'admin/user/user_pan');
+Route::post('user/提现系数', 'admin/user/提现系数');
 
 
 Route::rule('user/log/recharge', 'admin/app/recharge_log');
