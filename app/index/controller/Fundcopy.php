@@ -36,7 +36,6 @@ class Fund extends Base{
      */
     public static function 发放奖励(){
         $users_data = self::升级();
-        // sleep(10);
         //计算今日所有奖金
         $data = SysData::find(1);
         $data->昨日推广分红 = 0;
@@ -180,27 +179,40 @@ class Fund extends Base{
         //获取全部会员
         $users = IdxUser::select();
         $users_data = [];
-        $users_obj = [];
         foreach($users as $user){
-            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'top_id'=> $user->top_id, 'zjh'=> 0, 'zh'=> 0, 'jh'=> 0, 'th'=> 0, 'level'=> 0, 'xth'=> 0, ];
-            $users_obj[$user->user_id] = $user;
+            $users_data[$user->user_id] = ['user_id'=> $user->user_id, 'zjh'=> 0, 'zh'=> 0, 'jh'=> 0, 'th'=> 0, 'level'=> 0];
         }
-        $user_counts = IdxUserCount::select();
-        $users_count = [];
-        foreach($user_counts as $user_count){
-            $users_count[$user_count->user_id] = $user_count;
-        }
-        $son_set = new FTree($users_data, 'top_id', 'user_id');
         //获取合格人数
-        $time=0;
         foreach($users as &$user){
-            $time++;
-            if($users_count[$user->user_id]->today_date == date("Y-m-d", time())){
-                $users_data[$user->user_id]['zjh'] = $users_count[$user->user_id]->今日我合格;
-                $users_data[$user->user_id]['zh'] = $users_count[$user->user_id]->今日直推合格;
-                $users_data[$user->user_id]['jh'] = $users_count[$user->user_id]->今日间推合格;
-                $users_data[$user->user_id]['th'] = $users_count[$user->user_id]->今日团队合格;
-                $users_data[$user->user_id]['xth'] = self::大小区($user->user_id, $son_set, $users_count);
+            if($user->usercount->today_date == date("Y-m-d", time())){
+                $users_data[$user->user_id]['zjh'] = $user->usercount->今日我合格;
+                $users_data[$user->user_id]['zh'] = $user->usercount->今日直推合格;
+                $users_data[$user->user_id]['jh'] = $user->usercount->今日间推合格;
+                $users_data[$user->user_id]['th'] = $user->usercount->今日团队合格;
+                $down_users = IdxUser::field('user_id, top_id')->where('top_id', $user->user_id)->select();
+                $users_data[$user->user_id]['xth'] = 0;
+                if($down_users){
+                    $max_team_number = 0;
+                    foreach($down_users as $down_user){
+                        $down_user_今日团队合格 = IdxUserCount::where('user_id', $down_user->user_id)->value('今日团队合格');
+                        if($down_user_今日团队合格 > $max_team_number){
+                            $max_team_number = $down_user_今日团队合格;
+                        }
+                        $users_data[$user->user_id]['xth'] += $down_user_今日团队合格;
+                    }
+                    $users_data[$user->user_id]['xth'] -= $max_team_number;
+                }
+                // if($user->usercount->今日局数 >= Cache::get('settings')['任务局数']){ //我合格
+                //     $users_data[$user->user_id]['zjh'] = 1;
+                //     if($user->top_id != 0){
+                //         $top_user = IdxUser::find($user->top_id);
+                //         $users_data[$user->top_id]['zh'] += 1;
+                //         $users_data[$user->top_id]['th'] += 1;
+                //         if($top_user->top_id != 0){
+                //             $users_data[$top_user->top_id]['th'] += 1;
+                //         }
+                //     }
+                // }
             }
         }
         //判断条件
@@ -212,7 +224,7 @@ class Fund extends Base{
                 }
             }
             if($user_data['level'] != 0){
-                $user = $users_obj[$user_data['user_id']];//IdxUser::find($user_data['user_id']);
+                $user = IdxUser::find($user_data['user_id']);
                 if($user->is_admin_up_level == 0){
                     $user->level = $user_data['level'];
                     $user->save();
@@ -220,23 +232,6 @@ class Fund extends Base{
             }
         }
         return $users_data;
-    }
-
-    public static function 大小区($user_id, $son_set, $users_count){
-        $son_array = $son_set->get_child($user_id);
-        $team_small_sum_number = 0;
-        if (count($son_array) > 0) {
-            $team_sum = [];
-            foreach ($son_array as $ks => $kv) {
-                $team_sum[$kv] = $users_count[$kv]->今日团队合格;
-            }
-            if (count($team_sum) > 0) {
-                $max_key = array_search(max($team_sum), $team_sum);
-                unset($team_sum[$max_key]);
-                $team_small_sum_number = array_sum($team_sum);
-            }
-        }
-        return $team_small_sum_number;
     }
 
     //矿机  一天一次
@@ -322,9 +317,29 @@ class Fund extends Base{
     }
 
     public function 测试(){
-        $log = LogUserFund::where('insert_time', 'like', '2020-11-18 04:48%')->select();
-        foreach($log as $v){
-            echo $v->user_id . ',' . $v->number . ',' . $v->fund_type . '<br/>';
+        $质押s = GameAuto::where('质押日期', '2020-11-17')->select();
+        foreach($质押s as $质押){
+            $user_count = IdxUserCount::find($质押->user_id);
+            if($user_count->今日我合格 == 1){
+                return;
+            }
+            $user_count->今日我合格 = 1;
+            $user_count->save();
+            $top_id = IdxUser::where('user_id', $质押->user_id)->value('top_id');
+            $i = 0;
+            while($top_id != 0){
+                $top_count = IdxUserCount::find($top_id);
+                if($i == 0){
+                    $top_count->今日直推合格 += 1;
+                }
+                if($i == 1){
+                    $top_count->今日间推合格 += 1;
+                }
+                $top_count->今日团队合格 += 1;
+                $top_count->save();
+                $i++;
+                $top_id = IdxUser::where('user_id', $top_id)->value('top_id');
+            }
         }
     }
 }

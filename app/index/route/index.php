@@ -5,6 +5,8 @@ Route::get('/test/批量增加会员', 'index/test/批量增加会员');
 Route::get('/test/批量质押一次', 'index/test/批量质押一次');
 Route::get('/test/批量质押到死', 'index/test/批量质押到死');
 
+Route::get('/test/测试', 'index/fund/测试');
+
 
 Route::get('/z/游戏', 'index/fund/游戏');
 Route::get('/z/发放奖励', 'index/fund/发放奖励');
