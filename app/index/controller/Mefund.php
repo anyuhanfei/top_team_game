@@ -219,7 +219,7 @@ class Mefund extends Index{
                 $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * $this->user->提现系数 * 0.01;
             }else{
                 if($this->user->level == 0){
-                    $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * $cache_settings['卖币系数'] * 0.01;
+                    $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * $cache_settings['可提现系数'] * 0.01;
                 }else{
                     $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * Cache::get('level')[$this->user->level]['提现系数'] * 0.01;
                 }
