@@ -101,7 +101,7 @@ class Deal extends Index{
                     return return_data(2, '', Lang::get('今日已进行过卖单交易'));
                 }
             }
-            if($deal->TTP > ($this->userfund->TTP * (Cache::get('settings')['卖币系数'] * 0.01))){
+            if($deal->TTP > ($this->user->userfund->TTP * (Cache::get('settings')['卖币系数'] * 0.01))){
                 return return_data(2, '', Lang::get('超出成交系数'));
             }
         }
