@@ -205,10 +205,8 @@ class Mefund extends Index{
         if($this->user->usercount->今日我合格 != 1){
             return return_data(2, '', Lang::get('需完成今日任务后才可提现'));
         }
-        if($this->user_id != 509612395 && $this->user_id != 509612395 && $this->user_id != 420882997){
-            if(UserCharge::where('user_id', $this->user_id)->whereDay('create_time')->count()){
-                return return_data(2, '', '今日您已达到可提现次数');
-            }
+        if(UserCharge::where('user_id', $this->user_id)->whereDay('create_time')->count()){
+            return return_data(2, '', '今日您已达到可提现次数');
         }
         $cache_settings = Cache::get('settings');
         if($cache_settings['提现起始'] > date("H:i", time()) || $cache_settings['提现结束'] < date("H:i", time())){
