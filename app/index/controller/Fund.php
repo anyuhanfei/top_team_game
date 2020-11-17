@@ -235,7 +235,7 @@ class Fund extends Base{
     }
 
     //矿机  一天一次
-    public static function 矿机生产(){
+    public function 矿机生产(){
         $users_count = IdxUserCount::where('今日我合格', 1)->select();
         foreach($users_count as $user_count){
             $矿机s = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->where('user_id', $user_count->user_id)->select();

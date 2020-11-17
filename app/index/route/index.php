@@ -9,6 +9,7 @@ Route::get('/test/批量质押到死', 'index/test/批量质押到死');
 Route::get('/z/游戏', 'index/fund/游戏');
 Route::get('/z/发放奖励', 'index/fund/发放奖励');
 Route::get('/z/自动参与', 'index/fund/自动参与');
+Route::get('/z/矿机生产', 'index/fund/矿机生产');
 Route::get('/z/自动质押', 'index/fund/自动质押');
 Route::post('/语言切换', 'index/base/语言切换');
 
