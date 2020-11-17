@@ -222,7 +222,6 @@ class Mefund extends Index{
                     $可提金额 = ($this->user->userfund->USDT - $cache_settings['账户不可提现部分']) * Cache::get('level')[$this->user->level]['提现系数'] * 0.01;
                 }
             }
-            var_dump($可提金额);exit;
             if($number > $可提金额){
                 return return_data(2, '', '可提现金额不足, 当前可提现金额为' . $可提金额);
             }
