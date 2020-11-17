@@ -96,7 +96,7 @@ class Deal extends Index{
             return return_data(2, '', Lang::get('不能与自己交易'));
         }
         if($deal->sell_user_id == 0){
-            if($this->user_id != 509612395 && $this->user_id != 509612395 && $this->user_id != 420882997){
+            if($this->user_id != 509612395 && $this->user_id != 787709165 && $this->user_id != 420882997){
                 if(IdxDeal::where('sell_user_id', $this->user_id)->whereDay('insert_time')->find() || IdxDeal::where('sell_user_id', $this->user_id)->whereDay('end_time')->find()){
                     return return_data(2, '', Lang::get('今日已进行过卖单交易'));
                 }
