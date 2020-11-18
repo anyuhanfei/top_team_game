@@ -239,6 +239,7 @@ class Fund extends Base{
 
     //矿机  一天一次
     public function 矿机生产(){
+        $start_time = time();
         $users_count = IdxUserCount::where('今日我合格', 1)->select();
         $users = [];
         foreach($users_count as $v){
@@ -270,6 +271,10 @@ class Fund extends Base{
             }
         }
         foreach($users as $user_id => $user){
+            $end_time = time();
+            if($end_time - $start_time >= 540){
+                return;
+            }
             $矿机s = $user['mills'];
             if(!$矿机s){
                 continue;
