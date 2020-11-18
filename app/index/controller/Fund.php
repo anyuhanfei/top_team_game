@@ -328,8 +328,13 @@ class Fund extends Base{
         foreach($users_fund as $user_fund){
             $users_fund_array[$user_fund->user_id] = $user_fund;
         }
+        $log = LogUserFund::where('fund_type', '矿机生产')->whereDay('insert_time')->select();
+        $log_array = [];
+        foreach($log as $v){
+            $log_array[$v->user_id] = $v;
+        }
         foreach($users_count as $user_count){
-            if(LogUserFund::where('user_id', $user_count->user_id)->where('fund_type', '矿机生产')->whereDay('insert_time')->find()){
+            if(!empty($log_array[$user_count->user_id])){
                 continue;
             }
             $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_count->user_id)->select();
