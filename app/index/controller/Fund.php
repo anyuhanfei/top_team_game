@@ -158,19 +158,17 @@ class Fund extends Base{
             // if($s_time + 600 < time()){
             //     break;
             // }
-            if(strtotime($auto->insert_time) + (60 * $auto->可玩局数) <= time()){
-                $money = $auto->质押USDT;
-                $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
-                $money -= 20 * $auto->未中奖局数;
-                self::矿机生成($auto->user_id, $auto->未中奖局数);
-                $user_fund = IdxUserFund::find($auto->user_id);
-                $user_fund->USDT += $money;
-                $user_fund->save();
-                LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
-                $auto->status = 1;
-                $auto->end_time = date("Y-m-d H:i:s", time());
-                $auto->save();
-            }
+            $money = $auto->质押USDT;
+            $money += $auto->中奖局数 * (self::$cache_settings['中奖打赏金额'] - self::$cache_settings['中奖支付矿工费']);
+            $money -= 20 * $auto->未中奖局数;
+            self::矿机生成($auto->user_id, $auto->未中奖局数);
+            $user_fund = IdxUserFund::find($auto->user_id);
+            $user_fund->USDT += $money;
+            $user_fund->save();
+            LogUserFund::create_data($auto->user_id, $money, 'USDT', '质押USDT结算', '质押USDT结算');
+            $auto->status = 1;
+            $auto->end_time = date("Y-m-d H:i:s", time());
+            $auto->save();
         }
     }
 
@@ -200,7 +198,7 @@ class Fund extends Base{
                 $users_data[$user->user_id]['zh'] = $users_count[$user->user_id]->今日直推合格;
                 $users_data[$user->user_id]['jh'] = $users_count[$user->user_id]->今日间推合格;
                 $users_data[$user->user_id]['th'] = $users_count[$user->user_id]->今日团队合格;
-                $users_data[$user->user_id]['xth'] = self::大小区($user->user_id, $son_set, $users_count);
+                $users_data[$user->user_id]['xth'] = $users_count[$user->user_id]->今日团队合格 >= 100 ? self::大小区($user->user_id, $son_set, $users_count) : -1;
             }
         }
         //判断条件
@@ -228,7 +226,7 @@ class Fund extends Base{
         if (count($son_array) > 0) {
             $team_sum = [];
             foreach ($son_array as $ks => $kv) {
-                $team_sum[$kv] = $users_count[$kv]->今日团队合格;
+                $team_sum[] = $users_count[$kv]->今日团队合格;
             }
             if (count($team_sum) > 0) {
                 $max_key = array_search(max($team_sum), $team_sum);
@@ -242,19 +240,46 @@ class Fund extends Base{
     //矿机  一天一次
     public function 矿机生产(){
         $users_count = IdxUserCount::where('今日我合格', 1)->select();
-        foreach($users_count as $user_count){
-            $矿机s = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->where('user_id', $user_count->user_id)->select();
+        $users = [];
+        foreach($users_count as $v){
+            $users[$v->user_id] = ['user_count'=> $v, 'user_fund'=> null, 'level'=> 0, '矿机加速'=> 0, 'mills'=> []];
+        }
+        $收益周期 = SysSetting::where('sign', '收益周期')->value('value');
+        $users_fund = IdxUserfund::select();
+        foreach($users_fund as $v){
+            if(!empty($users[$v->user_id])){
+                $users[$v->user_id]['user_fund'] = $v;
+            }
+        }
+        $sys_level = SysLevel::select();
+        $sys_level_array = [];
+        foreach($sys_level as $v){
+            $sys_level_array[$v->level_id] = $v;
+        }
+        $users_user = IdxUser::select();
+        foreach($users_user as $v){
+            if(!empty($users[$v->user_id])){
+                $users[$v->user_id]['level'] = $v->level;
+                $users[$v->user_id]['矿机加速'] = $v->level == 0 ? 0 : $sys_level_array[$v->level]->矿机加速;
+            }
+        }
+        $mills = IdxUserMill::where('status', 0)->where('insert_date', '<>' ,date("Y-m-d", time()))->select();
+        foreach($mills as $mill){
+            if(!empty($users[$mill->user_id])){
+                $users[$mill->user_id]['mills'][] = $mill;
+            }
+        }
+        foreach($users as $user_id => $user){
+            $矿机s = $user['mills'];
             if(!$矿机s){
                 continue;
             }
-            $user_fund = IdxUserFund::find($user_count->user_id);
+            $user_fund = $user['user_fund'];
+            $price = 0;
+            $矿机加速 = $user['矿机加速'];
             foreach($矿机s as $矿机){
-                $price = $矿机->price + ($矿机->price * SysLevel::where('level_id', $user_count->user->level)->value('矿机加速') * 0.01);
-                $price = $矿机->all_price < $price ? $矿机->all_price : $price;
-                $user_fund->TTP += $price;
-                if($price > 0){
-                    LogUserFund::create_data($矿机->user_id, $price, 'TTP', '矿机生产', '矿机生产');
-                }
+                $temp_price = $矿机->price + ($矿机->price * $矿机加速 * 0.01);
+                $price += $矿机->all_price < $temp_price ? $矿机->all_price : $temp_price;
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", time());
                 $矿机->all_price -= $price;
@@ -263,15 +288,19 @@ class Fund extends Base{
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
                 $矿机->当前周期 += 1;
-                if($矿机->当前周期 >= SysSetting::where('sign', '收益周期')->value('value')){
+                if($矿机->当前周期 >= $收益周期){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
-                if(strtotime(date('Y-m-d', strtotime($矿机->insert_time))) + (SysSetting::where('sign', '收益周期')->value('value') * 24 * 60 * 60) < strtotime(date("Y-m-d", time()))){
+                if(strtotime(date('Y-m-d', strtotime($矿机->insert_time))) + ($收益周期 * 24 * 60 * 60) < strtotime(date("Y-m-d", time()))){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
                 }
                 $矿机->save();
+            }
+            $user_fund->TTP += $price;
+            if($price > 0){
+                LogUserFund::create_data($user_id, $price, 'TTP', '矿机生产', '矿机生产');
             }
             $user_fund->save();
         }
