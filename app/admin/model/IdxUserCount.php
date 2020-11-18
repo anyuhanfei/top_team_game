@@ -19,7 +19,7 @@ class IdxUserCount extends Model{
      */
     public function user(){
         $Base = new Base();
-        return $this->hasOne('idx_user', 'user_id', 'user_id')->field($Base->user_fund_type);
+        return $this->hasOne('idx_user', 'user_id', 'user_id');
     }
 
     /**

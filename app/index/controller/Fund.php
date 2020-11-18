@@ -322,9 +322,27 @@ class Fund extends Base{
     }
 
     public function 测试(){
-        $log = LogUserFund::where('insert_time', 'like', '2020-11-18 04:48%')->select();
-        foreach($log as $v){
-            echo $v->user_id . ',' . $v->number . ',' . $v->fund_type . '<br/>';
+        $users_count = IdxUserCount::where('昨日我合格', 1)->select();
+        $users_fund = IdxUserFund::select();
+        $users_fund_array = [];
+        foreach($users_fund as $user_fund){
+            $users_fund_array[$user_fund->user_id] = $user_fund;
+        }
+        foreach($users_count as $user_count){
+            if(LogUserFund::where('user_id', $user_count->user_id)->where('fund_type', '矿机生产')->whereDay('insert_time')->find()){
+                continue;
+            }
+            $矿机s = IdxUserMill::where('status', 0)->where('user_id', $user_count->user_id)->select();
+            if(!$矿机s){
+                continue;
+            }
+            $price = 0;
+            foreach($矿机s as $矿机){
+                $price += $矿机->price;
+            }
+            $users_fund_array[$user_count->user_id]->TTP += $price;
+            $users_fund_array[$user_count->user_id]->save();
+            LogUserFund::create_data($user_count->user_id, $price, 'TTP', '矿机生产', '矿机生产');
         }
     }
 }
