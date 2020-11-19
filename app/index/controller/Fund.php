@@ -284,10 +284,11 @@ class Fund extends Base{
             $矿机加速 = $user['矿机加速'];
             foreach($矿机s as $矿机){
                 $temp_price = $矿机->price + ($矿机->price * $矿机加速 * 0.01);
-                $price += $矿机->all_price < $temp_price ? $矿机->all_price : $temp_price;
+                $temp_price = $矿机->all_price < $temp_price ? $矿机->all_price : $temp_price;
+                $price += $temp_price;
                 //更新矿机
                 $矿机->insert_date = date("Y-m-d", time());
-                $矿机->all_price -= $price;
+                $矿机->all_price -= $temp_price;
                 if($矿机->all_price <= 0){
                     $矿机->status = 1;
                     $矿机->end_time = date("Y-m-d", strtotime($矿机->insert_date));
